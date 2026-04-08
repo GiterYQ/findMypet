@@ -1,0 +1,152 @@
+/// Prisma schema
+/// 作用：定义 findMypet 首版的数据库结构、状态机枚举和审计表。
+/// 联动：lib/notice/notice.types.ts、lib/notice/notice.schema.ts、lib/notice/notice.service.ts。
+/// 层级：schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum BusinessStatus {
+  ACTIVE
+  RECOVERED
+  CLOSED
+}
+
+enum ActivityState {
+  FRESH
+  STALE
+  ARCHIVED
+}
+
+enum Locale {
+  zh_CN
+  en_US
+}
+
+enum ModerationState {
+  VISIBLE
+  DOWNRANKED
+  HIDDEN
+}
+
+enum LocationPrivacy {
+  APPROXIMATE
+  EXACT
+}
+
+enum ReportReason {
+  SCAM
+  IMAGE_VIOLATION
+  IRRELEVANT
+  OTHER
+}
+
+enum EmailPurpose {
+  MANAGE_LINK
+  REMINDER
+}
+
+enum EmailDeliveryStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+enum NoticeAuditAction {
+  CREATE
+  EDIT
+  REFRESH
+  STATUS_CHANGE
+  REOPEN
+  AUTO_ARCHIVE
+  MODERATION_DOWNRANK
+  MODERATION_HIDE
+  DELETE
+}
+
+model PetNotice {
+  id                     String           @id @default(uuid())
+  shortId                String           @unique
+  locale                 Locale           @default(zh_CN)
+
+  businessStatus         BusinessStatus   @default(ACTIVE)
+  activityState          ActivityState    @default(FRESH)
+  moderationState        ModerationState  @default(VISIBLE)
+
+  petProfile             Json
+  lostInfo               Json
+  contactMethods         Json
+  rewards                Json?
+  photos                 Json
+  riskFlags              Json?
+
+  lostAtStart            DateTime?
+  regionCode             String?
+  locationPrivacy        LocationPrivacy?
+  primaryPhotoUrl        String?
+  priorityScore          Int              @default(0)
+  riskLevel              Int              @default(0)
+
+  ownerTokenHash         String
+  ownerNotificationEmail String?
+
+  posterVersion          Int              @default(1)
+  schemaVersion          Int              @default(1)
+
+  reportCount            Int              @default(0)
+  lastReportedAt         DateTime?
+
+  createdAt              DateTime         @default(now())
+  updatedAt              DateTime         @default(now())
+  lastRefreshedAt        DateTime         @default(now())
+  recoveredAt            DateTime?
+  closedAt               DateTime?
+  archivedAt             DateTime?
+  reopenedAt             DateTime?
+  deletedAt              DateTime?
+
+  reports                NoticeReport[]
+  emailLogs              NoticeEmailLog[]
+  statusAudits           NoticeStatusAudit[]
+}
+
+model NoticeReport {
+  id        String       @id @default(uuid())
+  noticeId  String
+  reason    ReportReason
+  createdAt DateTime     @default(now())
+
+  notice    PetNotice    @relation(fields: [noticeId], references: [id], onDelete: Cascade)
+}
+
+model NoticeEmailLog {
+  id         String              @id @default(uuid())
+  noticeId   String
+  email      String
+  purpose    EmailPurpose
+  status     EmailDeliveryStatus @default(PENDING)
+  providerId String?
+  createdAt  DateTime            @default(now())
+
+  notice     PetNotice           @relation(fields: [noticeId], references: [id], onDelete: Cascade)
+}
+
+model NoticeStatusAudit {
+  id           String          @id @default(uuid())
+  noticeId     String
+  fromBusiness BusinessStatus?
+  toBusiness   BusinessStatus?
+  fromActivity ActivityState?
+  toActivity   ActivityState?
+  action       NoticeAuditAction
+  createdAt    DateTime        @default(now())
+
+  notice       PetNotice       @relation(fields: [noticeId], references: [id], onDelete: Cascade)
+}
+
