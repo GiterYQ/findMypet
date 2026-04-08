@@ -115,3 +115,8 @@ export type AdminNoticePayload = PublicNoticePayload & {
   archivedAt?: string | null;
   reopenedAt?: string | null;
 };
+
+export type NoticeListFilters = {
+  regionCode?: string;
+  petType?: PetProfile["type"];
+};

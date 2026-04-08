@@ -5,12 +5,23 @@
  * 层级：page
  */
 import { NoticeCard } from "@/components/notice/NoticeCard";
+import { NoticeFilters } from "@/components/notice/NoticeFilters";
 import { NoticeForm } from "@/components/notice/NoticeForm";
 import { noticeService } from "@/lib/notice/notice.service";
 import { t } from "@/lib/i18n/t";
 
-export default async function HomePage() {
-  const notices = await noticeService.listVisibleNotices();
+type HomePageProps = {
+  searchParams: Promise<{ regionCode?: string; petType?: string }>;
+};
+
+export default async function HomePage({ searchParams }: HomePageProps) {
+  const params = await searchParams;
+  const regionCode = params.regionCode?.trim() || undefined;
+  const petType = params.petType && ["cat", "dog", "bird", "other"].includes(params.petType) ? (params.petType as "cat" | "dog" | "bird" | "other") : undefined;
+  const [notices, filterOptions] = await Promise.all([
+    noticeService.listVisibleNoticesWithFilters({ regionCode, petType }),
+    noticeService.listVisibleFilterOptions()
+  ]);
 
   return (
     <main className="shell">
@@ -20,6 +31,10 @@ export default async function HomePage() {
       </section>
 
       <NoticeForm />
+
+      <section className="section" style={{ paddingLeft: 0, paddingRight: 0 }}>
+        <NoticeFilters regionOptions={filterOptions.regionOptions} selectedPetType={petType} selectedRegionCode={regionCode} />
+      </section>
 
       <section className="section" style={{ paddingLeft: 0, paddingRight: 0 }}>
         <div className="actions" style={{ justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
@@ -36,4 +51,3 @@ export default async function HomePage() {
     </main>
   );
 }
-

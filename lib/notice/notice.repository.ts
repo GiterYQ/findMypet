@@ -14,16 +14,17 @@ export const noticeRepository = {
   findByShortId(shortId: string) {
     return prisma.petNotice.findUnique({ where: { shortId } });
   },
-  findVisibleFreshList() {
+  findVisibleFreshList(regionCode?: string) {
     return prisma.petNotice.findMany({
       where: {
         moderationState: "VISIBLE",
         businessStatus: "ACTIVE",
         activityState: "FRESH",
-        deletedAt: null
+        deletedAt: null,
+        ...(regionCode ? { regionCode } : {})
       },
       orderBy: [{ priorityScore: "desc" }, { lastRefreshedAt: "desc" }],
-      take: 24
+      take: 100
     });
   },
   updateByShortId(shortId: string, data: Prisma.PetNoticeUpdateInput) {

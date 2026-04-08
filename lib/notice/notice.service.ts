@@ -12,7 +12,7 @@ import { ARCHIVE_WINDOW_HOURS, FRESH_WINDOW_HOURS, REFRESH_COOLDOWN_HOURS, riskW
 import { toAdminNoticePayload, toPublicNoticePayload } from "@/lib/notice/notice.mapper";
 import { noticeRepository } from "@/lib/notice/notice.repository";
 import { noticeCreateSchema, noticeUpdateSchema, statusUpdateSchema, type NoticeCreateInput, type NoticeUpdateInput } from "@/lib/notice/notice.schema";
-import { type RiskFlags } from "@/lib/notice/notice.types";
+import { type NoticeListFilters, type RiskFlags } from "@/lib/notice/notice.types";
 import { type ActivityState, type BusinessStatus, type PetNotice } from "@prisma/client";
 
 function hashToken(rawToken: string) {
@@ -158,6 +158,26 @@ export const noticeService = {
   async listVisibleNotices() {
     const notices = await noticeRepository.findVisibleFreshList();
     return notices.map(toPublicNoticePayload);
+  },
+
+  async listVisibleNoticesWithFilters(filters: NoticeListFilters = {}) {
+    const notices = await noticeRepository.findVisibleFreshList(filters.regionCode);
+    const mapped = notices.map(toPublicNoticePayload);
+
+    if (!filters.petType) {
+      return mapped;
+    }
+
+    return mapped.filter((notice) => notice.petProfile.type === filters.petType);
+  },
+
+  async listVisibleFilterOptions() {
+    const notices = await noticeRepository.findVisibleFreshList();
+    const regionOptions = Array.from(new Set(notices.map((notice) => notice.regionCode).filter((value): value is string => Boolean(value)))).sort();
+
+    return {
+      regionOptions
+    };
   },
 
   async getNoticeByShortId(shortId: string, manageToken?: string) {

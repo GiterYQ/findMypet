@@ -8,8 +8,12 @@ import { NextResponse } from "next/server";
 import { AppError } from "@/lib/core/app-error";
 import { noticeService } from "@/lib/notice/notice.service";
 
-export async function GET() {
-  const notices = await noticeService.listVisibleNotices();
+export async function GET(request: Request) {
+  const url = new URL(request.url);
+  const regionCode = url.searchParams.get("regionCode") ?? undefined;
+  const petTypeParam = url.searchParams.get("petType") ?? undefined;
+  const petType = petTypeParam && ["cat", "dog", "bird", "other"].includes(petTypeParam) ? (petTypeParam as "cat" | "dog" | "bird" | "other") : undefined;
+  const notices = await noticeService.listVisibleNoticesWithFilters({ regionCode, petType });
   return NextResponse.json({ items: notices });
 }
 
@@ -31,4 +35,3 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: { code: "UNKNOWN", message: "Unexpected error." } }, { status: 500 });
   }
 }
-
