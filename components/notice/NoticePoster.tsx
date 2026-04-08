@@ -9,14 +9,16 @@ import { type PublicNoticePayload } from "@/lib/notice/notice.types";
 
 type NoticePosterProps = {
   notice: PublicNoticePayload;
+  id?: string;
+  className?: string;
 };
 
-export function NoticePoster({ notice }: NoticePosterProps) {
+export function NoticePoster({ notice, id, className }: NoticePosterProps) {
   const riskTags = getRiskFlagLabels(notice.riskFlags);
   const primaryContact = notice.contactMethods.find((item) => item.isPrimary) ?? notice.contactMethods[0];
 
   return (
-    <article className="poster-shell">
+    <article className={className ? `poster-shell ${className}` : "poster-shell"} id={id}>
       <header className="poster-header">
         <div>
           <div className="poster-kicker">{getBusinessStatusLabel(notice.businessStatus)}</div>
@@ -96,4 +98,3 @@ export function NoticePoster({ notice }: NoticePosterProps) {
     </article>
   );
 }
-

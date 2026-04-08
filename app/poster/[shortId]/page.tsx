@@ -18,16 +18,17 @@ export default async function PosterPage({ params }: PageProps) {
   const { shortId } = await params;
   const result = await noticeService.getNoticeByShortId(shortId);
   const notice = result.data as PublicNoticePayload;
+  const posterElementId = `notice-poster-${shortId}`;
 
   return (
     <main className="shell">
       <section className="hero">
         <h1>寻宠海报</h1>
-        <p>这是首版可打印海报页。可以直接打印，或在系统打印面板中保存为 PDF。</p>
+        <p>这是首版海报成品页。可以下载 PNG，也可以直接打印或保存为 PDF。</p>
       </section>
 
-      <PosterActions />
-      <NoticePoster notice={notice} />
+      <PosterActions downloadFileName={`findMypet-${shortId}.png`} targetId={posterElementId} />
+      <NoticePoster className="poster-capture" id={posterElementId} notice={notice} />
 
       <div className="actions" style={{ marginTop: 20 }}>
         <Link className="button button-secondary" href={`/notice/${shortId}`}>
@@ -37,4 +38,3 @@ export default async function PosterPage({ params }: PageProps) {
     </main>
   );
 }
-
