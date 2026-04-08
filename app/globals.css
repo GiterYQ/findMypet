@@ -1,0 +1,244 @@
+/**
+ * globals.css
+ * 作用：提供首版全局视觉变量、布局基础和移动端优先样式。
+ * 联动：app/layout.tsx、所有页面组件。
+ * 层级：style
+ */
+:root {
+  --bg: #f6f3ec;
+  --panel: rgba(255, 252, 247, 0.92);
+  --line: #d7cec0;
+  --text: #1d1a17;
+  --muted: #61574b;
+  --accent: #d35e38;
+  --accent-dark: #9f3c1c;
+  --success: #1d7d48;
+  --warning: #9f4d19;
+  --shadow: 0 22px 60px rgba(42, 32, 18, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+  background:
+    radial-gradient(circle at top left, rgba(211, 94, 56, 0.12), transparent 28%),
+    radial-gradient(circle at top right, rgba(157, 120, 67, 0.12), transparent 24%),
+    var(--bg);
+}
+
+body {
+  margin: 0;
+  color: var(--text);
+  font-family: "Avenir Next", "PingFang SC", "Noto Sans", sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+.shell {
+  width: min(1100px, calc(100% - 32px));
+  margin: 0 auto;
+}
+
+.hero {
+  padding: 56px 0 24px;
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3.75rem);
+  line-height: 1;
+}
+
+.hero p {
+  max-width: 640px;
+  color: var(--muted);
+  font-size: 1.05rem;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid rgba(215, 206, 192, 0.75);
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(10px);
+}
+
+.grid {
+  display: grid;
+  gap: 20px;
+}
+
+.two-col {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.section {
+  padding: 20px;
+}
+
+.section h2,
+.section h3 {
+  margin-top: 0;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.field label {
+  font-weight: 700;
+}
+
+.field input,
+.field select,
+.field textarea {
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.82);
+  border-radius: 14px;
+  padding: 12px 14px;
+}
+
+.field textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 18px;
+  border-radius: 999px;
+  border: 0;
+  cursor: pointer;
+  transition: transform 160ms ease, opacity 160ms ease;
+}
+
+.button:hover {
+  transform: translateY(-1px);
+}
+
+.button-primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  color: #fff;
+}
+
+.button-secondary {
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--text);
+  border: 1px solid var(--line);
+}
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag {
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(211, 94, 56, 0.12);
+  color: var(--accent-dark);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.notice-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
+}
+
+.notice-card {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+}
+
+.notice-photo {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 18px;
+  object-fit: cover;
+  background: linear-gradient(135deg, rgba(211, 94, 56, 0.18), rgba(110, 90, 60, 0.16));
+}
+
+.meta {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-weight: 700;
+  width: fit-content;
+}
+
+.status-active {
+  background: rgba(29, 125, 72, 0.12);
+  color: var(--success);
+}
+
+.status-recovered {
+  background: rgba(31, 93, 162, 0.12);
+  color: #215ca0;
+}
+
+.status-closed {
+  background: rgba(120, 106, 87, 0.16);
+  color: #5a4f43;
+}
+
+.hint {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.danger-box {
+  border: 1px solid rgba(159, 77, 25, 0.2);
+  background: rgba(159, 77, 25, 0.08);
+  color: var(--warning);
+  border-radius: 16px;
+  padding: 16px;
+}
+
+.mono {
+  font-family: "SF Mono", "Menlo", monospace;
+}
+
+@media (max-width: 760px) {
+  .two-col {
+    grid-template-columns: 1fr;
+  }
+
+  .hero {
+    padding-top: 36px;
+  }
+}
+
