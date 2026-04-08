@@ -7,6 +7,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 type ManageConsoleProps = {
   shortId: string;
@@ -25,6 +26,7 @@ export function ManageConsole({
   publicShareUrl,
   manageUrl
 }: ManageConsoleProps) {
+  const router = useRouter();
   const [message, setMessage] = useState<string | null>(null);
   const [pendingAction, setPendingAction] = useState<string | null>(null);
 
@@ -54,7 +56,8 @@ export function ManageConsole({
         throw new Error(data.error?.message ?? "Action failed.");
       }
 
-      setMessage("操作已完成，刷新页面后可看到最新状态。");
+      setMessage("操作已完成，页面将刷新为最新状态。");
+      router.refresh();
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "操作失败。");
     } finally {
@@ -70,6 +73,7 @@ export function ManageConsole({
       <p>
         当前状态：{businessStatus} / {activityState}
       </p>
+      <p className="hint">刷新活跃度只更新最近活跃时间；状态变更和重开会更新版本与业务状态。</p>
       <div className="actions">
         <button className="button button-secondary" disabled={pendingAction !== null || businessStatus !== "active"} onClick={() => runAction("refresh")} type="button">
           刷新活跃度

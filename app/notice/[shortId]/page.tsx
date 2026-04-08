@@ -5,6 +5,7 @@
  * 层级：page
  */
 import Link from "next/link";
+import { NoticeReportForm } from "@/components/notice/NoticeReportForm";
 import { noticeService } from "@/lib/notice/notice.service";
 
 type PageProps = {
@@ -41,9 +42,10 @@ export default async function NoticeSharePage({ params }: PageProps) {
           <pre className="mono" style={{ whiteSpace: "pre-wrap" }}>
             {JSON.stringify(notice.contactMethods, null, 2)}
           </pre>
+          <NoticeReportForm shortId={shortId} />
           <div className="actions">
-            <Link className="button button-secondary" href={`/api/notices/${shortId}/report`}>
-              举报入口（API）
+            <Link className="button button-secondary" href="/">
+              返回首页
             </Link>
           </div>
         </section>
@@ -51,4 +53,3 @@ export default async function NoticeSharePage({ params }: PageProps) {
     </main>
   );
 }
-
