@@ -5,8 +5,10 @@
  * 层级：page
  */
 import Link from "next/link";
+import { LocationLinkCard } from "@/components/notice/LocationLinkCard";
 import { NoticeReportForm } from "@/components/notice/NoticeReportForm";
 import { noticeService } from "@/lib/notice/notice.service";
+import { type PublicNoticePayload } from "@/lib/notice/notice.types";
 
 type PageProps = {
   params: Promise<{ shortId: string }>;
@@ -15,7 +17,8 @@ type PageProps = {
 export default async function NoticeSharePage({ params }: PageProps) {
   const { shortId } = await params;
   const result = await noticeService.getNoticeByShortId(shortId);
-  const notice = result.data;
+  const notice = result.data as PublicNoticePayload;
+  const location = notice.lostInfo.location;
 
   return (
     <main className="shell">
@@ -32,8 +35,8 @@ export default async function NoticeSharePage({ params }: PageProps) {
           <p className="mono">ID: {notice.shortId}</p>
           <p>更新时间：{new Date(notice.updatedAt).toLocaleString()}</p>
           <p>最近活跃：{new Date(notice.lastRefreshedAt).toLocaleString()}</p>
-          <p>地点：{String((notice.lostInfo as { location: { addressText: string } }).location.addressText)}</p>
-          <p>丢失时间：{String((notice.lostInfo as { lostTime: { displayText?: string } }).lostTime.displayText ?? "待补充")}</p>
+          <p>地点：{location.addressText}</p>
+          <p>丢失时间：{notice.lostInfo.lostTime.displayText ?? "待补充"}</p>
           <div className="danger-box">防骗提示：未核实前，请勿提前支付任何费用。</div>
         </section>
 
@@ -50,6 +53,10 @@ export default async function NoticeSharePage({ params }: PageProps) {
           </div>
         </section>
       </div>
+
+      <section style={{ marginTop: 20 }}>
+        <LocationLinkCard location={location} />
+      </section>
     </main>
   );
 }

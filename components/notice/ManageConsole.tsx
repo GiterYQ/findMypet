@@ -8,6 +8,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { LocationLinkCard } from "@/components/notice/LocationLinkCard";
+import { type PetLocation } from "@/lib/notice/notice.types";
 
 type ManageConsoleProps = {
   shortId: string;
@@ -16,6 +18,7 @@ type ManageConsoleProps = {
   activityState: "fresh" | "stale" | "archived";
   publicShareUrl: string;
   manageUrl: string;
+  location: PetLocation;
 };
 
 export function ManageConsole({
@@ -24,7 +27,8 @@ export function ManageConsole({
   businessStatus,
   activityState,
   publicShareUrl,
-  manageUrl
+  manageUrl,
+  location
 }: ManageConsoleProps) {
   const router = useRouter();
   const [message, setMessage] = useState<string | null>(null);
@@ -89,6 +93,9 @@ export function ManageConsole({
         </button>
       </div>
       {message ? <p className="hint">{message}</p> : null}
+      <div style={{ marginTop: 16 }}>
+        <LocationLinkCard location={location} />
+      </div>
     </div>
   );
 }

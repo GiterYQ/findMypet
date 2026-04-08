@@ -44,6 +44,7 @@ export default async function ManagePage({ params, searchParams }: PageProps) {
         <ManageConsole
           activityState={notice.activityState}
           businessStatus={notice.businessStatus}
+          location={notice.lostInfo.location}
           manageToken={token ?? ""}
           manageUrl={manageUrl}
           publicShareUrl={publicShareUrl}
