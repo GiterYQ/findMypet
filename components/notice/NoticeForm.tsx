@@ -6,13 +6,15 @@
  */
 "use client";
 
-import { useState } from "react";
+import { type ChangeEvent, useState } from "react";
+import { compressImageFile } from "@/lib/media/client-image";
+import { type NoticeCreateInput } from "@/lib/notice/notice.schema";
 
 type NoticeFormProps = {
-  initialValue?: Record<string, unknown>;
+  initialValue?: Partial<NoticeCreateInput>;
 };
 
-const defaultNotice = {
+const defaultNotice: NoticeCreateInput = {
   locale: "zh-CN",
   petProfile: {
     name: "",
@@ -67,7 +69,7 @@ const defaultNotice = {
   },
   photos: [
     {
-      url: "https://images.unsplash.com/photo-1511044568932-338cba0ad803?auto=format&fit=crop&w=900&q=80",
+      url: "",
       isPrimary: true
     }
   ],
@@ -98,10 +100,35 @@ const riskOptions = [
 ] as const;
 
 export function NoticeForm({ initialValue }: NoticeFormProps) {
-  const [payload, setPayload] = useState(() => ({ ...defaultNotice, ...initialValue }));
+  const [payload, setPayload] = useState<NoticeCreateInput>(() => ({ ...defaultNotice, ...initialValue }));
   const [result, setResult] = useState<{ publicShareUrl: string; manageUrl: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  const [uploadingImages, setUploadingImages] = useState(false);
+
+  async function handleImageChange(event: ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(event.target.files ?? []).slice(0, 3);
+
+    if (files.length === 0) {
+      return;
+    }
+
+    setUploadingImages(true);
+    setError(null);
+
+    try {
+      const compressedPhotos = await Promise.all(files.map((file, index) => compressImageFile(file, index === 0)));
+      setPayload((current) => ({
+        ...current,
+        photos: compressedPhotos
+      }));
+    } catch (uploadError) {
+      setError(uploadError instanceof Error ? uploadError.message : "图片处理失败。");
+    } finally {
+      setUploadingImages(false);
+      event.target.value = "";
+    }
+  }
 
   async function handleSubmit() {
     setPending(true);
@@ -167,7 +194,7 @@ export function NoticeForm({ initialValue }: NoticeFormProps) {
                     ...current,
                     petProfile: {
                       ...current.petProfile,
-                      type: event.target.value
+                      type: event.target.value as NoticeCreateInput["petProfile"]["type"]
                     }
                   }))
                 }
@@ -180,23 +207,41 @@ export function NoticeForm({ initialValue }: NoticeFormProps) {
             </div>
 
             <div className="field">
-              <label htmlFor="photoUrl">主图 URL</label>
-              <input
-                id="photoUrl"
-                value={String(payload.photos[0].url)}
-                onChange={(event) =>
-                  setPayload((current) => ({
-                    ...current,
-                    photos: [
-                      {
-                        ...current.photos[0],
-                        url: event.target.value,
-                        isPrimary: true
-                      }
-                    ]
-                  }))
-                }
-              />
+              <label htmlFor="photoUpload">宠物照片</label>
+              <input accept="image/*" id="photoUpload" multiple onChange={handleImageChange} type="file" />
+              <div className="hint">支持最多 3 张图片，浏览器会先压缩后再提交。</div>
+              <div className="tag-list">
+                {payload.photos.filter((photo) => photo.url).map((photo, index) => (
+                  <button
+                    className={`button ${photo.isPrimary ? "button-primary" : "button-secondary"}`}
+                    key={`${photo.url}-${index}`}
+                    onClick={() =>
+                      setPayload((current) => ({
+                        ...current,
+                        photos: current.photos.map((item, itemIndex) => ({
+                          ...item,
+                          isPrimary: itemIndex === index
+                        }))
+                      }))
+                    }
+                    type="button"
+                  >
+                    {photo.isPrimary ? `主图 ${index + 1}` : `设为主图 ${index + 1}`}
+                  </button>
+                ))}
+              </div>
+              <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", marginTop: 12 }}>
+                {payload.photos.filter((photo) => photo.url).map((photo, index) => (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    alt={`宠物照片 ${index + 1}`}
+                    className="notice-photo"
+                    key={`${photo.url}-preview-${index}`}
+                    src={photo.url}
+                    style={{ aspectRatio: "1 / 1", minHeight: 120 }}
+                  />
+                ))}
+              </div>
             </div>
 
             <div className="field">
@@ -299,14 +344,14 @@ export function NoticeForm({ initialValue }: NoticeFormProps) {
               <input
                 id="rewardRecovery"
                 type="number"
-                value={Number(payload.rewards.recovery.amountMinor)}
+                value={Number(payload.rewards?.recovery?.amountMinor ?? 0)}
                 onChange={(event) =>
                   setPayload((current) => ({
                     ...current,
                     rewards: {
                       ...current.rewards,
                       recovery: {
-                        ...current.rewards.recovery,
+                        ...current.rewards?.recovery,
                         enabled: Number(event.target.value) > 0,
                         amountMinor: Number(event.target.value)
                       }
@@ -321,14 +366,14 @@ export function NoticeForm({ initialValue }: NoticeFormProps) {
               <div className="tag-list">
                 {riskOptions.map((risk) => (
                   <button
-                    className={`button ${payload.riskFlags[risk.key] ? "button-primary" : "button-secondary"}`}
+                    className={`button ${payload.riskFlags?.[risk.key] ? "button-primary" : "button-secondary"}`}
                     key={risk.key}
                     onClick={() =>
                       setPayload((current) => ({
                         ...current,
                         riskFlags: {
                           ...current.riskFlags,
-                          [risk.key]: !current.riskFlags[risk.key]
+                          [risk.key]: !current.riskFlags?.[risk.key]
                         }
                       }))
                     }
@@ -347,8 +392,8 @@ export function NoticeForm({ initialValue }: NoticeFormProps) {
         </div>
 
         <div className="actions" style={{ marginTop: 20 }}>
-          <button className="button button-primary" disabled={pending} onClick={handleSubmit} type="button">
-            {pending ? "生成中..." : "生成海报与分享页"}
+          <button className="button button-primary" disabled={pending || uploadingImages} onClick={handleSubmit} type="button">
+            {uploadingImages ? "图片处理中..." : pending ? "生成中..." : "生成海报与分享页"}
           </button>
         </div>
 
@@ -364,4 +409,3 @@ export function NoticeForm({ initialValue }: NoticeFormProps) {
     </div>
   );
 }
-
