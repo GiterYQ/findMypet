@@ -9,6 +9,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { LocationLinkCard } from "@/components/notice/LocationLinkCard";
+import { getActivityStateLabel, getBusinessStatusLabel } from "@/lib/notice/notice-display";
 import { type PetLocation } from "@/lib/notice/notice.types";
 
 type ManageConsoleProps = {
@@ -75,7 +76,7 @@ export function ManageConsole({
       <p className="mono">公开页：{publicShareUrl}</p>
       <p className="mono">管理页：{manageUrl}</p>
       <p>
-        当前状态：{businessStatus} / {activityState}
+        当前状态：{getBusinessStatusLabel(businessStatus)} / {getActivityStateLabel(activityState)}
       </p>
       <p className="hint">刷新活跃度只更新最近活跃时间；状态变更和重开会更新版本与业务状态。</p>
       <div className="actions">
