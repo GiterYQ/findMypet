@@ -7,7 +7,7 @@
 "use client";
 
 import { type ChangeEvent, useState } from "react";
-import { compressImageFile } from "@/lib/media/client-image";
+import { compressImageFile, uploadCompressedImage } from "@/lib/media/client-image";
 import { type NoticeCreateInput } from "@/lib/notice/notice.schema";
 
 type NoticeFormProps = {
@@ -121,7 +121,17 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
     setError(null);
 
     try {
-      const compressedPhotos = await Promise.all(files.map((file, index) => compressImageFile(file, index === 0)));
+      const compressedPhotos = await Promise.all(
+        files.map(async (file, index) => {
+          const compressed = await compressImageFile(file, index === 0);
+          const uploaded = await uploadCompressedImage(compressed.blob, file.name || `pet-${index + 1}.jpg`);
+
+          return {
+            ...compressed.photo,
+            url: uploaded.url
+          };
+        })
+      );
       setPayload((current) => ({
         ...current,
         photos: compressedPhotos
