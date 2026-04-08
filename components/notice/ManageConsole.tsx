@@ -7,6 +7,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { LocationLinkCard } from "@/components/notice/LocationLinkCard";
 import { getActivityStateLabel, getBusinessStatusLabel } from "@/lib/notice/notice-display";
@@ -79,6 +80,11 @@ export function ManageConsole({
         当前状态：{getBusinessStatusLabel(businessStatus)} / {getActivityStateLabel(activityState)}
       </p>
       <p className="hint">刷新活跃度只更新最近活跃时间；状态变更和重开会更新版本与业务状态。</p>
+      <div className="actions">
+        <Link className="button button-secondary" href={`/poster/${shortId}`} target="_blank">
+          打开海报页
+        </Link>
+      </div>
       <div className="actions">
         <button className="button button-secondary" disabled={pendingAction !== null || businessStatus !== "active"} onClick={() => runAction("refresh")} type="button">
           刷新活跃度

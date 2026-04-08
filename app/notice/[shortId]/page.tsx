@@ -59,6 +59,9 @@ export default async function NoticeSharePage({ params }: PageProps) {
           <ContactMethodsCard contactMethods={notice.contactMethods} />
           <NoticeReportForm shortId={shortId} />
           <div className="actions">
+            <Link className="button button-primary" href={`/poster/${shortId}`} target="_blank">
+              查看海报
+            </Link>
             <Link className="button button-secondary" href="/">
               返回首页
             </Link>
