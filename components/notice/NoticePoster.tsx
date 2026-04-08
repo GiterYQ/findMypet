@@ -4,7 +4,18 @@
  * 联动：poster 页面、notice-display.ts、ContactMethodsCard 的展示规则。
  * 层级：component
  */
-import { getActivityStateLabel, getBusinessStatusLabel, getContactDisplayValue, getContactTypeLabel, getPetTypeLabel, getRiskFlagLabels } from "@/lib/notice/notice-display";
+import {
+  getActivityStateLabel,
+  getBusinessStatusLabel,
+  getContactDisplayValue,
+  getContactTypeLabel,
+  getLocationFieldLabel,
+  getNoticeCategoryLabel,
+  getPetTypeLabel,
+  getPrimaryContactPrompt,
+  getRiskFlagLabels,
+  getTimeFieldLabel
+} from "@/lib/notice/notice-display";
 import { type PublicNoticePayload } from "@/lib/notice/notice.types";
 
 type NoticePosterProps = {
@@ -24,7 +35,7 @@ export function NoticePoster({ notice, id, className }: NoticePosterProps) {
           <div className="poster-kicker">{getBusinessStatusLabel(notice.businessStatus)}</div>
           <h1>{notice.petProfile.name}</h1>
           <p>
-            {getPetTypeLabel(notice.petProfile.type)} · {notice.lostInfo.location.addressText}
+            {getNoticeCategoryLabel(notice.noticeCategory)} · {getPetTypeLabel(notice.petProfile.type)} · {notice.lostInfo.location.addressText}
           </p>
         </div>
         <div className="poster-id-block">
@@ -48,11 +59,11 @@ export function NoticePoster({ notice, id, className }: NoticePosterProps) {
             <h2>关键信息</h2>
             <dl className="poster-facts">
               <div>
-                <dt>丢失时间</dt>
+                <dt>{getTimeFieldLabel(notice.noticeCategory)}</dt>
                 <dd>{notice.lostInfo.lostTime.displayText ?? "待补充"}</dd>
               </div>
               <div>
-                <dt>地点</dt>
+                <dt>{getLocationFieldLabel(notice.noticeCategory)}</dt>
                 <dd>{notice.lostInfo.location.addressText}</dd>
               </div>
               <div>
@@ -81,7 +92,7 @@ export function NoticePoster({ notice, id, className }: NoticePosterProps) {
 
           {primaryContact ? (
             <div className="poster-contact">
-              <div className="poster-contact-label">请帮忙联系</div>
+              <div className="poster-contact-label">{getPrimaryContactPrompt(notice.noticeCategory)}</div>
               <div className="poster-contact-value">
                 {getContactTypeLabel(primaryContact.type)} · {getContactDisplayValue(primaryContact)}
               </div>

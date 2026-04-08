@@ -10,12 +10,13 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { LocationLinkCard } from "@/components/notice/LocationLinkCard";
-import { getActivityStateLabel, getBusinessStatusLabel } from "@/lib/notice/notice-display";
-import { type PetLocation } from "@/lib/notice/notice.types";
+import { getActivityStateLabel, getBusinessStatusLabel, getNoticeCategoryLabel } from "@/lib/notice/notice-display";
+import { type NoticeCategory, type PetLocation } from "@/lib/notice/notice.types";
 
 type ManageConsoleProps = {
   shortId: string;
   manageToken: string;
+  noticeCategory: NoticeCategory;
   businessStatus: "active" | "recovered" | "closed";
   activityState: "fresh" | "stale" | "archived";
   publicShareUrl: string;
@@ -26,6 +27,7 @@ type ManageConsoleProps = {
 export function ManageConsole({
   shortId,
   manageToken,
+  noticeCategory,
   businessStatus,
   activityState,
   publicShareUrl,
@@ -74,10 +76,11 @@ export function ManageConsole({
   return (
     <div className="panel section">
       <h2>管理操作台</h2>
+      <p>当前启事类型：{getNoticeCategoryLabel(noticeCategory)}</p>
       <p className="mono">公开页：{publicShareUrl}</p>
       <p className="mono">管理页：{manageUrl}</p>
       <p>
-        当前状态：{getBusinessStatusLabel(businessStatus)} / {getActivityStateLabel(activityState)}
+        当前状态：{getBusinessStatusLabel(businessStatus, noticeCategory)} / {getActivityStateLabel(activityState)}
       </p>
       <p className="hint">刷新活跃度只更新最近活跃时间；状态变更和重开会更新版本与业务状态。</p>
       <div className="actions">

@@ -5,6 +5,7 @@
  * 层级：types
  */
 export type AppLocale = "zh-CN" | "en";
+export type NoticeCategory = "lost-pet" | "found-owner";
 
 export type PetProfile = {
   name: string;
@@ -90,6 +91,7 @@ export type PublicNoticePayload = {
   id: string;
   shortId: string;
   locale: AppLocale;
+  noticeCategory: NoticeCategory;
   businessStatus: "active" | "recovered" | "closed";
   activityState: "fresh" | "stale" | "archived";
   moderationState: "visible" | "downranked" | "hidden";

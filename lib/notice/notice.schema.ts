@@ -7,6 +7,7 @@
 import { z } from "zod";
 
 export const localeSchema = z.enum(["zh-CN", "en"]);
+export const noticeCategorySchema = z.enum(["lost-pet", "found-owner"]);
 export const businessStatusSchema = z.enum(["active", "recovered", "closed"]);
 export const activityStateSchema = z.enum(["fresh", "stale", "archived"]);
 
@@ -98,6 +99,7 @@ export const riskFlagsSchema = z
 
 export const noticeCreateSchema = z.object({
   locale: localeSchema.default("zh-CN"),
+  noticeCategory: noticeCategorySchema.default("lost-pet"),
   petProfile: petProfileSchema,
   lostInfo: z.object({
     lostTime: petLostTimeSchema,
@@ -112,6 +114,7 @@ export const noticeCreateSchema = z.object({
 
 export const noticeUpdateSchema = noticeCreateSchema.pick({
   locale: true,
+  noticeCategory: true,
   petProfile: true,
   lostInfo: true,
   contactMethods: true,
@@ -130,4 +133,3 @@ export const reportCreateSchema = z.object({
 
 export type NoticeCreateInput = z.infer<typeof noticeCreateSchema>;
 export type NoticeUpdateInput = z.infer<typeof noticeUpdateSchema>;
-

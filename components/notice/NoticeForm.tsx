@@ -9,6 +9,7 @@
 import { type ChangeEvent, useState } from "react";
 import { compressImageFile, uploadCompressedImage } from "@/lib/media/client-image";
 import { type NoticeCreateInput } from "@/lib/notice/notice.schema";
+import { getLocationFieldLabel, getNoticeCategoryLabel, getTimeFieldLabel } from "@/lib/notice/notice-display";
 
 type NoticeFormProps = {
   initialValue?: Partial<NoticeCreateInput>;
@@ -19,6 +20,7 @@ type NoticeFormProps = {
 
 const defaultNotice: NoticeCreateInput = {
   locale: "zh-CN",
+  noticeCategory: "lost-pet",
   petProfile: {
     name: "",
     type: "cat",
@@ -109,6 +111,9 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
   const [pending, setPending] = useState(false);
   const [uploadingImages, setUploadingImages] = useState(false);
   const isEditMode = mode === "edit";
+  const locationFieldLabel = getLocationFieldLabel(payload.noticeCategory);
+  const timeFieldLabel = getTimeFieldLabel(payload.noticeCategory);
+  const categoryLabel = getNoticeCategoryLabel(payload.noticeCategory);
 
   async function handleImageChange(event: ChangeEvent<HTMLInputElement>) {
     const files = Array.from(event.target.files ?? []).slice(0, 3);
@@ -183,9 +188,26 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
   return (
     <div className="grid">
       <div className="panel section">
-        <h2>{isEditMode ? "编辑寻宠启事" : "创建寻宠启事"}</h2>
+        <h2>{isEditMode ? `编辑${categoryLabel}启事` : `创建${categoryLabel}启事`}</h2>
         <div className="grid two-col">
           <div>
+            <div className="field">
+              <label htmlFor="noticeCategory">发布类型</label>
+              <select
+                id="noticeCategory"
+                value={payload.noticeCategory}
+                onChange={(event) =>
+                  setPayload((current) => ({
+                    ...current,
+                    noticeCategory: event.target.value as NoticeCreateInput["noticeCategory"]
+                  }))
+                }
+              >
+                <option value="lost-pet">寻宠</option>
+                <option value="found-owner">寻主</option>
+              </select>
+            </div>
+
             <div className="field">
               <label htmlFor="petName">宠物名称</label>
               <input
@@ -264,7 +286,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
             </div>
 
             <div className="field">
-              <label htmlFor="location">丢失地点</label>
+              <label htmlFor="location">{locationFieldLabel}</label>
               <input
                 id="location"
                 value={String(payload.lostInfo.location.addressText)}
@@ -284,10 +306,10 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
             </div>
 
             <div className="field">
-              <label htmlFor="lostDisplay">丢失时间说明</label>
+              <label htmlFor="lostDisplay">{timeFieldLabel}说明</label>
               <input
                 id="lostDisplay"
-                placeholder="例如：昨晚 8 点左右"
+                placeholder={payload.noticeCategory === "found-owner" ? "例如：今天下午 3 点左右" : "例如：昨晚 8 点左右"}
                 value={String(payload.lostInfo.lostTime.displayText)}
                 onChange={(event) =>
                   setPayload((current) => ({
@@ -412,7 +434,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
 
         <div className="actions" style={{ marginTop: 20 }}>
           <button className="button button-primary" disabled={pending || uploadingImages} onClick={handleSubmit} type="button">
-            {uploadingImages ? "图片处理中..." : pending ? (isEditMode ? "保存中..." : "生成中...") : isEditMode ? "保存修改" : "生成海报与分享页"}
+            {uploadingImages ? "图片处理中..." : pending ? (isEditMode ? "保存中..." : "生成中...") : isEditMode ? "保存修改" : `生成${categoryLabel}海报与分享页`}
           </button>
         </div>
 

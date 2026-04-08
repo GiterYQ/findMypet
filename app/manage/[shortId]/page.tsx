@@ -22,6 +22,7 @@ export default async function ManagePage({ params, searchParams }: PageProps) {
   const notice = result.data as AdminNoticePayload;
   const editablePayload: Partial<NoticeCreateInput> = {
     locale: notice.locale,
+    noticeCategory: notice.noticeCategory,
     petProfile: notice.petProfile,
     lostInfo: notice.lostInfo,
     contactMethods: notice.contactMethods,
@@ -44,6 +45,7 @@ export default async function ManagePage({ params, searchParams }: PageProps) {
         <ManageConsole
           activityState={notice.activityState}
           businessStatus={notice.businessStatus}
+          noticeCategory={notice.noticeCategory}
           location={notice.lostInfo.location}
           manageToken={token ?? ""}
           manageUrl={manageUrl}

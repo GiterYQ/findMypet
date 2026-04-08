@@ -4,12 +4,19 @@
  * 联动：列表卡片、分享页、管理页、后续海报模板。
  * 层级：constants
  */
-import { type ContactMethod, type PetProfile, type RiskFlags, type PublicNoticePayload } from "@/lib/notice/notice.types";
+import { type ContactMethod, type NoticeCategory, type PetProfile, type RiskFlags, type PublicNoticePayload } from "@/lib/notice/notice.types";
 
-const businessStatusLabels: Record<PublicNoticePayload["businessStatus"], string> = {
-  active: "寻找中",
-  recovered: "已找回",
-  closed: "停止扩散"
+const businessStatusLabels: Record<NoticeCategory, Record<PublicNoticePayload["businessStatus"], string>> = {
+  "lost-pet": {
+    active: "寻找中",
+    recovered: "已找回",
+    closed: "停止扩散"
+  },
+  "found-owner": {
+    active: "寻找主人",
+    recovered: "已找到主人",
+    closed: "停止扩散"
+  }
 };
 
 const activityStateLabels: Record<PublicNoticePayload["activityState"], string> = {
@@ -23,6 +30,11 @@ const petTypeLabels: Record<PetProfile["type"], string> = {
   dog: "狗",
   bird: "鸟",
   other: "其他"
+};
+
+const noticeCategoryLabels: Record<NoticeCategory, string> = {
+  "lost-pet": "寻宠",
+  "found-owner": "寻主"
 };
 
 const riskFlagLabels: Record<keyof RiskFlags, string> = {
@@ -47,8 +59,8 @@ const contactTypeLabels: Record<ContactMethod["type"], string> = {
   other: "其他联系方式"
 };
 
-export function getBusinessStatusLabel(status: PublicNoticePayload["businessStatus"]) {
-  return businessStatusLabels[status];
+export function getBusinessStatusLabel(status: PublicNoticePayload["businessStatus"], category: NoticeCategory = "lost-pet") {
+  return businessStatusLabels[category][status];
 }
 
 export function getActivityStateLabel(state: PublicNoticePayload["activityState"]) {
@@ -57,6 +69,22 @@ export function getActivityStateLabel(state: PublicNoticePayload["activityState"
 
 export function getPetTypeLabel(type: PetProfile["type"]) {
   return petTypeLabels[type];
+}
+
+export function getNoticeCategoryLabel(category: NoticeCategory) {
+  return noticeCategoryLabels[category];
+}
+
+export function getTimeFieldLabel(category: NoticeCategory) {
+  return category === "found-owner" ? "拾获时间" : "丢失时间";
+}
+
+export function getLocationFieldLabel(category: NoticeCategory) {
+  return category === "found-owner" ? "拾获地点" : "丢失地点";
+}
+
+export function getPrimaryContactPrompt(category: NoticeCategory) {
+  return category === "found-owner" ? "请联系确认主人" : "请帮忙联系";
 }
 
 export function getRiskFlagLabels(riskFlags?: RiskFlags | null) {
@@ -100,4 +128,3 @@ export function getContactHref(contact: ContactMethod) {
       return null;
   }
 }
-

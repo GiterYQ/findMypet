@@ -15,6 +15,10 @@ function normalizeLocaleValue(value: string): PublicNoticePayload["locale"] {
   return value === "zh_CN" ? "zh-CN" : "en";
 }
 
+function normalizeNoticeCategory(value: string): PublicNoticePayload["noticeCategory"] {
+  return value === "FOUND_OWNER" ? "found-owner" : "lost-pet";
+}
+
 function normalizeBusinessStatus(value: string): PublicNoticePayload["businessStatus"] {
   return normalizeEnumValue(value) as PublicNoticePayload["businessStatus"];
 }
@@ -32,6 +36,7 @@ export function toPublicNoticePayload(notice: PetNotice): PublicNoticePayload {
     id: notice.id,
     shortId: notice.shortId,
     locale: normalizeLocaleValue(notice.locale),
+    noticeCategory: normalizeNoticeCategory(notice.noticeCategory),
     businessStatus: normalizeBusinessStatus(notice.businessStatus),
     activityState: normalizeActivityState(notice.activityState),
     moderationState: normalizeModerationState(notice.moderationState),

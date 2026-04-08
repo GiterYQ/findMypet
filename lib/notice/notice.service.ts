@@ -102,6 +102,7 @@ export const noticeService = {
     const notice = await noticeRepository.create({
       shortId,
       locale: input.locale === "zh-CN" ? "zh_CN" : "en_US",
+      noticeCategory: input.noticeCategory === "found-owner" ? "FOUND_OWNER" : "LOST_PET",
       petProfile: input.petProfile,
       lostInfo: input.lostInfo,
       contactMethods: input.contactMethods,
@@ -216,6 +217,7 @@ export const noticeService = {
 
     const updatedNotice = await noticeRepository.updateByShortId(shortId, {
       locale: input.locale === "zh-CN" ? "zh_CN" : "en_US",
+      noticeCategory: input.noticeCategory === "found-owner" ? "FOUND_OWNER" : "LOST_PET",
       petProfile: input.petProfile,
       lostInfo: input.lostInfo,
       contactMethods: input.contactMethods,

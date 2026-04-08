@@ -8,7 +8,15 @@ import Link from "next/link";
 import { ContactMethodsCard } from "@/components/notice/ContactMethodsCard";
 import { LocationLinkCard } from "@/components/notice/LocationLinkCard";
 import { NoticeReportForm } from "@/components/notice/NoticeReportForm";
-import { getActivityStateLabel, getBusinessStatusLabel, getPetTypeLabel, getRiskFlagLabels } from "@/lib/notice/notice-display";
+import {
+  getActivityStateLabel,
+  getBusinessStatusLabel,
+  getLocationFieldLabel,
+  getNoticeCategoryLabel,
+  getPetTypeLabel,
+  getRiskFlagLabels,
+  getTimeFieldLabel
+} from "@/lib/notice/notice-display";
 import { noticeService } from "@/lib/notice/notice.service";
 import { type PublicNoticePayload } from "@/lib/notice/notice.types";
 
@@ -27,22 +35,27 @@ export default async function NoticeSharePage({ params }: PageProps) {
     <main className="shell">
       <section className="hero">
         <h1>{String((notice.petProfile as { name: string }).name)}</h1>
-        <p>分享页会始终显示最新版本，旧海报应引导查看这里的状态和更新时间。</p>
+        <p>{getNoticeCategoryLabel(notice.noticeCategory)}分享页会始终显示最新版本，旧海报应引导查看这里的状态和更新时间。</p>
       </section>
 
       <div className="grid two-col">
         <section className="panel section">
           <span className={`status-pill ${notice.businessStatus === "active" ? "status-active" : notice.businessStatus === "recovered" ? "status-recovered" : "status-closed"}`}>
-            {getBusinessStatusLabel(notice.businessStatus)}
+            {getBusinessStatusLabel(notice.businessStatus, notice.noticeCategory)}
           </span>
           <p className="mono">ID: {notice.shortId}</p>
+          <p>类型：{getNoticeCategoryLabel(notice.noticeCategory)}</p>
           <p>宠物类型：{getPetTypeLabel(notice.petProfile.type)}</p>
           <p>更新时间：{new Date(notice.updatedAt).toLocaleString()}</p>
           <p>
             最近活跃：{new Date(notice.lastRefreshedAt).toLocaleString()} · {getActivityStateLabel(notice.activityState)}
           </p>
-          <p>地点：{location.addressText}</p>
-          <p>丢失时间：{notice.lostInfo.lostTime.displayText ?? "待补充"}</p>
+          <p>
+            {getLocationFieldLabel(notice.noticeCategory)}：{location.addressText}
+          </p>
+          <p>
+            {getTimeFieldLabel(notice.noticeCategory)}：{notice.lostInfo.lostTime.displayText ?? "待补充"}
+          </p>
           {riskTags.length > 0 ? (
             <div className="tag-list">
               {riskTags.map((tag) => (

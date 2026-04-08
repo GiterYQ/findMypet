@@ -5,7 +5,7 @@
  * 层级：component
  */
 import Link from "next/link";
-import { getBusinessStatusLabel, getPetTypeLabel, getRiskFlagLabels } from "@/lib/notice/notice-display";
+import { getBusinessStatusLabel, getNoticeCategoryLabel, getPetTypeLabel, getRiskFlagLabels } from "@/lib/notice/notice-display";
 import { type PublicNoticePayload } from "@/lib/notice/notice.types";
 
 type NoticeCardProps = {
@@ -51,13 +51,13 @@ export function NoticeCard({ notice }: NoticeCardProps) {
       )}
 
       <span className={statusClassName(notice.businessStatus)}>
-        {getBusinessStatusLabel(notice.businessStatus)}
+        {getBusinessStatusLabel(notice.businessStatus, notice.noticeCategory)}
       </span>
 
       <div>
         <h3>{notice.petProfile.name}</h3>
         <div className="meta">
-          {getPetTypeLabel(notice.petProfile.type)} · {notice.lostInfo.location.addressText}
+          {getNoticeCategoryLabel(notice.noticeCategory)} · {getPetTypeLabel(notice.petProfile.type)} · {notice.lostInfo.location.addressText}
         </div>
         <div className="meta">{notice.lostInfo.lostTime.displayText ?? "时间待确认"}</div>
       </div>
