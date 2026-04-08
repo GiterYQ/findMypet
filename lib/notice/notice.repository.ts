@@ -37,6 +37,8 @@ export const noticeRepository = {
   },
   createReport(data: Prisma.NoticeReportCreateInput) {
     return prisma.noticeReport.create({ data });
+  },
+  createEmailLog(data: Prisma.NoticeEmailLogCreateInput) {
+    return prisma.noticeEmailLog.create({ data });
   }
 };
-

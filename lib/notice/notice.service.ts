@@ -7,6 +7,7 @@
 import crypto from "node:crypto";
 import { nanoid } from "nanoid";
 import { AppError } from "@/lib/core/app-error";
+import { sendManageLinkEmail } from "@/lib/notice/notice-email.service";
 import { ARCHIVE_WINDOW_HOURS, FRESH_WINDOW_HOURS, REFRESH_COOLDOWN_HOURS, riskWeights } from "@/lib/notice/notice.constants";
 import { toAdminNoticePayload, toPublicNoticePayload } from "@/lib/notice/notice.mapper";
 import { noticeRepository } from "@/lib/notice/notice.repository";
@@ -86,6 +87,10 @@ function verifyOwnerToken(notice: Pick<PetNotice, "ownerTokenHash">, rawToken?: 
   }
 }
 
+function getBaseUrl() {
+  return process.env.APP_BASE_URL?.replace(/\/$/, "") ?? "http://localhost:3000";
+}
+
 export const noticeService = {
   async createNotice(rawInput: unknown) {
     const input = noticeCreateSchema.parse(rawInput);
@@ -122,11 +127,31 @@ export const noticeService = {
       toActivity: notice.activityState
     });
 
+    const publicShareUrl = `${getBaseUrl()}/notice/${notice.shortId}`;
+    const manageUrl = `${getBaseUrl()}/manage/${notice.shortId}?token=${rawToken}`;
+
+    if (input.ownerNotificationEmail) {
+      const delivery = await sendManageLinkEmail({
+        email: input.ownerNotificationEmail,
+        shortId: notice.shortId,
+        manageUrl,
+        publicShareUrl
+      });
+
+      await noticeRepository.createEmailLog({
+        notice: { connect: { id: notice.id } },
+        email: input.ownerNotificationEmail,
+        purpose: "MANAGE_LINK",
+        status: delivery.status,
+        providerId: delivery.providerId
+      });
+    }
+
     return {
       notice,
       rawToken,
-      publicShareUrl: `/notice/${notice.shortId}`,
-      manageUrl: `/manage/${notice.shortId}?token=${rawToken}`
+      publicShareUrl,
+      manageUrl
     };
   },
 
@@ -336,4 +361,3 @@ export const noticeService = {
     return toPublicNoticePayload(updatedNotice);
   }
 };
-
