@@ -4,7 +4,11 @@
  * 联动：notice service、manage token 查询参数、PATCH/refresh/reopen/status API。
  * 层级：page
  */
+import { ManageConsole } from "@/components/notice/ManageConsole";
+import { NoticeForm } from "@/components/notice/NoticeForm";
+import { type NoticeCreateInput } from "@/lib/notice/notice.schema";
 import { noticeService } from "@/lib/notice/notice.service";
+import { type AdminNoticePayload } from "@/lib/notice/notice.types";
 
 type PageProps = {
   params: Promise<{ shortId: string }>;
@@ -15,35 +19,40 @@ export default async function ManagePage({ params, searchParams }: PageProps) {
   const { shortId } = await params;
   const { token } = await searchParams;
   const result = await noticeService.getNoticeByShortId(shortId, token);
-  const notice = result.data;
+  const notice = result.data as AdminNoticePayload;
+  const editablePayload: Partial<NoticeCreateInput> = {
+    locale: notice.locale,
+    petProfile: notice.petProfile,
+    lostInfo: notice.lostInfo,
+    contactMethods: notice.contactMethods,
+    rewards: notice.rewards ?? undefined,
+    photos: notice.photos,
+    riskFlags: notice.riskFlags ?? undefined,
+    ownerNotificationEmail: notice.ownerNotificationEmail ?? undefined
+  };
+  const publicShareUrl = `/notice/${notice.shortId}`;
+  const manageUrl = `/manage/${notice.shortId}?token=${token ?? ""}`;
 
   return (
     <main className="shell">
       <section className="hero">
         <h1>管理寻宠启事</h1>
-        <p>这个页面只在持有管理链接时可访问。后续编辑、刷新和状态变更都应从这里发起。</p>
+        <p>这个页面只在持有管理链接时可访问。编辑、刷新和状态变更都从这里发起。</p>
       </section>
 
       <div className="grid two-col">
-        <section className="panel section">
-          <h2>当前管理视图</h2>
-          <p className="mono">shortId: {notice.shortId}</p>
-          <p className="mono">ownerNotificationEmail: {String((notice as { ownerNotificationEmail?: string | null }).ownerNotificationEmail ?? "未填写")}</p>
-          <p>报告数量：{String((notice as { reportCount?: number }).reportCount ?? 0)}</p>
-          <p>业务状态：{notice.businessStatus}</p>
-          <p>活跃状态：{notice.activityState}</p>
-          <p>版本：{notice.posterVersion}</p>
-        </section>
-
-        <section className="panel section">
-          <h2>后续操作</h2>
-          <p className="hint">当前实现已打通管理读取与服务层逻辑，下一步可直接在这里接表单编辑、刷新和状态按钮。</p>
-          <pre className="mono" style={{ whiteSpace: "pre-wrap" }}>
-            {JSON.stringify(notice, null, 2)}
-          </pre>
+        <ManageConsole
+          activityState={notice.activityState}
+          businessStatus={notice.businessStatus}
+          manageToken={token ?? ""}
+          manageUrl={manageUrl}
+          publicShareUrl={publicShareUrl}
+          shortId={notice.shortId}
+        />
+        <section>
+          <NoticeForm initialValue={editablePayload} manageToken={token} mode="edit" shortId={shortId} />
         </section>
       </div>
     </main>
   );
 }
-

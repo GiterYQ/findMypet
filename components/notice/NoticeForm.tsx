@@ -12,6 +12,9 @@ import { type NoticeCreateInput } from "@/lib/notice/notice.schema";
 
 type NoticeFormProps = {
   initialValue?: Partial<NoticeCreateInput>;
+  manageToken?: string;
+  mode?: "create" | "edit";
+  shortId?: string;
 };
 
 const defaultNotice: NoticeCreateInput = {
@@ -99,12 +102,13 @@ const riskOptions = [
   { key: "inExtremeWeather", label: "极端天气" }
 ] as const;
 
-export function NoticeForm({ initialValue }: NoticeFormProps) {
+export function NoticeForm({ initialValue, manageToken, mode = "create", shortId }: NoticeFormProps) {
   const [payload, setPayload] = useState<NoticeCreateInput>(() => ({ ...defaultNotice, ...initialValue }));
   const [result, setResult] = useState<{ publicShareUrl: string; manageUrl: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const [uploadingImages, setUploadingImages] = useState(false);
+  const isEditMode = mode === "edit";
 
   async function handleImageChange(event: ChangeEvent<HTMLInputElement>) {
     const files = Array.from(event.target.files ?? []).slice(0, 3);
@@ -135,8 +139,9 @@ export function NoticeForm({ initialValue }: NoticeFormProps) {
     setError(null);
 
     try {
-      const response = await fetch("/api/notices", {
-        method: "POST",
+      const endpoint = isEditMode ? `/api/notices/${shortId}?token=${encodeURIComponent(manageToken ?? "")}` : "/api/notices";
+      const response = await fetch(endpoint, {
+        method: isEditMode ? "PATCH" : "POST",
         headers: {
           "Content-Type": "application/json"
         },
@@ -149,13 +154,17 @@ export function NoticeForm({ initialValue }: NoticeFormProps) {
         throw new Error(data.error?.message ?? "Create failed.");
       }
 
-      setResult({
-        publicShareUrl: data.publicShareUrl,
-        manageUrl: data.manageUrl
-      });
-      localStorage.setItem("findMypet.latestManageUrl", data.manageUrl);
+      if (isEditMode) {
+        setResult(null);
+      } else {
+        setResult({
+          publicShareUrl: data.publicShareUrl,
+          manageUrl: data.manageUrl
+        });
+        localStorage.setItem("findMypet.latestManageUrl", data.manageUrl);
+      }
     } catch (submitError) {
-      setError(submitError instanceof Error ? submitError.message : "Create failed.");
+      setError(submitError instanceof Error ? submitError.message : isEditMode ? "Update failed." : "Create failed.");
     } finally {
       setPending(false);
     }
@@ -164,7 +173,7 @@ export function NoticeForm({ initialValue }: NoticeFormProps) {
   return (
     <div className="grid">
       <div className="panel section">
-        <h2>创建寻宠启事</h2>
+        <h2>{isEditMode ? "编辑寻宠启事" : "创建寻宠启事"}</h2>
         <div className="grid two-col">
           <div>
             <div className="field">
@@ -393,18 +402,19 @@ export function NoticeForm({ initialValue }: NoticeFormProps) {
 
         <div className="actions" style={{ marginTop: 20 }}>
           <button className="button button-primary" disabled={pending || uploadingImages} onClick={handleSubmit} type="button">
-            {uploadingImages ? "图片处理中..." : pending ? "生成中..." : "生成海报与分享页"}
+            {uploadingImages ? "图片处理中..." : pending ? (isEditMode ? "保存中..." : "生成中...") : isEditMode ? "保存修改" : "生成海报与分享页"}
           </button>
         </div>
 
         {error ? <p className="danger-box">{error}</p> : null}
-        {result ? (
+        {result && !isEditMode ? (
           <div className="panel section" style={{ marginTop: 20 }}>
             <h3>已生成</h3>
             <p className="mono">公开页：{result.publicShareUrl}</p>
             <p className="mono">管理页：{result.manageUrl}</p>
           </div>
         ) : null}
+        {!error && !result && isEditMode ? <p className="hint">保存后会更新分享页内容与版本号。</p> : null}
       </div>
     </div>
   );
