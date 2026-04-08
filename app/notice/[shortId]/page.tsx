@@ -5,6 +5,7 @@
  * 层级：page
  */
 import Link from "next/link";
+import { ContactMethodsCard } from "@/components/notice/ContactMethodsCard";
 import { LocationLinkCard } from "@/components/notice/LocationLinkCard";
 import { NoticeReportForm } from "@/components/notice/NoticeReportForm";
 import { getActivityStateLabel, getBusinessStatusLabel, getPetTypeLabel, getRiskFlagLabels } from "@/lib/notice/notice-display";
@@ -55,10 +56,7 @@ export default async function NoticeSharePage({ params }: PageProps) {
         </section>
 
         <section className="panel section">
-          <h2>联系与举报</h2>
-          <pre className="mono" style={{ whiteSpace: "pre-wrap" }}>
-            {JSON.stringify(notice.contactMethods, null, 2)}
-          </pre>
+          <ContactMethodsCard contactMethods={notice.contactMethods} />
           <NoticeReportForm shortId={shortId} />
           <div className="actions">
             <Link className="button button-secondary" href="/">
