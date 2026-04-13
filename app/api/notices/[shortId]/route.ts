@@ -5,6 +5,7 @@
  * 层级：route
  */
 import { NextResponse } from "next/server";
+import { ZodError } from "zod";
 import { AppError } from "@/lib/core/app-error";
 import { noticeService } from "@/lib/notice/notice.service";
 
@@ -35,6 +36,13 @@ export async function PATCH(request: Request, { params }: RouteProps) {
     const result = await noticeService.updateNotice(shortId, payload, token);
     return NextResponse.json({ item: result });
   } catch (error) {
+    if (error instanceof ZodError) {
+      const firstIssue = error.issues[0];
+      const path = firstIssue?.path.join(".") || "";
+      const message = path ? `${path}: ${firstIssue.message}` : firstIssue?.message ?? "验证失败";
+      return NextResponse.json({ error: { code: "VALIDATION", message } }, { status: 400 });
+    }
+
     if (error instanceof AppError) {
       return NextResponse.json({ error: { code: error.code, message: error.message } }, { status: 400 });
     }

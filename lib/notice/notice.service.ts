@@ -65,7 +65,8 @@ function deriveActivityState(lastRefreshedAt: Date): ActivityState {
 }
 
 function buildDerivedFields(input: NoticeCreateInput | NoticeUpdateInput) {
-  const primaryPhoto = input.photos.find((photo) => photo.isPrimary) ?? input.photos[0];
+  const photos = input.photos ?? [];
+  const primaryPhoto = photos.find((photo) => photo.isPrimary) ?? photos[0];
   const lostAtStart = input.lostInfo.lostTime.startAt ? new Date(input.lostInfo.lostTime.startAt) : undefined;
   const riskLevel = computeRiskLevel(input.riskFlags);
   const rewardScore = computeRewardScore(input);

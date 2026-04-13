@@ -12,43 +12,48 @@ export const businessStatusSchema = z.enum(["active", "recovered", "closed"]);
 export const activityStateSchema = z.enum(["fresh", "stale", "archived"]);
 
 export const petProfileSchema = z.object({
-  name: z.string().min(1),
+  name: z.string().min(1).max(30),
   type: z.enum(["dog", "cat", "bird", "other"]),
-  breed: z.string().optional(),
+  breed: z.string().max(30).optional(),
   breedConfidence: z.number().min(0).max(1).optional(),
-  color: z.array(z.string()).optional(),
+  color: z.array(z.string().max(20)).max(5).optional(),
   gender: z.enum(["male", "female", "unknown"]).optional(),
-  ageText: z.string().optional(),
+  ageText: z.string().max(20).optional(),
   bodySize: z.enum(["small", "medium", "large"]).optional(),
   neutered: z.enum(["yes", "no", "unknown"]).optional(),
-  collar: z.string().optional(),
+  collar: z.string().max(50).optional(),
   leash: z.boolean().optional(),
-  distinctiveFeatures: z.array(z.string()).optional(),
-  healthNotes: z.string().optional(),
-  description: z.string().optional()
+  distinctiveFeatures: z.array(z.string().max(50)).max(10).optional(),
+  healthNotes: z.string().max(200).optional(),
+  description: z.string().max(500).optional()
 });
 
 export const petLostTimeSchema = z.object({
   precision: z.enum(["exact", "day", "range", "approx"]),
   startAt: z.string().datetime().optional(),
   endAt: z.string().datetime().optional(),
-  displayText: z.string().optional(),
-  timezone: z.string().min(1)
+  displayText: z.string().max(100).optional(),
+  timezone: z.string().min(1).max(50)
 });
 
 export const petLocationSchema = z.object({
-  addressText: z.string().min(1),
-  placeName: z.string().optional(),
+  province: z.string().max(20).optional(),
+  city: z.string().max(20).optional(),
+  district: z.string().max(20).optional(),
+  street: z.string().max(50).optional(),
+  addressText: z.string().min(1).max(200),
+  nearbyLandmark: z.string().max(100).optional(),
+  placeName: z.string().max(100).optional(),
   lat: z.number().optional(),
   lng: z.number().optional(),
-  regionCode: z.string().optional(),
+  regionCode: z.string().max(20).optional(),
   privacyLevel: z.enum(["approximate", "exact"])
 });
 
 export const contactMethodSchema = z.object({
   type: z.enum(["phone", "sms", "whatsapp", "wechat", "telegram", "email", "other"]),
-  value: z.string().min(1),
-  label: z.string().optional(),
+  value: z.string().min(1).max(100),
+  label: z.string().max(30).optional(),
   isPrimary: z.boolean().optional(),
   visibility: z.enum(["public", "masked"])
 });
@@ -58,24 +63,24 @@ export const rewardsSchema = z
     clue: z
       .object({
         enabled: z.boolean(),
-        amountMinor: z.number().int().nonnegative().optional(),
-        currency: z.string().optional(),
-        note: z.string().optional()
+        amountMinor: z.number().int().nonnegative().max(10_000_000).optional(),
+        currency: z.string().max(5).optional(),
+        note: z.string().max(100).optional()
       })
       .optional(),
     recovery: z
       .object({
         enabled: z.boolean(),
-        amountMinor: z.number().int().nonnegative().optional(),
-        currency: z.string().optional(),
-        note: z.string().optional()
+        amountMinor: z.number().int().nonnegative().max(10_000_000).optional(),
+        currency: z.string().max(5).optional(),
+        note: z.string().max(100).optional()
       })
       .optional()
   })
   .optional();
 
 export const photoSchema = z.object({
-  url: z.string().url(),
+  url: z.string().min(1),
   width: z.number().optional(),
   height: z.number().optional(),
   sizeBytes: z.number().optional(),
@@ -107,9 +112,12 @@ export const noticeCreateSchema = z.object({
   }),
   contactMethods: z.array(contactMethodSchema).min(1),
   rewards: rewardsSchema,
-  photos: z.array(photoSchema).min(1).max(3),
+  photos: z.array(photoSchema).max(3).default([]),
   riskFlags: riskFlagsSchema,
-  ownerNotificationEmail: z.string().email().optional()
+  ownerNotificationEmail: z.preprocess(
+    (val) => (typeof val === "string" && val.trim() === "" ? undefined : val),
+    z.string().email().optional()
+  )
 });
 
 export const noticeUpdateSchema = noticeCreateSchema.pick({

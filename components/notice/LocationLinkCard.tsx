@@ -5,6 +5,7 @@
  * 层级：component
  */
 import { getMapLink } from "@/lib/location/map-link";
+import { getFullLocationText } from "@/lib/notice/notice-display";
 import { type PetLocation } from "@/lib/notice/notice.types";
 
 type LocationLinkCardProps = {
@@ -17,8 +18,9 @@ export function LocationLinkCard({ location }: LocationLinkCardProps) {
   return (
     <div className="panel section">
       <h3>地点与地图</h3>
-      <p>{location.addressText}</p>
+      <p>{getFullLocationText(location)}</p>
       {location.placeName ? <p className="hint">地标：{location.placeName}</p> : null}
+      {location.nearbyLandmark ? <p className="hint">附近：{location.nearbyLandmark}</p> : null}
       <p className="hint">隐私级别：{location.privacyLevel === "exact" ? "精确位置" : "模糊区域"}</p>
       <div className="actions">
         <a className="button button-secondary" href={mapLink.href} rel="noreferrer" target="_blank">

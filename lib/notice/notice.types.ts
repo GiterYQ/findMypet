@@ -33,7 +33,12 @@ export type PetLostTime = {
 };
 
 export type PetLocation = {
+  province?: string;
+  city?: string;
+  district?: string;
+  street?: string;
   addressText: string;
+  nearbyLandmark?: string;
   placeName?: string;
   lat?: number;
   lng?: number;

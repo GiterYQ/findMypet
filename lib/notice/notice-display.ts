@@ -97,6 +97,25 @@ export function getContactTypeLabel(type: ContactMethod["type"]) {
   return contactTypeLabels[type];
 }
 
+export function getFullLocationText(location: {
+  province?: string;
+  city?: string;
+  district?: string;
+  street?: string;
+  addressText: string;
+  nearbyLandmark?: string;
+}) {
+  const parts = [
+    location.province,
+    location.city,
+    location.district,
+    location.street,
+    location.addressText
+  ].filter(Boolean);
+  const base = parts.join("");
+  return location.nearbyLandmark ? `${base}（${location.nearbyLandmark}附近）` : base;
+}
+
 export function getContactDisplayValue(contact: ContactMethod) {
   if (contact.visibility !== "masked") {
     return contact.value;

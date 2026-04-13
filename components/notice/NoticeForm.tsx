@@ -44,7 +44,12 @@ const defaultNotice: NoticeCreateInput = {
       timezone: "Asia/Shanghai"
     },
     location: {
+      province: "",
+      city: "",
+      district: "",
+      street: "",
       addressText: "",
+      nearbyLandmark: "",
       placeName: "",
       regionCode: "",
       privacyLevel: "approximate"
@@ -104,6 +109,18 @@ const riskOptions = [
   { key: "inExtremeWeather", label: "极端天气" }
 ] as const;
 
+function toLocalDateString(isoString: string): string {
+  try {
+    const date = new Date(isoString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  } catch {
+    return "";
+  }
+}
+
 export function NoticeForm({ initialValue, manageToken, mode = "create", shortId }: NoticeFormProps) {
   const [payload, setPayload] = useState<NoticeCreateInput>(() => ({ ...defaultNotice, ...initialValue }));
   const [result, setResult] = useState<{ publicShareUrl: string; manageUrl: string } | null>(null);
@@ -114,6 +131,17 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
   const locationFieldLabel = getLocationFieldLabel(payload.noticeCategory);
   const timeFieldLabel = getTimeFieldLabel(payload.noticeCategory);
   const categoryLabel = getNoticeCategoryLabel(payload.noticeCategory);
+
+  function handleCategoryChange(category: NoticeCreateInput["noticeCategory"]) {
+    setPayload((current) => ({
+      ...current,
+      noticeCategory: category,
+      petProfile: {
+        ...current.petProfile,
+        name: category === "found-owner" && !current.petProfile.name.trim() ? "未知" : current.petProfile.name
+      }
+    }));
+  }
 
   async function handleImageChange(event: ChangeEvent<HTMLInputElement>) {
     const files = Array.from(event.target.files ?? []).slice(0, 3);
@@ -149,18 +177,61 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
     }
   }
 
+  function validateForm(): string | null {
+    if (!payload.petProfile.name.trim() && payload.noticeCategory !== "found-owner") return "请填写宠物名称";
+    if (payload.petProfile.name.length > 30) return "宠物名称不能超过 30 个字符";
+    if (!payload.lostInfo.location.addressText.trim()) return `请填写${locationFieldLabel}详细地址`;
+    if (payload.lostInfo.location.addressText.length > 200) return "详细地址不能超过 200 个字符";
+    if (!payload.contactMethods[0]?.value.trim()) return "请填写联系方式";
+    if (payload.contactMethods[0].value.length > 100) return "联系方式不能超过 100 个字符";
+    if (payload.petProfile.description && payload.petProfile.description.length > 500) return "补充描述不能超过 500 个字符";
+    return null;
+  }
+
+  function cleanPayload() {
+    return {
+      ...payload,
+      photos: payload.photos.filter((p) => p.url),
+      ownerNotificationEmail: payload.ownerNotificationEmail?.trim() || undefined,
+      petProfile: {
+        ...payload.petProfile,
+        name: payload.petProfile.name.trim() || (payload.noticeCategory === "found-owner" ? "未知" : ""),
+        description: payload.petProfile.description || undefined
+      },
+      lostInfo: {
+        ...payload.lostInfo,
+        location: {
+          ...payload.lostInfo.location,
+          province: payload.lostInfo.location.province?.trim() || undefined,
+          city: payload.lostInfo.location.city?.trim() || undefined,
+          district: payload.lostInfo.location.district?.trim() || undefined,
+          street: payload.lostInfo.location.street?.trim() || undefined,
+          nearbyLandmark: payload.lostInfo.location.nearbyLandmark?.trim() || undefined,
+          addressText: payload.lostInfo.location.addressText.trim()
+        }
+      }
+    };
+  }
+
   async function handleSubmit() {
+    const validationError = validateForm();
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
     setPending(true);
     setError(null);
 
     try {
+      const cleaned = cleanPayload();
       const endpoint = isEditMode ? `/api/notices/${shortId}?token=${encodeURIComponent(manageToken ?? "")}` : "/api/notices";
       const response = await fetch(endpoint, {
         method: isEditMode ? "PATCH" : "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(cleaned)
       });
 
       const data = await response.json();
@@ -192,26 +263,37 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
         <div className="grid two-col">
           <div>
             <div className="field">
-              <label htmlFor="noticeCategory">发布类型</label>
-              <select
-                id="noticeCategory"
-                value={payload.noticeCategory}
-                onChange={(event) =>
-                  setPayload((current) => ({
-                    ...current,
-                    noticeCategory: event.target.value as NoticeCreateInput["noticeCategory"]
-                  }))
-                }
-              >
-                <option value="lost-pet">寻宠</option>
-                <option value="found-owner">寻主</option>
-              </select>
+              <label>发布类型</label>
+              <div className="radio-group">
+                <label className="radio-label">
+                  <input
+                    checked={payload.noticeCategory === "lost-pet"}
+                    name="noticeCategory"
+                    onChange={() => handleCategoryChange("lost-pet")}
+                    type="radio"
+                    value="lost-pet"
+                  />
+                  寻宠（我丢了宠物）
+                </label>
+                <label className="radio-label">
+                  <input
+                    checked={payload.noticeCategory === "found-owner"}
+                    name="noticeCategory"
+                    onChange={() => handleCategoryChange("found-owner")}
+                    type="radio"
+                    value="found-owner"
+                  />
+                  寻主（我捡到了宠物）
+                </label>
+              </div>
             </div>
 
             <div className="field">
               <label htmlFor="petName">宠物名称</label>
               <input
                 id="petName"
+                maxLength={30}
+                placeholder={payload.noticeCategory === "found-owner" ? '不知道可填"未知"' : "例如：小橘、豆豆"}
                 value={String(payload.petProfile.name)}
                 onChange={(event) =>
                   setPayload((current) => ({
@@ -223,6 +305,9 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
                   }))
                 }
               />
+              {payload.noticeCategory === "found-owner" && !payload.petProfile.name.trim() ? (
+                <div className="hint">寻主启事不知道名字可留空，将自动填为&ldquo;未知&rdquo;</div>
+              ) : null}
             </div>
 
             <div className="field">
@@ -285,51 +370,208 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
               </div>
             </div>
 
-            <div className="field">
-              <label htmlFor="location">{locationFieldLabel}</label>
-              <input
-                id="location"
-                value={String(payload.lostInfo.location.addressText)}
-                onChange={(event) =>
-                  setPayload((current) => ({
-                    ...current,
-                    lostInfo: {
-                      ...current.lostInfo,
-                      location: {
-                        ...current.lostInfo.location,
-                        addressText: event.target.value
-                      }
-                    }
-                  }))
-                }
-              />
-            </div>
+            <fieldset className="field" style={{ border: "1px solid var(--color-border, #ddd)", borderRadius: 6, padding: 16 }}>
+              <legend>{locationFieldLabel}</legend>
 
-            <div className="field">
-              <label htmlFor="lostDisplay">{timeFieldLabel}说明</label>
-              <input
-                id="lostDisplay"
-                placeholder={payload.noticeCategory === "found-owner" ? "例如：今天下午 3 点左右" : "例如：昨晚 8 点左右"}
-                value={String(payload.lostInfo.lostTime.displayText)}
-                onChange={(event) =>
-                  setPayload((current) => ({
-                    ...current,
-                    lostInfo: {
-                      ...current.lostInfo,
-                      lostTime: {
-                        ...current.lostInfo.lostTime,
-                        displayText: event.target.value
-                      }
+              <div className="grid" style={{ gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 8 }}>
+                <div className="field" style={{ marginBottom: 0 }}>
+                  <label htmlFor="province">省/直辖市</label>
+                  <input
+                    id="province"
+                    maxLength={20}
+                    placeholder="例如：北京市"
+                    value={String(payload.lostInfo.location.province ?? "")}
+                    onChange={(event) =>
+                      setPayload((current) => ({
+                        ...current,
+                        lostInfo: {
+                          ...current.lostInfo,
+                          location: { ...current.lostInfo.location, province: event.target.value }
+                        }
+                      }))
                     }
-                  }))
-                }
-              />
-            </div>
+                  />
+                </div>
+                <div className="field" style={{ marginBottom: 0 }}>
+                  <label htmlFor="city">市</label>
+                  <input
+                    id="city"
+                    maxLength={20}
+                    placeholder="例如：北京市"
+                    value={String(payload.lostInfo.location.city ?? "")}
+                    onChange={(event) =>
+                      setPayload((current) => ({
+                        ...current,
+                        lostInfo: {
+                          ...current.lostInfo,
+                          location: { ...current.lostInfo.location, city: event.target.value }
+                        }
+                      }))
+                    }
+                  />
+                </div>
+                <div className="field" style={{ marginBottom: 0 }}>
+                  <label htmlFor="district">区/县</label>
+                  <input
+                    id="district"
+                    maxLength={20}
+                    placeholder="例如：朝阳区"
+                    value={String(payload.lostInfo.location.district ?? "")}
+                    onChange={(event) =>
+                      setPayload((current) => ({
+                        ...current,
+                        lostInfo: {
+                          ...current.lostInfo,
+                          location: { ...current.lostInfo.location, district: event.target.value }
+                        }
+                      }))
+                    }
+                  />
+                </div>
+              </div>
+
+              <div className="field" style={{ marginBottom: 8 }}>
+                <label htmlFor="street">街道/乡镇</label>
+                <input
+                  id="street"
+                  maxLength={50}
+                  placeholder="例如：望京街道"
+                  value={String(payload.lostInfo.location.street ?? "")}
+                  onChange={(event) =>
+                    setPayload((current) => ({
+                      ...current,
+                      lostInfo: {
+                        ...current.lostInfo,
+                        location: { ...current.lostInfo.location, street: event.target.value }
+                      }
+                    }))
+                  }
+                />
+              </div>
+
+              <div className="field" style={{ marginBottom: 8 }}>
+                <label htmlFor="addressText">详细地址</label>
+                <input
+                  id="addressText"
+                  maxLength={200}
+                  placeholder="例如：望京SOHO北门"
+                  value={String(payload.lostInfo.location.addressText)}
+                  onChange={(event) =>
+                    setPayload((current) => ({
+                      ...current,
+                      lostInfo: {
+                        ...current.lostInfo,
+                        location: { ...current.lostInfo.location, addressText: event.target.value }
+                      }
+                    }))
+                  }
+                />
+              </div>
+
+              <div className="field" style={{ marginBottom: 0 }}>
+                <label htmlFor="nearbyLandmark">附近标志物</label>
+                <input
+                  id="nearbyLandmark"
+                  maxLength={100}
+                  placeholder="例如：地铁14号线望京站C口旁"
+                  value={String(payload.lostInfo.location.nearbyLandmark ?? "")}
+                  onChange={(event) =>
+                    setPayload((current) => ({
+                      ...current,
+                      lostInfo: {
+                        ...current.lostInfo,
+                        location: { ...current.lostInfo.location, nearbyLandmark: event.target.value }
+                      }
+                    }))
+                  }
+                />
+              </div>
+            </fieldset>
+
+            <fieldset className="field" style={{ border: "1px solid var(--color-border, #ddd)", borderRadius: 6, padding: 16 }}>
+              <legend>{timeFieldLabel}</legend>
+
+              <div className="field" style={{ marginBottom: 8 }}>
+                <label htmlFor="lostDate">日期</label>
+                <input
+                  id="lostDate"
+                  type="date"
+                  value={payload.lostInfo.lostTime.startAt ? toLocalDateString(payload.lostInfo.lostTime.startAt) : ""}
+                  onChange={(event) => {
+                    const dateValue = event.target.value;
+                    setPayload((current) => ({
+                      ...current,
+                      lostInfo: {
+                        ...current.lostInfo,
+                        lostTime: {
+                          ...current.lostInfo.lostTime,
+                          startAt: dateValue ? new Date(`${dateValue}T12:00:00`).toISOString() : undefined
+                        }
+                      }
+                    }));
+                  }}
+                />
+              </div>
+
+              <div className="field" style={{ marginBottom: 8 }}>
+                <label>时间精度</label>
+                <div className="radio-group">
+                  {([
+                    { value: "exact", label: "精确时间" },
+                    { value: "day", label: "当天" },
+                    { value: "approx", label: "大约" }
+                  ] as const).map((opt) => (
+                    <label className="radio-label" key={opt.value}>
+                      <input
+                        checked={payload.lostInfo.lostTime.precision === opt.value}
+                        name="timePrecision"
+                        onChange={() =>
+                          setPayload((current) => ({
+                            ...current,
+                            lostInfo: {
+                              ...current.lostInfo,
+                              lostTime: { ...current.lostInfo.lostTime, precision: opt.value }
+                            }
+                          }))
+                        }
+                        type="radio"
+                        value={opt.value}
+                      />
+                      {opt.label}
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div className="field" style={{ marginBottom: 0 }}>
+                <label htmlFor="lostDisplay">补充说明</label>
+                <input
+                  id="lostDisplay"
+                  maxLength={100}
+                  placeholder={payload.noticeCategory === "found-owner" ? "例如：今天下午 3 点左右" : "例如：昨晚 8 点左右"}
+                  value={String(payload.lostInfo.lostTime.displayText)}
+                  onChange={(event) =>
+                    setPayload((current) => ({
+                      ...current,
+                      lostInfo: {
+                        ...current.lostInfo,
+                        lostTime: {
+                          ...current.lostInfo.lostTime,
+                          displayText: event.target.value
+                        }
+                      }
+                    }))
+                  }
+                />
+              </div>
+            </fieldset>
 
             <div className="field">
               <label htmlFor="contact">主联系方式</label>
               <input
                 id="contact"
+                maxLength={100}
+                placeholder="例如：13800138000"
                 value={String(payload.contactMethods[0].value)}
                 onChange={(event) =>
                   setPayload((current) => ({
@@ -351,6 +593,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
               <label htmlFor="ownerEmail">管理链接邮箱</label>
               <input
                 id="ownerEmail"
+                maxLength={100}
                 type="email"
                 value={String(payload.ownerNotificationEmail)}
                 onChange={(event) =>
@@ -367,6 +610,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
               <label htmlFor="description">补充描述</label>
               <textarea
                 id="description"
+                maxLength={500}
                 value={String(payload.petProfile.description)}
                 onChange={(event) =>
                   setPayload((current) => ({
@@ -378,12 +622,15 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
                   }))
                 }
               />
+              <div className="hint">{payload.petProfile.description?.length ?? 0}/500</div>
             </div>
 
             <div className="field">
               <label htmlFor="rewardRecovery">找回奖励（分）</label>
               <input
                 id="rewardRecovery"
+                max={10000000}
+                min={0}
                 type="number"
                 value={Number(payload.rewards?.recovery?.amountMinor ?? 0)}
                 onChange={(event) =>
@@ -441,9 +688,25 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
         {error ? <p className="danger-box">{error}</p> : null}
         {result && !isEditMode ? (
           <div className="panel section" style={{ marginTop: 20 }}>
-            <h3>已生成</h3>
-            <p className="mono">公开页：{result.publicShareUrl}</p>
-            <p className="mono">管理页：{result.manageUrl}</p>
+            <h3>启事已生成</h3>
+            <div className="field">
+              <label>公开分享页</label>
+              <a className="button button-primary" href={result.publicShareUrl} target="_blank" rel="noopener noreferrer">
+                查看分享页
+              </a>
+            </div>
+            <div className="field">
+              <label>管理页（请妥善保存）</label>
+              <a className="button button-secondary" href={result.manageUrl} target="_blank" rel="noopener noreferrer">
+                打开管理页
+              </a>
+            </div>
+            <div className="field">
+              <label>海报页</label>
+              <a className="button button-secondary" href={result.publicShareUrl.replace("/notice/", "/poster/")} target="_blank" rel="noopener noreferrer">
+                查看海报
+              </a>
+            </div>
           </div>
         ) : null}
         {!error && !result && isEditMode ? <p className="hint">保存后会更新分享页内容与版本号。</p> : null}

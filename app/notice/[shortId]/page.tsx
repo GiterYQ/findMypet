@@ -11,6 +11,7 @@ import { NoticeReportForm } from "@/components/notice/NoticeReportForm";
 import {
   getActivityStateLabel,
   getBusinessStatusLabel,
+  getFullLocationText,
   getLocationFieldLabel,
   getNoticeCategoryLabel,
   getPetTypeLabel,
@@ -51,7 +52,7 @@ export default async function NoticeSharePage({ params }: PageProps) {
             最近活跃：{new Date(notice.lastRefreshedAt).toLocaleString()} · {getActivityStateLabel(notice.activityState)}
           </p>
           <p>
-            {getLocationFieldLabel(notice.noticeCategory)}：{location.addressText}
+            {getLocationFieldLabel(notice.noticeCategory)}：{getFullLocationText(location)}
           </p>
           <p>
             {getTimeFieldLabel(notice.noticeCategory)}：{notice.lostInfo.lostTime.displayText ?? "待补充"}
