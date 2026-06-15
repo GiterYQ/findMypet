@@ -40,28 +40,37 @@ export async function sendManageLinkEmail(input: SendManageLinkEmailInput): Prom
     return { status: "FAILED" };
   }
 
-  const response = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      from,
-      to: [input.email],
-      subject: `findMypet 管理链接 · ${input.shortId}`,
-      html: buildEmailHtml(input)
-    })
-  });
+  try {
+    const response = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        from,
+        to: [input.email],
+        subject: `findMypet 管理链接 · ${input.shortId}`,
+        html: buildEmailHtml(input)
+      })
+    });
 
-  if (!response.ok) {
+    if (!response.ok) {
+      return { status: "FAILED" };
+    }
+
+    const data = (await response.json()) as { id?: string };
+    return {
+      status: "SENT",
+      providerId: data.id
+    };
+  } catch (error) {
+    // 邮件只是管理链接找回辅助通道，失败不能阻断 notice 创建主链路。
+    console.warn("[findMypet] manage link email failed.", {
+      email: input.email,
+      shortId: input.shortId,
+      error
+    });
     return { status: "FAILED" };
   }
-
-  const data = (await response.json()) as { id?: string };
-  return {
-    status: "SENT",
-    providerId: data.id
-  };
 }
-
