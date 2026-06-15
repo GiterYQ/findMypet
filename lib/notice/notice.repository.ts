@@ -27,6 +27,24 @@ export const noticeRepository = {
       take: 100
     });
   },
+  findActivityMaintenanceCandidates(staleBefore: Date) {
+    return prisma.petNotice.findMany({
+      where: {
+        businessStatus: "ACTIVE",
+        deletedAt: null,
+        activityState: {
+          in: ["FRESH", "STALE"]
+        },
+        lastRefreshedAt: {
+          lt: staleBefore
+        }
+      },
+      orderBy: {
+        lastRefreshedAt: "asc"
+      },
+      take: 500
+    });
+  },
   updateByShortId(shortId: string, data: Prisma.PetNoticeUpdateInput) {
     return prisma.petNotice.update({
       where: { shortId },

@@ -7,6 +7,7 @@
 import crypto from "node:crypto";
 import { nanoid } from "nanoid";
 import { AppError } from "@/lib/core/app-error";
+import { getActivityMaintenanceCutoffs, getNextActivityStateForMaintenance } from "@/lib/notice/activity-maintenance";
 import { sendManageLinkEmail } from "@/lib/notice/notice-email.service";
 import { ARCHIVE_WINDOW_HOURS, FRESH_WINDOW_HOURS, REFRESH_COOLDOWN_HOURS, riskWeights } from "@/lib/notice/notice.constants";
 import { toAdminNoticePayload, toPublicNoticePayload } from "@/lib/notice/notice.mapper";
@@ -382,5 +383,47 @@ export const noticeService = {
     }
 
     return toPublicNoticePayload(updatedNotice);
+  },
+
+  async advanceActivityStates(now = new Date()) {
+    const { staleBefore } = getActivityMaintenanceCutoffs(now);
+    const candidates = await noticeRepository.findActivityMaintenanceCandidates(staleBefore);
+    const summary = {
+      scanned: candidates.length,
+      stale: 0,
+      archived: 0,
+      unchanged: 0
+    };
+
+    for (const notice of candidates) {
+      const nextActivityState = getNextActivityStateForMaintenance(notice.activityState, notice.lastRefreshedAt, now);
+
+      if (!nextActivityState) {
+        summary.unchanged += 1;
+        continue;
+      }
+
+      const updatedNotice = await noticeRepository.updateByShortId(notice.shortId, {
+        activityState: nextActivityState,
+        archivedAt: nextActivityState === "ARCHIVED" ? (notice.archivedAt ?? now) : notice.archivedAt
+      });
+
+      await noticeRepository.createAudit({
+        notice: { connect: { id: updatedNotice.id } },
+        action: nextActivityState === "ARCHIVED" ? "AUTO_ARCHIVE" : "AUTO_STALE",
+        fromBusiness: notice.businessStatus,
+        toBusiness: updatedNotice.businessStatus,
+        fromActivity: notice.activityState,
+        toActivity: updatedNotice.activityState
+      });
+
+      if (nextActivityState === "ARCHIVED") {
+        summary.archived += 1;
+      } else {
+        summary.stale += 1;
+      }
+    }
+
+    return summary;
   }
 };

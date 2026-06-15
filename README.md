@@ -15,8 +15,15 @@ A lightweight global lost-pet notice tool built with Next.js and Prisma.
 - `APP_BASE_URL`: public site origin used when generating share and manage links
 - `RESEND_API_KEY`: optional Resend API key for owner manage-link emails
 - `RESEND_FROM_EMAIL`: optional sender address for manage-link emails
+- `CRON_SECRET`: secret for `/api/cron/notices/activity` when running scheduled stale/archive maintenance
 
 If email is not configured or delivery fails, notice creation still succeeds. Users should copy the manage link or recover it from the local `/mine` page on the same browser.
+
+## Operations
+
+- Run `GET /api/cron/notices/activity` or `POST /api/cron/notices/activity` on a schedule to move old active notices from `fresh` to `stale` and then `archived`.
+- In production, call the cron endpoint with `Authorization: Bearer <CRON_SECRET>` or `?secret=<CRON_SECRET>`.
+- Without `CRON_SECRET`, the cron endpoint is only allowed outside production.
 
 ## Current MVP slice
 
