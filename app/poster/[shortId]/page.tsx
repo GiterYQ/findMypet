@@ -7,6 +7,7 @@
 import Link from "next/link";
 import { NoticeAlertPoster } from "@/components/notice/NoticeAlertPoster";
 import { NoticePoster } from "@/components/notice/NoticePoster";
+import { NoticeSquarePoster } from "@/components/notice/NoticeSquarePoster";
 import { PosterActions } from "@/components/notice/PosterActions";
 import { normalizePosterTemplate } from "@/lib/notice/poster-template";
 import { noticeService } from "@/lib/notice/notice.service";
@@ -39,10 +40,15 @@ export default async function PosterPage({ params, searchParams }: PageProps) {
         <Link className={template === "alert" ? "button button-primary" : "button button-secondary"} href={`/poster/${shortId}?template=alert`}>
           警示模板
         </Link>
+        <Link className={template === "square" ? "button button-primary" : "button button-secondary"} href={`/poster/${shortId}?template=square`}>
+          方图模板
+        </Link>
       </div>
 
       <PosterActions downloadFileName={`findMypet-${shortId}-${template}.png`} targetId={posterElementId} />
-      {template === "alert" ? (
+      {template === "square" ? (
+        <NoticeSquarePoster className="poster-capture" id={posterElementId} notice={notice} />
+      ) : template === "alert" ? (
         <NoticeAlertPoster className="poster-capture" id={posterElementId} notice={notice} />
       ) : (
         <NoticePoster className="poster-capture" id={posterElementId} notice={notice} />

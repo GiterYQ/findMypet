@@ -11,6 +11,7 @@ import { normalizePosterTemplate } from "../lib/notice/poster-template.ts";
 test("normalizePosterTemplate accepts known poster templates", () => {
   assert.equal(normalizePosterTemplate("classic"), "classic");
   assert.equal(normalizePosterTemplate("alert"), "alert");
+  assert.equal(normalizePosterTemplate("square"), "square");
 });
 
 test("normalizePosterTemplate falls back to classic for unknown values", () => {

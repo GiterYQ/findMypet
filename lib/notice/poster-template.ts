@@ -1,10 +1,10 @@
 /**
  * Poster template
  * 作用：定义海报模板 ID 与 URL 参数归一化规则。
- * 联动：poster 页面、NoticePoster、NoticeAlertPoster、tests/poster-template.test.mts。
+ * 联动：poster 页面、NoticePoster、NoticeAlertPoster、NoticeSquarePoster、tests/poster-template.test.mts。
  * 层级：utility
  */
-export const posterTemplateIds = ["classic", "alert"] as const;
+export const posterTemplateIds = ["classic", "alert", "square"] as const;
 
 export type PosterTemplateId = (typeof posterTemplateIds)[number];
 

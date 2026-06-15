@@ -573,6 +573,213 @@ textarea {
   font-weight: 800;
 }
 
+.poster-square {
+  aspect-ratio: 1 / 1;
+  background:
+    radial-gradient(circle at 88% 12%, rgba(255, 213, 80, 0.88), transparent 24%),
+    linear-gradient(150deg, #fff7e7 0%, #fff 48%, #ffe6dc 100%);
+  border: 2px solid rgba(36, 31, 29, 0.9);
+  border-radius: 34px;
+  box-shadow: 0 24px 70px rgba(48, 29, 16, 0.2);
+  color: #251d19;
+  display: grid;
+  gap: 16px;
+  grid-template-rows: auto minmax(0, 1fr) auto auto auto auto;
+  max-width: 900px;
+  overflow: hidden;
+  padding: 26px;
+  position: relative;
+}
+
+.poster-square::before {
+  background: #e91d2c;
+  border-radius: 999px;
+  content: "";
+  height: 190px;
+  position: absolute;
+  right: -88px;
+  top: -92px;
+  width: 190px;
+}
+
+.poster-square-top,
+.poster-square-body,
+.poster-square-info,
+.poster-square-contact {
+  position: relative;
+  z-index: 1;
+}
+
+.poster-square-top {
+  align-items: center;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+}
+
+.poster-square-top span {
+  background: #251d19;
+  border-radius: 999px;
+  color: #fff;
+  font-size: clamp(1rem, 2vw, 1.35rem);
+  font-weight: 900;
+  padding: 8px 14px;
+}
+
+.poster-square-top strong {
+  color: #e91d2c;
+  font-size: clamp(2rem, 6vw, 4.6rem);
+  font-weight: 1000;
+  letter-spacing: -0.07em;
+  line-height: 0.9;
+  text-align: center;
+}
+
+.poster-square-top small {
+  color: #695f58;
+  font-weight: 900;
+}
+
+.poster-square-photo {
+  background: rgba(255, 255, 255, 0.72);
+  border: 2px solid rgba(36, 31, 29, 0.12);
+  border-radius: 28px;
+  display: grid;
+  min-height: 0;
+  overflow: hidden;
+  place-items: center;
+}
+
+.poster-square-photo img {
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+.poster-square-photo div {
+  display: grid;
+  gap: 8px;
+  place-items: center;
+}
+
+.poster-square-photo div strong {
+  color: #e91d2c;
+  font-size: clamp(3rem, 12vw, 7rem);
+  font-weight: 1000;
+}
+
+.poster-square-photo div span {
+  color: #6b625c;
+  font-weight: 900;
+}
+
+.poster-square-body {
+  align-items: end;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.poster-square-body p {
+  color: #7a6f68;
+  font-weight: 900;
+  margin: 0 0 4px;
+}
+
+.poster-square-body h1 {
+  font-size: clamp(2.8rem, 9vw, 5.8rem);
+  font-weight: 1000;
+  letter-spacing: -0.08em;
+  line-height: 0.88;
+  margin: 0;
+}
+
+.poster-square-reward {
+  background: #e91d2c;
+  border-radius: 24px;
+  color: #fff;
+  display: grid;
+  min-width: 180px;
+  padding: 14px 18px;
+  text-align: center;
+}
+
+.poster-square-reward span {
+  font-size: 0.85rem;
+  font-weight: 900;
+  opacity: 0.82;
+}
+
+.poster-square-reward strong {
+  font-size: clamp(1.6rem, 4vw, 3rem);
+  font-weight: 1000;
+  line-height: 1;
+}
+
+.poster-square-info {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 1fr 1fr;
+}
+
+.poster-square-info div {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(36, 31, 29, 0.12);
+  border-radius: 18px;
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+}
+
+.poster-square-info span {
+  color: #7a6f68;
+  font-size: 0.88rem;
+  font-weight: 900;
+}
+
+.poster-square-info strong {
+  font-size: clamp(1.05rem, 2vw, 1.45rem);
+  font-weight: 1000;
+  overflow-wrap: anywhere;
+}
+
+.poster-square-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  position: relative;
+  z-index: 1;
+}
+
+.poster-square-tags span {
+  background: #251d19;
+  border-radius: 999px;
+  color: #fff;
+  font-weight: 900;
+  padding: 7px 10px;
+}
+
+.poster-square-contact {
+  background: #251d19;
+  border-radius: 22px;
+  color: #fff;
+  display: grid;
+  gap: 4px;
+  padding: 16px 18px;
+}
+
+.poster-square-contact span {
+  color: #ffd550;
+  font-weight: 900;
+}
+
+.poster-square-contact strong {
+  font-size: clamp(1.3rem, 4vw, 2.4rem);
+  font-weight: 1000;
+  line-height: 1;
+  overflow-wrap: anywhere;
+}
+
 @media print {
   html,
   body {
@@ -596,6 +803,10 @@ textarea {
   }
 
   .poster-alert {
+    box-shadow: none;
+  }
+
+  .poster-square {
     box-shadow: none;
   }
 }
@@ -699,5 +910,29 @@ textarea {
 
   .poster-alert-photo {
     min-height: 220px;
+  }
+
+  .poster-square {
+    aspect-ratio: auto;
+    border-radius: 24px;
+    padding: 16px;
+  }
+
+  .poster-square-top,
+  .poster-square-body,
+  .poster-square-info {
+    grid-template-columns: 1fr;
+  }
+
+  .poster-square-top strong {
+    text-align: left;
+  }
+
+  .poster-square-photo {
+    aspect-ratio: 1 / 1;
+  }
+
+  .poster-square-reward {
+    min-width: 0;
   }
 }
