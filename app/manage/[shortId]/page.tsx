@@ -9,6 +9,7 @@ import { NoticeForm } from "@/components/notice/NoticeForm";
 import { type NoticeCreateInput } from "@/lib/notice/notice.schema";
 import { noticeService } from "@/lib/notice/notice.service";
 import { type AdminNoticePayload } from "@/lib/notice/notice.types";
+import { notFound } from "next/navigation";
 
 type PageProps = {
   params: Promise<{ shortId: string }>;
@@ -18,7 +19,16 @@ type PageProps = {
 export default async function ManagePage({ params, searchParams }: PageProps) {
   const { shortId } = await params;
   const { token } = await searchParams;
+
+  if (!token) {
+    notFound();
+  }
+
   const result = await noticeService.getNoticeByShortId(shortId, token);
+  if (result.view !== "admin") {
+    notFound();
+  }
+
   const notice = result.data as AdminNoticePayload;
   const editablePayload: Partial<NoticeCreateInput> = {
     locale: notice.locale,
@@ -46,6 +56,7 @@ export default async function ManagePage({ params, searchParams }: PageProps) {
           activityState={notice.activityState}
           businessStatus={notice.businessStatus}
           noticeCategory={notice.noticeCategory}
+          petName={notice.petProfile.name}
           location={notice.lostInfo.location}
           manageToken={token ?? ""}
           manageUrl={manageUrl}

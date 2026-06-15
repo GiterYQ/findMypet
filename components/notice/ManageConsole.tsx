@@ -6,10 +6,13 @@
  */
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { CopyButton } from "@/components/notice/CopyButton";
 import { LocationLinkCard } from "@/components/notice/LocationLinkCard";
+import { saveManagedNotice } from "@/lib/manage/manage-history";
+import { parseManageUrl } from "@/lib/manage/manage-url";
 import { getActivityStateLabel, getBusinessStatusLabel, getNoticeCategoryLabel } from "@/lib/notice/notice-display";
 import { type NoticeCategory, type PetLocation } from "@/lib/notice/notice.types";
 
@@ -17,6 +20,7 @@ type ManageConsoleProps = {
   shortId: string;
   manageToken: string;
   noticeCategory: NoticeCategory;
+  petName: string;
   businessStatus: "active" | "recovered" | "closed";
   activityState: "fresh" | "stale" | "archived";
   publicShareUrl: string;
@@ -28,6 +32,7 @@ export function ManageConsole({
   shortId,
   manageToken,
   noticeCategory,
+  petName,
   businessStatus,
   activityState,
   publicShareUrl,
@@ -37,6 +42,24 @@ export function ManageConsole({
   const router = useRouter();
   const [message, setMessage] = useState<string | null>(null);
   const [pendingAction, setPendingAction] = useState<string | null>(null);
+
+  useEffect(() => {
+    const parsed = parseManageUrl(manageUrl, window.location.origin);
+
+    if (!parsed) {
+      return;
+    }
+
+    const publicUrl = new URL(publicShareUrl, window.location.origin).toString();
+    saveManagedNotice({
+      shortId: parsed.shortId,
+      petName: petName || "未命名启事",
+      noticeCategory,
+      publicShareUrl: publicUrl,
+      manageUrl: parsed.manageUrl,
+      createdAt: new Date().toISOString()
+    });
+  }, [manageUrl, noticeCategory, petName, publicShareUrl]);
 
   async function runAction(action: "refresh" | "reopen" | "status", statusValue?: "recovered" | "closed") {
     setPendingAction(action);
@@ -87,6 +110,8 @@ export function ManageConsole({
         <Link className="button button-secondary" href={`/poster/${shortId}`} target="_blank">
           打开海报页
         </Link>
+        <CopyButton label="复制公开链接" makeAbsolute text={publicShareUrl} />
+        <CopyButton label="复制管理链接" makeAbsolute text={manageUrl} />
       </div>
       <div className="actions">
         <button className="button button-secondary" disabled={pendingAction !== null || businessStatus !== "active"} onClick={() => runAction("refresh")} type="button">

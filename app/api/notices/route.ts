@@ -25,6 +25,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       item: result.notice.id,
+      shortId: result.notice.shortId,
       publicShareUrl: result.publicShareUrl,
       manageUrl: result.manageUrl
     });

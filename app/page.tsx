@@ -9,6 +9,7 @@ import { NoticeFilters } from "@/components/notice/NoticeFilters";
 import { NoticeForm } from "@/components/notice/NoticeForm";
 import { noticeService } from "@/lib/notice/notice.service";
 import { t } from "@/lib/i18n/t";
+import Link from "next/link";
 
 type HomePageProps = {
   searchParams: Promise<{ regionCode?: string; petType?: string }>;
@@ -28,6 +29,11 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       <section className="hero">
         <h1>{t("notice.create.title", "快速生成寻宠启事")}</h1>
         <p>{t("notice.create.subtitle", "上传照片、填写信息、生成海报与分享页。")}</p>
+        <div className="actions">
+          <Link className="button button-secondary" href="/mine">
+            我的启事
+          </Link>
+        </div>
       </section>
 
       <NoticeForm />

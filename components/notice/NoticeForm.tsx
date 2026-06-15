@@ -7,9 +7,11 @@
 "use client";
 
 import { type ChangeEvent, useState } from "react";
+import { CopyButton } from "@/components/notice/CopyButton";
 import { compressImageFile, uploadCompressedImage } from "@/lib/media/client-image";
 import { type NoticeCreateInput } from "@/lib/notice/notice.schema";
 import { getLocationFieldLabel, getNoticeCategoryLabel, getTimeFieldLabel } from "@/lib/notice/notice-display";
+import { saveManagedNotice } from "@/lib/manage/manage-history";
 
 type NoticeFormProps = {
   initialValue?: Partial<NoticeCreateInput>;
@@ -248,6 +250,14 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
           manageUrl: data.manageUrl
         });
         localStorage.setItem("findMypet.latestManageUrl", data.manageUrl);
+        saveManagedNotice({
+          shortId: data.shortId,
+          petName: cleaned.petProfile.name,
+          noticeCategory: cleaned.noticeCategory,
+          publicShareUrl: data.publicShareUrl,
+          manageUrl: data.manageUrl,
+          createdAt: new Date().toISOString()
+        });
       }
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : isEditMode ? "Update failed." : "Create failed.");
@@ -691,15 +701,22 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
             <h3>启事已生成</h3>
             <div className="field">
               <label>公开分享页</label>
-              <a className="button button-primary" href={result.publicShareUrl} target="_blank" rel="noopener noreferrer">
-                查看分享页
-              </a>
+              <div className="actions">
+                <a className="button button-primary" href={result.publicShareUrl} target="_blank" rel="noopener noreferrer">
+                  查看分享页
+                </a>
+                <CopyButton label="复制公开链接" text={result.publicShareUrl} />
+              </div>
             </div>
             <div className="field">
               <label>管理页（请妥善保存）</label>
-              <a className="button button-secondary" href={result.manageUrl} target="_blank" rel="noopener noreferrer">
-                打开管理页
-              </a>
+              <div className="actions">
+                <a className="button button-secondary" href={result.manageUrl} target="_blank" rel="noopener noreferrer">
+                  打开管理页
+                </a>
+                <CopyButton label="复制管理链接" text={result.manageUrl} />
+              </div>
+              <p className="hint">匿名模式下，管理链接就是刷新、编辑和标记找回的凭证。建议复制保存或发送到自己的邮箱。</p>
             </div>
             <div className="field">
               <label>海报页</label>
