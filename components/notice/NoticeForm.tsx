@@ -599,22 +599,24 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
           </div>
 
           <div>
-            <div className="field">
-              <label htmlFor="ownerEmail">管理链接邮箱</label>
-              <input
-                id="ownerEmail"
-                maxLength={100}
-                type="email"
-                value={String(payload.ownerNotificationEmail)}
-                onChange={(event) =>
-                  setPayload((current) => ({
-                    ...current,
-                    ownerNotificationEmail: event.target.value
-                  }))
-                }
-              />
-              <div className="hint">仅用于接收管理链接，不自动公开展示。</div>
-            </div>
+            {!isEditMode ? (
+              <div className="field">
+                <label htmlFor="ownerEmail">管理链接邮箱</label>
+                <input
+                  id="ownerEmail"
+                  maxLength={100}
+                  type="email"
+                  value={String(payload.ownerNotificationEmail)}
+                  onChange={(event) =>
+                    setPayload((current) => ({
+                      ...current,
+                      ownerNotificationEmail: event.target.value
+                    }))
+                  }
+                />
+                <div className="hint">仅用于接收管理链接，不自动公开展示。创建后如需找回，请使用管理链接或“我的启事”。</div>
+              </div>
+            ) : null}
 
             <div className="field">
               <label htmlFor="description">补充描述</label>
