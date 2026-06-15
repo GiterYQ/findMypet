@@ -5,6 +5,7 @@
  * 层级：route
  */
 import { NextResponse } from "next/server";
+import { detectImageMimeType } from "@/lib/media/image-validation";
 import { storeUploadedImage } from "@/lib/media/local-storage.service";
 
 export const runtime = "nodejs";
@@ -29,10 +30,16 @@ export async function POST(request: Request) {
     }
 
     const arrayBuffer = await file.arrayBuffer();
-    const uploaded = await storeUploadedImage(Buffer.from(arrayBuffer), file.type);
+    const buffer = Buffer.from(arrayBuffer);
+    const detectedMimeType = detectImageMimeType(buffer);
+
+    if (!detectedMimeType) {
+      return NextResponse.json({ error: { code: "INVALID_INPUT", message: "Unsupported or invalid image file." } }, { status: 400 });
+    }
+
+    const uploaded = await storeUploadedImage(buffer, detectedMimeType);
     return NextResponse.json({ item: uploaded });
   } catch {
     return NextResponse.json({ error: { code: "UNKNOWN", message: "Unexpected upload error." } }, { status: 500 });
   }
 }
-
