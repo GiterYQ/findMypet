@@ -4,12 +4,28 @@
  * 联动：app/globals.css、各路由页面。
  * 层级：page
  */
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "@/app/globals.css";
 
 export const metadata: Metadata = {
   title: "findMypet",
-  description: "A lightweight lost pet notice tool with hosted share pages."
+  description: "A lightweight lost pet notice tool with hosted share pages.",
+  applicationName: "findMypet",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "findMypet"
+  },
+  formatDetection: {
+    telephone: false
+  }
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#f6f3ec"
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -19,4 +35,3 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     </html>
   );
 }
-

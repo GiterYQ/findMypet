@@ -89,12 +89,12 @@ function verifyOwnerToken(notice: Pick<PetNotice, "ownerTokenHash">, rawToken?: 
   }
 }
 
-function getBaseUrl() {
-  return process.env.APP_BASE_URL?.replace(/\/$/, "") ?? "http://localhost:3000";
+function getBaseUrl(baseUrl?: string) {
+  return baseUrl?.replace(/\/$/, "") ?? process.env.APP_BASE_URL?.replace(/\/$/, "") ?? "http://localhost:3000";
 }
 
 export const noticeService = {
-  async createNotice(rawInput: unknown) {
+  async createNotice(rawInput: unknown, baseUrl?: string) {
     const input = noticeCreateSchema.parse(rawInput);
     const rawToken = crypto.randomBytes(32).toString("hex");
     const derivedFields = buildDerivedFields(input);
@@ -130,8 +130,9 @@ export const noticeService = {
       toActivity: notice.activityState
     });
 
-    const publicShareUrl = `${getBaseUrl()}/notice/${notice.shortId}`;
-    const manageUrl = `${getBaseUrl()}/manage/${notice.shortId}?token=${rawToken}`;
+    const resolvedBaseUrl = getBaseUrl(baseUrl);
+    const publicShareUrl = `${resolvedBaseUrl}/notice/${notice.shortId}`;
+    const manageUrl = `${resolvedBaseUrl}/manage/${notice.shortId}?token=${rawToken}`;
 
     if (input.ownerNotificationEmail) {
       const delivery = await sendManageLinkEmail({

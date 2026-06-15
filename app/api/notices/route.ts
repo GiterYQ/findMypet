@@ -6,6 +6,7 @@
  */
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
+import { resolveAppBaseUrl } from "@/lib/core/app-url";
 import { AppError } from "@/lib/core/app-error";
 import { noticeService } from "@/lib/notice/notice.service";
 
@@ -21,7 +22,13 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const payload = await request.json();
-    const result = await noticeService.createNotice(payload);
+    const requestOrigin = new URL(request.url).origin;
+    const baseUrl = resolveAppBaseUrl({
+      requestOrigin,
+      configuredBaseUrl: process.env.APP_BASE_URL,
+      nodeEnv: process.env.NODE_ENV
+    });
+    const result = await noticeService.createNotice(payload, baseUrl);
 
     return NextResponse.json({
       item: result.notice.id,

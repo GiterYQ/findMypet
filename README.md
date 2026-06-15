@@ -9,6 +9,15 @@ A lightweight global lost-pet notice tool built with Next.js and Prisma.
 3. Run `TMPDIR=/tmp npx prisma db push`
 4. Run `npm run dev`
 
+## Mobile LAN testing
+
+1. Make sure your phone and computer are on the same Wi-Fi.
+2. Run `npm run dev:mobile`.
+3. Find your computer LAN IP, for example `ipconfig getifaddr en0` on macOS.
+4. Open `http://<LAN-IP>:3000` on the phone.
+
+During local development, share and manage links use the request origin when `APP_BASE_URL` still points to `localhost`, so phone-created notices will generate phone-accessible LAN links.
+
 ## Environment
 
 - `DATABASE_URL`: local SQLite or production database URL

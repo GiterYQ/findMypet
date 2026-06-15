@@ -23,6 +23,7 @@
 
 html {
   min-height: 100%;
+  -webkit-text-size-adjust: 100%;
   background:
     radial-gradient(circle at top left, rgba(211, 94, 56, 0.12), transparent 28%),
     radial-gradient(circle at top right, rgba(157, 120, 67, 0.12), transparent 24%),
@@ -31,6 +32,8 @@ html {
 
 body {
   margin: 0;
+  min-height: 100dvh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   color: var(--text);
   font-family: "Avenir Next", "PingFang SC", "Noto Sans", sans-serif;
 }
@@ -45,6 +48,20 @@ input,
 select,
 textarea {
   font: inherit;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: rgba(211, 94, 56, 0.18);
+}
+
+input,
+select,
+textarea {
+  max-width: 100%;
 }
 
 .shell {
@@ -133,6 +150,8 @@ textarea {
   border: 0;
   cursor: pointer;
   transition: transform 160ms ease, opacity 160ms ease;
+  min-height: 44px;
+  text-align: center;
 }
 
 .button:hover {
@@ -251,6 +270,7 @@ textarea {
 
 .mono {
   font-family: "SF Mono", "Menlo", monospace;
+  overflow-wrap: anywhere;
 }
 
 .poster-shell {
@@ -406,12 +426,72 @@ textarea {
 }
 
 @media (max-width: 760px) {
+  .shell {
+    width: min(100% - 24px, 540px);
+  }
+
   .two-col {
     grid-template-columns: 1fr;
   }
 
   .hero {
-    padding-top: 36px;
+    padding: 32px 0 18px;
+  }
+
+  .hero h1 {
+    font-size: clamp(2.15rem, 12vw, 3.2rem);
+    letter-spacing: -0.05em;
+  }
+
+  .hero p {
+    font-size: 1rem;
+  }
+
+  .panel {
+    border-radius: 20px;
+  }
+
+  .section {
+    padding: 16px;
+  }
+
+  .field input,
+  .field select,
+  .field textarea {
+    font-size: 16px;
+    min-height: 46px;
+  }
+
+  .field textarea {
+    min-height: 108px;
+  }
+
+  .actions {
+    gap: 10px;
+  }
+
+  .actions .button,
+  .actions a.button,
+  .actions button.button {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+
+  .radio-group,
+  .tag-list {
+    gap: 10px;
+  }
+
+  .radio-label {
+    min-height: 38px;
+  }
+
+  .notice-grid {
+    grid-template-columns: 1fr;
+  }
+
+  fieldset .grid {
+    grid-template-columns: 1fr !important;
   }
 
   .poster-grid,
