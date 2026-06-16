@@ -6,7 +6,7 @@
  */
 import assert from "node:assert/strict";
 import test from "node:test";
-import { normalizePosterTemplate } from "../lib/notice/poster-template.ts";
+import { getPosterTemplateHref, posterTemplateOptions, normalizePosterTemplate } from "../lib/notice/poster-template.ts";
 
 test("normalizePosterTemplate accepts known poster templates", () => {
   assert.equal(normalizePosterTemplate("classic"), "classic");
@@ -17,4 +17,18 @@ test("normalizePosterTemplate accepts known poster templates", () => {
 test("normalizePosterTemplate falls back to classic for unknown values", () => {
   assert.equal(normalizePosterTemplate(undefined), "classic");
   assert.equal(normalizePosterTemplate("random"), "classic");
+});
+
+test("posterTemplateOptions exposes user-facing metadata for each template", () => {
+  assert.deepEqual(
+    posterTemplateOptions.map((template) => template.id),
+    ["classic", "alert", "square"]
+  );
+  assert.ok(posterTemplateOptions.every((template) => template.label && template.useCase && template.aspectLabel));
+});
+
+test("getPosterTemplateHref keeps classic URL clean and adds query for other templates", () => {
+  assert.equal(getPosterTemplateHref("abc123", "classic"), "/poster/abc123");
+  assert.equal(getPosterTemplateHref("abc123", "alert"), "/poster/abc123?template=alert");
+  assert.equal(getPosterTemplateHref("abc123", "square"), "/poster/abc123?template=square");
 });

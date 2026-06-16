@@ -9,7 +9,7 @@ import { NoticeAlertPoster } from "@/components/notice/NoticeAlertPoster";
 import { NoticePoster } from "@/components/notice/NoticePoster";
 import { NoticeSquarePoster } from "@/components/notice/NoticeSquarePoster";
 import { PosterActions } from "@/components/notice/PosterActions";
-import { normalizePosterTemplate } from "@/lib/notice/poster-template";
+import { getPosterTemplateHref, normalizePosterTemplate, posterTemplateOptions } from "@/lib/notice/poster-template";
 import { noticeService } from "@/lib/notice/notice.service";
 import { type PublicNoticePayload } from "@/lib/notice/notice.types";
 
@@ -33,17 +33,19 @@ export default async function PosterPage({ params, searchParams }: PageProps) {
         <p>这是首版海报成品页。可以下载 PNG，也可以直接打印或保存为 PDF。</p>
       </section>
 
-      <div className="actions" style={{ marginBottom: 20 }}>
-        <Link className={template === "classic" ? "button button-primary" : "button button-secondary"} href={`/poster/${shortId}`}>
-          经典模板
-        </Link>
-        <Link className={template === "alert" ? "button button-primary" : "button button-secondary"} href={`/poster/${shortId}?template=alert`}>
-          警示模板
-        </Link>
-        <Link className={template === "square" ? "button button-primary" : "button button-secondary"} href={`/poster/${shortId}?template=square`}>
-          方图模板
-        </Link>
-      </div>
+      <section className="poster-template-picker" aria-label="选择海报模板">
+        {posterTemplateOptions.map((option) => (
+          <Link
+            className={template === option.id ? "poster-template-option poster-template-option-active" : "poster-template-option"}
+            href={getPosterTemplateHref(shortId, option.id)}
+            key={option.id}
+          >
+            <span>{option.aspectLabel}</span>
+            <strong>{option.label}</strong>
+            <small>{option.useCase}</small>
+          </Link>
+        ))}
+      </section>
 
       <PosterActions downloadFileName={`findMypet-${shortId}-${template}.png`} targetId={posterElementId} />
       {template === "square" ? (
