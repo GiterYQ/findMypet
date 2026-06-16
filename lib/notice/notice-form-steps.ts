@@ -32,6 +32,25 @@ type NoticeFormStep = {
   tone: "ember" | "leaf" | "sky" | "gold" | "ink";
 };
 
+const noticeFormStepFieldLabels: Record<NoticeFormStepField, string> = {
+  noticeCategory: "发布类型",
+  petName: "宠物名称",
+  petType: "宠物类型",
+  addressText: "位置",
+  nearbyLandmark: "标志物",
+  contact: "联系方式",
+  photoUpload: "照片",
+  description: "描述",
+  lostDate: "日期",
+  timePrecision: "时间精度",
+  lostDisplay: "时间说明",
+  riskFlags: "风险标签",
+  rewardRecovery: "悬赏",
+  ownerEmail: "邮箱",
+  antiScam: "防骗提示",
+  submit: "提交"
+};
+
 export const noticeFormSteps = [
   {
     id: "essentials",
@@ -94,6 +113,21 @@ export function getNoticeFormStepById(stepId: NoticeFormStepId) {
 export function isNoticeFormStepField(stepId: NoticeFormStepId, field: NoticeFormStepField) {
   const fields: readonly NoticeFormStepField[] = getNoticeFormStepById(stepId).fields;
   return fields.includes(field);
+}
+
+export function isNoticeFormFieldRequired(stepId: NoticeFormStepId, field: NoticeFormStepField) {
+  const requiredFields: readonly NoticeFormStepField[] = getNoticeFormStepById(stepId).requiredFields;
+  return requiredFields.includes(field);
+}
+
+export function getNoticeFormRequiredSummary(stepId: NoticeFormStepId) {
+  const requiredFields: readonly NoticeFormStepField[] = getNoticeFormStepById(stepId).requiredFields;
+
+  if (requiredFields.length === 0) {
+    return "可选信息，可直接下一步";
+  }
+
+  return `必填：${requiredFields.map((field) => noticeFormStepFieldLabels[field]).join("、")}`;
 }
 
 export function getNoticeFormNextButtonLabel(stepId: NoticeFormStepId) {

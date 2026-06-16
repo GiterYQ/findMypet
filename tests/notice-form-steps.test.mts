@@ -7,9 +7,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  getNoticeFormRequiredSummary,
   getNoticeFormNextButtonLabel,
   getNoticeFormStep,
   getNoticeFormStepById,
+  isNoticeFormFieldRequired,
   isNoticeFormStepField,
   noticeFormSteps
 } from "../lib/notice/notice-form-steps.ts";
@@ -37,6 +39,18 @@ test("essentials step only requires location and contact", () => {
   const step = getNoticeFormStepById("essentials");
 
   assert.deepEqual(step.requiredFields, ["addressText", "contact"]);
+});
+
+test("isNoticeFormFieldRequired identifies required fields per step", () => {
+  assert.equal(isNoticeFormFieldRequired("essentials", "addressText"), true);
+  assert.equal(isNoticeFormFieldRequired("essentials", "contact"), true);
+  assert.equal(isNoticeFormFieldRequired("essentials", "petName"), false);
+  assert.equal(isNoticeFormFieldRequired("photo", "photoUpload"), false);
+});
+
+test("getNoticeFormRequiredSummary makes required scope obvious", () => {
+  assert.equal(getNoticeFormRequiredSummary("essentials"), "必填：位置、联系方式");
+  assert.equal(getNoticeFormRequiredSummary("photo"), "可选信息，可直接下一步");
 });
 
 test("isNoticeFormStepField matches field ids to their owning step", () => {

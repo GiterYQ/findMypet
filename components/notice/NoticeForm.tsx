@@ -11,9 +11,11 @@ import { CopyButton } from "@/components/notice/CopyButton";
 import { compressImageFile, uploadCompressedImage } from "@/lib/media/client-image";
 import { formatAmountMinorForDisplay, majorAmountInputToMinor, minorAmountToMajorInput } from "@/lib/notice/money";
 import {
+  getNoticeFormRequiredSummary,
   getNoticeFormNextButtonLabel,
   getNoticeFormStep,
   type NoticeFormStepField,
+  isNoticeFormFieldRequired,
   noticeFormSteps
 } from "@/lib/notice/notice-form-steps";
 import { type NoticeCreateInput } from "@/lib/notice/notice.schema";
@@ -215,9 +217,42 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
     currentTimeDisplay && !timeDisplayOptions.some((option) => option.value === currentTimeDisplay)
       ? [{ label: currentTimeDisplay, value: currentTimeDisplay }, ...timeDisplayOptions]
       : timeDisplayOptions;
+  const requiredSummary = getNoticeFormRequiredSummary(activeStep.id);
 
   function isFieldVisible(field: NoticeFormStepField) {
     return isEditMode || activeStepFields.includes(field);
+  }
+
+  function isCurrentFieldRequired(field: NoticeFormStepField) {
+    return isStepFlow ? isNoticeFormFieldRequired(activeStep.id, field) : field === "addressText" || field === "contact";
+  }
+
+  function renderRequirementBadge(field: NoticeFormStepField) {
+    const isRequired = isCurrentFieldRequired(field);
+
+    return (
+      <span className={`notice-field-badge ${isRequired ? "notice-field-badge-required" : "notice-field-badge-optional"}`}>
+        {isRequired ? "必填" : "可选"}
+      </span>
+    );
+  }
+
+  function renderFieldLabel(field: NoticeFormStepField, label: string, htmlFor?: string) {
+    return (
+      <label className="notice-field-label" htmlFor={htmlFor}>
+        <span>{label}</span>
+        {renderRequirementBadge(field)}
+      </label>
+    );
+  }
+
+  function renderLegend(field: NoticeFormStepField, label: string) {
+    return (
+      <span className="notice-field-label">
+        <span>{label}</span>
+        {renderRequirementBadge(field)}
+      </span>
+    );
   }
 
   function handleCategoryChange(category: NoticeCreateInput["noticeCategory"]) {
@@ -398,6 +433,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
               <div>
                 <strong>{activeStep.title}</strong>
                 <p>{activeStep.summary}</p>
+                <p className="notice-step-required-summary">{requiredSummary}</p>
                 {activeStep.skippable ? <p>这一步可不填，直接点下一步。</p> : null}
               </div>
             </div>
@@ -419,7 +455,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
             <div>
             {isFieldVisible("noticeCategory") ? (
               <div className="field">
-              <label>发布类型</label>
+              {renderFieldLabel("noticeCategory", "发布类型")}
               <div className="radio-group">
                 <label className="radio-label">
                   <input
@@ -447,7 +483,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
 
             {isFieldVisible("petName") ? (
               <div className="field">
-              <label htmlFor="petName">宠物名称</label>
+              {renderFieldLabel("petName", "宠物名称", "petName")}
               <input
                 id="petName"
                 maxLength={30}
@@ -471,7 +507,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
 
             {isFieldVisible("petType") ? (
               <div className="field">
-              <label htmlFor="petType">宠物类型</label>
+              {renderFieldLabel("petType", "宠物类型", "petType")}
               <select
                 id="petType"
                 value={String(payload.petProfile.type)}
@@ -495,7 +531,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
 
             {isFieldVisible("photoUpload") ? (
               <div className="field">
-              <label htmlFor="photoUpload">宠物照片</label>
+              {renderFieldLabel("photoUpload", "宠物照片", "photoUpload")}
               <input accept="image/*" id="photoUpload" multiple onChange={handleImageChange} type="file" />
               <div className="hint">支持最多 3 张图片，浏览器会先压缩后再提交。</div>
               <div className="tag-list">
@@ -535,12 +571,12 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
 
             {isFieldVisible("addressText") || isFieldVisible("nearbyLandmark") ? (
               <fieldset className="field" style={{ border: "1px solid var(--color-border, #ddd)", borderRadius: 8, padding: 10 }}>
-              <legend>{locationFieldLabel}</legend>
+              <legend>{renderLegend("addressText", locationFieldLabel)}</legend>
 
               {isEditMode ? (
                 <div className="grid" style={{ gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 8 }}>
                 <div className="field" style={{ marginBottom: 0 }}>
-                  <label htmlFor="province">省/直辖市</label>
+                  {renderFieldLabel("addressText", "省/直辖市", "province")}
                   <input
                     id="province"
                     maxLength={20}
@@ -558,7 +594,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
                   />
                 </div>
                 <div className="field" style={{ marginBottom: 0 }}>
-                  <label htmlFor="city">市</label>
+                  {renderFieldLabel("addressText", "市", "city")}
                   <input
                     id="city"
                     maxLength={20}
@@ -576,7 +612,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
                   />
                 </div>
                 <div className="field" style={{ marginBottom: 0 }}>
-                  <label htmlFor="district">区/县</label>
+                  {renderFieldLabel("addressText", "区/县", "district")}
                   <input
                     id="district"
                     maxLength={20}
@@ -598,7 +634,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
 
               {isEditMode ? (
                 <div className="field" style={{ marginBottom: 8 }}>
-                <label htmlFor="street">街道/乡镇</label>
+                {renderFieldLabel("addressText", "街道/乡镇", "street")}
                 <input
                   id="street"
                   maxLength={50}
@@ -618,7 +654,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
               ) : null}
 
               <div className="field" style={{ marginBottom: 8 }}>
-                <label htmlFor="addressText">详细地址</label>
+                {renderFieldLabel("addressText", "详细地址", "addressText")}
                 <input
                   id="addressText"
                   maxLength={200}
@@ -637,7 +673,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
               </div>
 
               <div className="field" style={{ marginBottom: 0 }}>
-                <label htmlFor="nearbyLandmark">附近标志物</label>
+                {renderFieldLabel("nearbyLandmark", "附近标志物", "nearbyLandmark")}
                 <input
                   id="nearbyLandmark"
                   maxLength={100}
@@ -659,10 +695,10 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
 
             {isFieldVisible("lostDate") || isFieldVisible("timePrecision") || isFieldVisible("lostDisplay") ? (
               <fieldset className="field" style={{ border: "1px solid var(--color-border, #ddd)", borderRadius: 8, padding: 10 }}>
-              <legend>{timeFieldLabel}</legend>
+              <legend>{renderLegend("lostDate", timeFieldLabel)}</legend>
 
               <div className="field" style={{ marginBottom: 8 }}>
-                <label htmlFor="lostDate">日期</label>
+                {renderFieldLabel("lostDate", "日期", "lostDate")}
                 <input
                   id="lostDate"
                   type="date"
@@ -685,7 +721,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
               </div>
 
               <div className="field" style={{ marginBottom: 8 }}>
-                <label>时间精度</label>
+                {renderFieldLabel("timePrecision", "时间精度")}
                 <div className="radio-group">
                   {([
                     { value: "exact", label: "精确时间" },
@@ -725,7 +761,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
               </div>
 
               <div className="field" style={{ marginBottom: 0 }}>
-                <label htmlFor="lostDisplay">{payload.lostInfo.lostTime.precision === "exact" ? "具体时间" : "补充说明"}</label>
+                {renderFieldLabel("lostDisplay", payload.lostInfo.lostTime.precision === "exact" ? "具体时间" : "补充说明", "lostDisplay")}
                 <select
                   id="lostDisplay"
                   value={payload.lostInfo.lostTime.precision === "exact" ? selectedExactTimeValue : currentTimeDisplay}
@@ -766,7 +802,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
 
             {isFieldVisible("contact") ? (
               <div className="field">
-              <label htmlFor="contact">主联系方式</label>
+              {renderFieldLabel("contact", "主联系方式", "contact")}
               <input
                 id="contact"
                 maxLength={100}
@@ -793,7 +829,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
             <div>
             {!isEditMode && isFieldVisible("ownerEmail") ? (
               <div className="field">
-                <label htmlFor="ownerEmail">管理链接邮箱</label>
+                {renderFieldLabel("ownerEmail", "管理链接邮箱", "ownerEmail")}
                 <input
                   id="ownerEmail"
                   maxLength={100}
@@ -812,7 +848,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
 
             {isFieldVisible("description") ? (
               <div className="field">
-              <label htmlFor="description">补充描述</label>
+              {renderFieldLabel("description", "补充描述", "description")}
               <textarea
                 id="description"
                 maxLength={500}
@@ -833,7 +869,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
 
             {isFieldVisible("rewardRecovery") ? (
               <div className="field">
-              <label htmlFor="rewardRecovery">找回奖励（元）</label>
+              {renderFieldLabel("rewardRecovery", "找回奖励（元）", "rewardRecovery")}
               <input
                 id="rewardRecovery"
                 max={100000}
@@ -862,7 +898,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
 
             {isFieldVisible("riskFlags") ? (
               <div className="field">
-              <label>紧急风险标签</label>
+              {renderFieldLabel("riskFlags", "紧急风险标签")}
               <div className="tag-list">
                 {riskOptions.map((risk) => (
                   <button

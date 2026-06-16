@@ -153,3 +153,20 @@
   - `npm test` 通过 32 项。
   - `npm run lint` 通过。
   - `npm run build` 通过。
+
+## 2026-06-16 手机端 App 化体验优化
+
+- 完成用户反馈：
+  - 手机端隐藏桌面式 hero，改为 sticky 顶部 App 栏，降低“手机打开网页”的感觉。
+  - 增加底部快捷 tab：发布、列表、我的，方便手机单手跳转。
+  - 创建表单在手机端使用更强的 App 卡片感、圆角输入框、浮层式下一步操作区。
+  - 字段标题增加“必填/可选” badge，第一步明确展示“必填：位置、联系方式”。
+  - 手机端默认隐藏筛选表单，公开列表保留为紧凑动态区。
+- TDD 记录：
+  - 先新增 `isNoticeFormFieldRequired` 和 `getNoticeFormRequiredSummary` 测试，确认必填范围被配置锁定。
+  - 先新增表单 UI 静态测试，确认 NoticeForm 使用必填摘要和字段 badge。
+  - 先新增首页 App chrome 静态测试，确认移动端顶部栏、底部 tab 和移动端 CSS 存在。
+- 验证记录：
+  - `npm test` 通过 38 项。
+  - `npm run lint` 通过。
+  - `npm run build` 通过。
