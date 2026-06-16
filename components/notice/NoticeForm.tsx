@@ -9,6 +9,11 @@
 import { type ChangeEvent, useState } from "react";
 import { CopyButton } from "@/components/notice/CopyButton";
 import { compressImageFile, uploadCompressedImage } from "@/lib/media/client-image";
+import {
+  getNoticeFormStep,
+  type NoticeFormStepField,
+  noticeFormSteps
+} from "@/lib/notice/notice-form-steps";
 import { type NoticeCreateInput } from "@/lib/notice/notice.schema";
 import { getLocationFieldLabel, getNoticeCategoryLabel, getTimeFieldLabel } from "@/lib/notice/notice-display";
 import { saveManagedNotice } from "@/lib/manage/manage-history";
@@ -111,6 +116,27 @@ const riskOptions = [
   { key: "inExtremeWeather", label: "极端天气" }
 ] as const;
 
+const leftColumnStepFields = new Set<NoticeFormStepField>([
+  "noticeCategory",
+  "petName",
+  "petType",
+  "addressText",
+  "nearbyLandmark",
+  "photoUpload",
+  "lostDate",
+  "timePrecision",
+  "lostDisplay",
+  "contact"
+]);
+
+const rightColumnStepFields = new Set<NoticeFormStepField>([
+  "description",
+  "riskFlags",
+  "rewardRecovery",
+  "ownerEmail",
+  "antiScam"
+]);
+
 function toLocalDateString(isoString: string): string {
   try {
     const date = new Date(isoString);
@@ -129,10 +155,28 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const [uploadingImages, setUploadingImages] = useState(false);
+  const [activeStepIndex, setActiveStepIndex] = useState(0);
   const isEditMode = mode === "edit";
+  const isStepFlow = !isEditMode;
+  const activeStep = getNoticeFormStep(activeStepIndex);
+  const activeStepFields: readonly NoticeFormStepField[] = activeStep.fields;
+  const isFinalCreateStep = isStepFlow && activeStepIndex === noticeFormSteps.length - 1;
+  const hasLeftColumnFields =
+    isEditMode || activeStepFields.some((field) => leftColumnStepFields.has(field));
+  const hasRightColumnFields =
+    isEditMode || activeStepFields.some((field) => rightColumnStepFields.has(field));
   const locationFieldLabel = getLocationFieldLabel(payload.noticeCategory);
   const timeFieldLabel = getTimeFieldLabel(payload.noticeCategory);
   const categoryLabel = getNoticeCategoryLabel(payload.noticeCategory);
+  const selectedRiskLabels = riskOptions
+    .filter((risk) => Boolean(payload.riskFlags?.[risk.key]))
+    .map((risk) => risk.label);
+  const uploadedPhotoCount = payload.photos.filter((photo) => photo.url).length;
+  const recoveryRewardMinor = Number(payload.rewards?.recovery?.amountMinor ?? 0);
+
+  function isFieldVisible(field: NoticeFormStepField) {
+    return isEditMode || activeStepFields.includes(field);
+  }
 
   function handleCategoryChange(category: NoticeCreateInput["noticeCategory"]) {
     setPayload((current) => ({
@@ -190,6 +234,38 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
     return null;
   }
 
+  function validateStepBeforeNext(): string | null {
+    if (activeStep.id !== "essentials") {
+      return null;
+    }
+
+    if (!payload.petProfile.name.trim() && payload.noticeCategory !== "found-owner") return "请填写宠物名称";
+    if (payload.petProfile.name.length > 30) return "宠物名称不能超过 30 个字符";
+    if (!payload.lostInfo.location.addressText.trim()) return `请填写${locationFieldLabel}详细地址`;
+    if (payload.lostInfo.location.addressText.length > 200) return "详细地址不能超过 200 个字符";
+    if (!payload.contactMethods[0]?.value.trim()) return "请填写联系方式";
+    if (payload.contactMethods[0].value.length > 100) return "联系方式不能超过 100 个字符";
+
+    return null;
+  }
+
+  function goToNextStep() {
+    const validationError = validateStepBeforeNext();
+
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
+    setError(null);
+    setActiveStepIndex((current) => Math.min(current + 1, noticeFormSteps.length - 1));
+  }
+
+  function goToPreviousStep() {
+    setError(null);
+    setActiveStepIndex((current) => Math.max(current - 1, 0));
+  }
+
   function cleanPayload() {
     return {
       ...payload,
@@ -218,6 +294,9 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
   async function handleSubmit() {
     const validationError = validateForm();
     if (validationError) {
+      if (isStepFlow) {
+        setActiveStepIndex(validationError.includes("补充描述") ? 1 : 0);
+      }
       setError(validationError);
       return;
     }
@@ -270,9 +349,35 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
     <div className="grid">
       <div className="panel section">
         <h2>{isEditMode ? `编辑${categoryLabel}启事` : `创建${categoryLabel}启事`}</h2>
-        <div className="grid two-col">
-          <div>
-            <div className="field">
+        {isStepFlow ? (
+          <div className="notice-stepper" aria-label="创建进度">
+            <div className="notice-stepper-header">
+              <span>
+                {activeStepIndex + 1}/{noticeFormSteps.length}
+              </span>
+              <div>
+                <strong>{activeStep.title}</strong>
+                <p>{activeStep.summary}</p>
+              </div>
+            </div>
+            <div className="notice-stepper-track">
+              {noticeFormSteps.map((step, index) => (
+                <span
+                  aria-current={index === activeStepIndex ? "step" : undefined}
+                  className={`notice-step-pill ${index === activeStepIndex ? "notice-step-pill-active" : ""}`}
+                  key={step.id}
+                >
+                  {index + 1}
+                </span>
+              ))}
+            </div>
+          </div>
+        ) : null}
+        <div className={`grid ${isEditMode ? "two-col" : "notice-step-grid"}`}>
+          {hasLeftColumnFields ? (
+            <div>
+            {isFieldVisible("noticeCategory") ? (
+              <div className="field">
               <label>发布类型</label>
               <div className="radio-group">
                 <label className="radio-label">
@@ -297,8 +402,10 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
                 </label>
               </div>
             </div>
+            ) : null}
 
-            <div className="field">
+            {isFieldVisible("petName") ? (
+              <div className="field">
               <label htmlFor="petName">宠物名称</label>
               <input
                 id="petName"
@@ -319,8 +426,10 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
                 <div className="hint">寻主启事不知道名字可留空，将自动填为&ldquo;未知&rdquo;</div>
               ) : null}
             </div>
+            ) : null}
 
-            <div className="field">
+            {isFieldVisible("petType") ? (
+              <div className="field">
               <label htmlFor="petType">宠物类型</label>
               <select
                 id="petType"
@@ -341,8 +450,10 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
                 <option value="other">其他</option>
               </select>
             </div>
+            ) : null}
 
-            <div className="field">
+            {isFieldVisible("photoUpload") ? (
+              <div className="field">
               <label htmlFor="photoUpload">宠物照片</label>
               <input accept="image/*" id="photoUpload" multiple onChange={handleImageChange} type="file" />
               <div className="hint">支持最多 3 张图片，浏览器会先压缩后再提交。</div>
@@ -379,11 +490,14 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
                 ))}
               </div>
             </div>
+            ) : null}
 
-            <fieldset className="field" style={{ border: "1px solid var(--color-border, #ddd)", borderRadius: 6, padding: 16 }}>
+            {isFieldVisible("addressText") || isFieldVisible("nearbyLandmark") ? (
+              <fieldset className="field" style={{ border: "1px solid var(--color-border, #ddd)", borderRadius: 6, padding: 16 }}>
               <legend>{locationFieldLabel}</legend>
 
-              <div className="grid" style={{ gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 8 }}>
+              {isEditMode ? (
+                <div className="grid" style={{ gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 8 }}>
                 <div className="field" style={{ marginBottom: 0 }}>
                   <label htmlFor="province">省/直辖市</label>
                   <input
@@ -439,8 +553,10 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
                   />
                 </div>
               </div>
+              ) : null}
 
-              <div className="field" style={{ marginBottom: 8 }}>
+              {isEditMode ? (
+                <div className="field" style={{ marginBottom: 8 }}>
                 <label htmlFor="street">街道/乡镇</label>
                 <input
                   id="street"
@@ -458,6 +574,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
                   }
                 />
               </div>
+              ) : null}
 
               <div className="field" style={{ marginBottom: 8 }}>
                 <label htmlFor="addressText">详细地址</label>
@@ -497,8 +614,10 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
                 />
               </div>
             </fieldset>
+            ) : null}
 
-            <fieldset className="field" style={{ border: "1px solid var(--color-border, #ddd)", borderRadius: 6, padding: 16 }}>
+            {isFieldVisible("lostDate") || isFieldVisible("timePrecision") || isFieldVisible("lostDisplay") ? (
+              <fieldset className="field" style={{ border: "1px solid var(--color-border, #ddd)", borderRadius: 6, padding: 16 }}>
               <legend>{timeFieldLabel}</legend>
 
               <div className="field" style={{ marginBottom: 8 }}>
@@ -575,8 +694,10 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
                 />
               </div>
             </fieldset>
+            ) : null}
 
-            <div className="field">
+            {isFieldVisible("contact") ? (
+              <div className="field">
               <label htmlFor="contact">主联系方式</label>
               <input
                 id="contact"
@@ -596,10 +717,13 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
                 }
               />
             </div>
+            ) : null}
           </div>
+          ) : null}
 
-          <div>
-            {!isEditMode ? (
+          {hasRightColumnFields ? (
+            <div>
+            {!isEditMode && isFieldVisible("ownerEmail") ? (
               <div className="field">
                 <label htmlFor="ownerEmail">管理链接邮箱</label>
                 <input
@@ -618,7 +742,8 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
               </div>
             ) : null}
 
-            <div className="field">
+            {isFieldVisible("description") ? (
+              <div className="field">
               <label htmlFor="description">补充描述</label>
               <textarea
                 id="description"
@@ -636,8 +761,10 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
               />
               <div className="hint">{payload.petProfile.description?.length ?? 0}/500</div>
             </div>
+            ) : null}
 
-            <div className="field">
+            {isFieldVisible("rewardRecovery") ? (
+              <div className="field">
               <label htmlFor="rewardRecovery">找回奖励（分）</label>
               <input
                 id="rewardRecovery"
@@ -660,8 +787,10 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
                 }
               />
             </div>
+            ) : null}
 
-            <div className="field">
+            {isFieldVisible("riskFlags") ? (
+              <div className="field">
               <label>紧急风险标签</label>
               <div className="tag-list">
                 {riskOptions.map((risk) => (
@@ -684,17 +813,78 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
                 ))}
               </div>
             </div>
+            ) : null}
 
-            <div className="danger-box">
+            {isFieldVisible("antiScam") ? (
+              <div className="danger-box">
               防骗提示：未核实前，请勿提前支付任何费用。高风险标签会影响公开列表排序，请如实填写。
             </div>
+            ) : null}
           </div>
+          ) : null}
         </div>
 
-        <div className="actions" style={{ marginTop: 20 }}>
-          <button className="button button-primary" disabled={pending || uploadingImages} onClick={handleSubmit} type="button">
-            {uploadingImages ? "图片处理中..." : pending ? (isEditMode ? "保存中..." : "生成中...") : isEditMode ? "保存修改" : `生成${categoryLabel}海报与分享页`}
-          </button>
+        {isFinalCreateStep ? (
+          <div className="notice-step-review">
+            <h3>确认后生成</h3>
+            <dl className="notice-review-list">
+              <div>
+                <dt>类型</dt>
+                <dd>{categoryLabel}</dd>
+              </div>
+              <div>
+                <dt>宠物</dt>
+                <dd>
+                  {payload.petProfile.name.trim() || (payload.noticeCategory === "found-owner" ? "未知" : "未填写")} /{" "}
+                  {payload.petProfile.type === "cat" ? "猫" : payload.petProfile.type === "dog" ? "狗" : payload.petProfile.type === "bird" ? "鸟" : "其他"}
+                </dd>
+              </div>
+              <div>
+                <dt>{locationFieldLabel}</dt>
+                <dd>{payload.lostInfo.location.addressText || "未填写"}</dd>
+              </div>
+              <div>
+                <dt>联系方式</dt>
+                <dd>{payload.contactMethods[0]?.value || "未填写"}</dd>
+              </div>
+              <div>
+                <dt>照片</dt>
+                <dd>{uploadedPhotoCount > 0 ? `${uploadedPhotoCount} 张` : "未上传，可稍后补"}</dd>
+              </div>
+              <div>
+                <dt>紧急标签</dt>
+                <dd>{selectedRiskLabels.length > 0 ? selectedRiskLabels.join("、") : "未选择"}</dd>
+              </div>
+              <div>
+                <dt>找回奖励</dt>
+                <dd>{recoveryRewardMinor > 0 ? `${recoveryRewardMinor} 分` : "未设置"}</dd>
+              </div>
+            </dl>
+            <p className="hint">生成后会得到公开分享页、海报页和匿名管理链接。管理链接会保存在本机“我的启事”，如填写邮箱也会尝试发送到邮箱。</p>
+          </div>
+        ) : null}
+
+        <div className={`actions ${isStepFlow ? "notice-step-actions" : ""}`} style={{ marginTop: 20 }}>
+          {isStepFlow ? (
+            <>
+              <button className="button button-secondary" disabled={activeStepIndex === 0 || pending || uploadingImages} onClick={goToPreviousStep} type="button">
+                上一步
+              </button>
+              {isFinalCreateStep ? (
+                <button className="button button-primary" disabled={pending || uploadingImages} onClick={handleSubmit} type="button">
+                  {uploadingImages ? "图片处理中..." : pending ? "生成中..." : `生成${categoryLabel}海报与分享页`}
+                </button>
+              ) : (
+                <button className="button button-primary" disabled={pending || uploadingImages} onClick={goToNextStep} type="button">
+                  {uploadingImages ? "图片处理中..." : "下一步"}
+                </button>
+              )}
+            </>
+          ) : (
+            <button className="button button-primary" disabled={pending || uploadingImages} onClick={handleSubmit} type="button">
+              {uploadingImages ? "图片处理中..." : pending ? "保存中..." : "保存修改"}
+            </button>
+          )}
         </div>
 
         {error ? <p className="danger-box">{error}</p> : null}

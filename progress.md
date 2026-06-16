@@ -32,3 +32,22 @@
   - `npm run build` 首次失败一次，原因是 Next typed routes 不接受宽泛 `string` 作为 `Link href`。
   - 修复方式：将 `getPosterTemplateHref` 返回类型收窄为模板字符串 union。
   - 修复后 `npm run build` 通过。
+
+## 2026-06-16 阶段 3 执行记录
+
+- 完成创建页分步发布流程：
+  - 新增 `noticeFormSteps` 步骤配置，统一维护步骤顺序、文案和字段归属。
+  - `NoticeForm` 创建模式改为 5 步：必要信息、照片与描述、时间与紧急程度、悬赏与找回、预览生成。
+  - 第一步控制为 6 个字段，降低首屏压迫感。
+  - 第五步增加生成前摘要，用户可最后确认关键信息。
+  - 编辑模式保持原完整表单，避免影响管理页。
+  - 移动端增加 sticky 上一步/下一步操作栏。
+- TDD 记录：
+  - 先补 `notice-form-steps` 测试，确认缺少字段分组 API 时失败。
+  - 再实现字段分组、步骤查找和字段归属 helper。
+- 验证记录：
+  - `npm test` 通过 20 项。
+  - `npm run lint` 通过。
+  - `npm run build` 首次失败一次，原因是 `as const` 步骤字段元组在 `includes` 中被 TypeScript 推成 `never`。
+  - 修复方式：将当前步骤字段显式拓宽为 `readonly NoticeFormStepField[]`。
+  - 修复后 `npm run build` 通过。
