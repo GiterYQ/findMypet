@@ -51,3 +51,9 @@ test("skippable detail steps still use next as the primary action label", () => 
   assert.equal(getNoticeFormNextButtonLabel("photo"), "下一步");
   assert.equal(getNoticeFormNextButtonLabel("reward-extra"), "下一步");
 });
+
+test("noticeFormSteps gives every step a distinct visual tone", () => {
+  const tones = noticeFormSteps.map((step) => step.tone);
+
+  assert.equal(new Set(tones).size, noticeFormSteps.length);
+});

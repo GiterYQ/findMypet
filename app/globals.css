@@ -275,7 +275,7 @@ textarea {
 
 .notice-stepper {
   border: 1px solid rgba(211, 94, 56, 0.16);
-  background: linear-gradient(145deg, rgba(211, 94, 56, 0.1), rgba(255, 255, 255, 0.72));
+  background: linear-gradient(145deg, color-mix(in srgb, var(--step-accent, var(--accent)) 14%, transparent), rgba(255, 255, 255, 0.72));
   border-radius: 16px;
   display: grid;
   gap: 10px;
@@ -291,7 +291,7 @@ textarea {
 }
 
 .notice-stepper-header > span {
-  background: var(--text);
+  background: var(--step-accent, var(--text));
   border-radius: 999px;
   color: #fff;
   font-size: 0.86rem;
@@ -327,9 +327,67 @@ textarea {
 }
 
 .notice-step-pill-active {
-  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  background: linear-gradient(135deg, var(--step-accent, var(--accent)), var(--step-accent-dark, var(--accent-dark)));
   border-color: transparent;
   color: #fff;
+}
+
+.notice-step-theme {
+  --step-accent: var(--accent);
+  --step-accent-dark: var(--accent-dark);
+  --step-bg: rgba(255, 252, 247, 0.92);
+  background:
+    radial-gradient(circle at 92% 0%, color-mix(in srgb, var(--step-accent) 18%, transparent), transparent 24%),
+    var(--step-bg);
+}
+
+.notice-step-theme-ember {
+  --step-accent: #d35e38;
+  --step-accent-dark: #9f3c1c;
+  --step-bg: rgba(255, 250, 244, 0.94);
+}
+
+.notice-step-theme-leaf {
+  --step-accent: #4f8757;
+  --step-accent-dark: #2f6237;
+  --step-bg: rgba(248, 253, 245, 0.94);
+}
+
+.notice-step-theme-sky {
+  --step-accent: #3c74a8;
+  --step-accent-dark: #24547e;
+  --step-bg: rgba(244, 250, 255, 0.94);
+}
+
+.notice-step-theme-gold {
+  --step-accent: #c4862f;
+  --step-accent-dark: #875815;
+  --step-bg: rgba(255, 251, 240, 0.94);
+}
+
+.notice-step-theme-ink {
+  --step-accent: #363a45;
+  --step-accent-dark: #171a21;
+  --step-bg: rgba(247, 247, 249, 0.94);
+}
+
+.notice-step-theme .field > label,
+.notice-step-theme fieldset.field > legend {
+  align-items: center;
+  background: color-mix(in srgb, var(--step-accent) 12%, #fff);
+  border-left: 4px solid var(--step-accent);
+  border-radius: 10px;
+  color: color-mix(in srgb, var(--step-accent-dark) 82%, var(--text));
+  display: flex;
+  font-size: 0.95rem;
+  font-weight: 900;
+  line-height: 1.2;
+  padding: 7px 10px;
+  width: fit-content;
+}
+
+.notice-step-theme fieldset.field {
+  background: rgba(255, 255, 255, 0.54);
 }
 
 .notice-step-grid {

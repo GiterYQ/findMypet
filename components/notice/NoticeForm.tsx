@@ -19,6 +19,7 @@ import {
 import { type NoticeCreateInput } from "@/lib/notice/notice.schema";
 import { getLocationFieldLabel, getNoticeCategoryLabel, getTimeFieldLabel } from "@/lib/notice/notice-display";
 import { saveManagedNotice } from "@/lib/manage/manage-history";
+import { getNoticeTimeDisplayOptions } from "@/lib/notice/notice-time-options";
 
 type NoticeFormProps = {
   initialValue?: Partial<NoticeCreateInput>;
@@ -176,6 +177,12 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
   const uploadedPhotoCount = payload.photos.filter((photo) => photo.url).length;
   const recoveryRewardMinor = Number(payload.rewards?.recovery?.amountMinor ?? 0);
   const nextStepLabel = getNoticeFormNextButtonLabel(activeStep.id);
+  const timeDisplayOptions = getNoticeTimeDisplayOptions(payload.noticeCategory);
+  const currentTimeDisplay = String(payload.lostInfo.lostTime.displayText ?? "");
+  const visibleTimeDisplayOptions =
+    currentTimeDisplay && !timeDisplayOptions.some((option) => option.value === currentTimeDisplay)
+      ? [{ label: currentTimeDisplay, value: currentTimeDisplay }, ...timeDisplayOptions]
+      : timeDisplayOptions;
 
   function isFieldVisible(field: NoticeFormStepField) {
     return isEditMode || activeStepFields.includes(field);
@@ -350,7 +357,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
 
   return (
     <div className="grid">
-      <div className="panel section">
+      <div className={isStepFlow ? `panel section notice-step-theme notice-step-theme-${activeStep.tone}` : "panel section"}>
         <h2>{isEditMode ? `编辑${categoryLabel}启事` : `创建${categoryLabel}启事`}</h2>
         {isStepFlow ? (
           <div className="notice-stepper" aria-label="创建进度">
@@ -678,10 +685,8 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
 
               <div className="field" style={{ marginBottom: 0 }}>
                 <label htmlFor="lostDisplay">补充说明</label>
-                <input
+                <select
                   id="lostDisplay"
-                  maxLength={100}
-                  placeholder={payload.noticeCategory === "found-owner" ? "例如：今天下午 3 点左右" : "例如：昨晚 8 点左右"}
                   value={String(payload.lostInfo.lostTime.displayText)}
                   onChange={(event) =>
                     setPayload((current) => ({
@@ -695,7 +700,15 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
                       }
                     }))
                   }
-                />
+                >
+                  <option value="">请选择大概时间</option>
+                  {visibleTimeDisplayOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+                <div className="hint">不用手打，直接选择最接近的时间段即可。</div>
               </div>
             </fieldset>
             ) : null}
