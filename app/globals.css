@@ -937,6 +937,302 @@ textarea {
   overflow-wrap: anywhere;
 }
 
+.poster-minimal {
+  background:
+    linear-gradient(180deg, rgba(255, 254, 248, 0.98), rgba(245, 238, 226, 0.98)),
+    radial-gradient(circle at 80% 0%, rgba(84, 122, 89, 0.16), transparent 28%);
+  border: 1px solid rgba(91, 81, 68, 0.22);
+  border-radius: 30px;
+  box-shadow: 0 24px 70px rgba(42, 32, 18, 0.13);
+  color: #241f1b;
+  display: grid;
+  gap: 22px;
+  padding: 34px;
+}
+
+.poster-minimal-header {
+  align-items: center;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+}
+
+.poster-minimal-header span,
+.poster-minimal-title span {
+  background: #ecdfcb;
+  border-radius: 999px;
+  color: #514739;
+  font-weight: 900;
+  padding: 8px 12px;
+}
+
+.poster-minimal-header strong {
+  color: #315f3d;
+  font-size: clamp(1.4rem, 3vw, 2.4rem);
+  font-weight: 1000;
+  text-align: center;
+}
+
+.poster-minimal-header small {
+  color: #6a6053;
+  font-weight: 800;
+}
+
+.poster-minimal-title {
+  align-items: end;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.poster-minimal-title p {
+  color: #6a6053;
+  font-size: clamp(1.4rem, 3vw, 2.4rem);
+  font-weight: 900;
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+.poster-minimal-title h1 {
+  font-size: clamp(3.4rem, 9vw, 7rem);
+  font-weight: 1000;
+  letter-spacing: -0.07em;
+  line-height: 0.9;
+  margin: 0;
+}
+
+.poster-minimal-card {
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(91, 81, 68, 0.16);
+  border-radius: 26px;
+  display: grid;
+  gap: 20px;
+  grid-template-columns: minmax(240px, 0.86fr) minmax(0, 1fr);
+  padding: 18px;
+}
+
+.poster-minimal-photo {
+  background: #eee3d1;
+  border-radius: 22px;
+  display: grid;
+  min-height: 320px;
+  overflow: hidden;
+  place-items: center;
+}
+
+.poster-minimal-photo img {
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+.poster-minimal-photo span {
+  color: #756a5c;
+  font-weight: 900;
+}
+
+.poster-minimal-facts {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+}
+
+.poster-minimal-facts div {
+  border-bottom: 1px dashed rgba(91, 81, 68, 0.22);
+  display: grid;
+  gap: 5px;
+  padding-bottom: 14px;
+}
+
+.poster-minimal-facts div:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.poster-minimal-facts dt {
+  color: #766b5d;
+  font-size: 0.92rem;
+  font-weight: 900;
+}
+
+.poster-minimal-facts dd {
+  font-size: clamp(1.1rem, 2vw, 1.55rem);
+  font-weight: 900;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.poster-minimal-contact {
+  background: #315f3d;
+  border-radius: 22px;
+  color: #fff;
+  display: grid;
+  gap: 5px;
+  padding: 20px 22px;
+}
+
+.poster-minimal-contact span {
+  color: #dbe9c8;
+  font-weight: 900;
+}
+
+.poster-minimal-contact strong {
+  font-size: clamp(1.5rem, 3vw, 2.7rem);
+  font-weight: 1000;
+  line-height: 1.06;
+  overflow-wrap: anywhere;
+}
+
+.poster-urgent {
+  background: #fff;
+  border: 3px solid #111;
+  box-shadow: 0 26px 76px rgba(0, 0, 0, 0.2);
+  color: #101010;
+  display: grid;
+  gap: 22px;
+  padding: 30px;
+}
+
+.poster-urgent-header {
+  align-items: stretch;
+  display: grid;
+  gap: 18px;
+  grid-template-columns: minmax(140px, 0.32fr) minmax(0, 1fr);
+}
+
+.poster-urgent-header > span {
+  align-items: center;
+  background: #e60012;
+  color: #fff;
+  display: flex;
+  font-size: clamp(3.2rem, 10vw, 7rem);
+  font-weight: 1000;
+  justify-content: center;
+  letter-spacing: 0.08em;
+  line-height: 0.9;
+  padding: 22px 10px;
+}
+
+.poster-urgent-header div {
+  border-bottom: 12px solid #111;
+  border-top: 12px solid #111;
+  display: grid;
+  gap: 10px;
+  padding: 22px 0;
+}
+
+.poster-urgent-header strong {
+  color: #e60012;
+  font-size: clamp(3rem, 9vw, 7rem);
+  font-weight: 1000;
+  letter-spacing: -0.08em;
+  line-height: 0.86;
+}
+
+.poster-urgent-header small {
+  color: #555;
+  font-size: 1.1rem;
+  font-weight: 900;
+}
+
+.poster-urgent-hero {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: minmax(0, 0.92fr) minmax(260px, 0.7fr);
+}
+
+.poster-urgent-hero p {
+  font-size: clamp(1.8rem, 4vw, 3.6rem);
+  font-weight: 1000;
+  margin: 0;
+}
+
+.poster-urgent-hero h1 {
+  color: #e60012;
+  font-size: clamp(4rem, 13vw, 10rem);
+  font-weight: 1000;
+  letter-spacing: -0.09em;
+  line-height: 0.82;
+  margin: 10px 0 18px;
+}
+
+.poster-urgent-hero strong {
+  background: #111;
+  color: #fff;
+  display: inline-block;
+  font-size: clamp(1.4rem, 3vw, 2.7rem);
+  font-weight: 1000;
+  line-height: 1.08;
+  padding: 12px 14px;
+}
+
+.poster-urgent-photo {
+  border: 3px solid #111;
+  display: grid;
+  min-height: 340px;
+  overflow: hidden;
+  place-items: center;
+}
+
+.poster-urgent-photo img {
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+.poster-urgent-photo span {
+  color: #e60012;
+  font-size: 2rem;
+  font-weight: 1000;
+}
+
+.poster-urgent-facts {
+  display: grid;
+  gap: 12px;
+}
+
+.poster-urgent-facts div {
+  align-items: center;
+  border-bottom: 4px solid #111;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 160px minmax(0, 1fr);
+  padding-bottom: 12px;
+}
+
+.poster-urgent-facts span {
+  color: #e60012;
+  font-size: clamp(1.1rem, 2vw, 1.7rem);
+  font-weight: 1000;
+}
+
+.poster-urgent-facts strong {
+  font-size: clamp(1.5rem, 4vw, 3.1rem);
+  font-weight: 1000;
+  line-height: 1;
+  overflow-wrap: anywhere;
+}
+
+.poster-urgent-contact {
+  background: #e60012;
+  color: #fff;
+  display: grid;
+  gap: 4px;
+  padding: 20px;
+}
+
+.poster-urgent-contact span {
+  font-size: clamp(1.2rem, 3vw, 2rem);
+  font-weight: 1000;
+}
+
+.poster-urgent-contact strong {
+  font-size: clamp(2.4rem, 8vw, 6.5rem);
+  font-weight: 1000;
+  line-height: 0.95;
+  overflow-wrap: anywhere;
+}
+
 @media print {
   html,
   body {
@@ -964,6 +1260,11 @@ textarea {
   }
 
   .poster-square {
+    box-shadow: none;
+  }
+
+  .poster-minimal,
+  .poster-urgent {
     box-shadow: none;
   }
 }
@@ -1074,7 +1375,11 @@ textarea {
   .poster-header,
   .poster-alert-header,
   .poster-alert-identity,
-  .poster-alert-media {
+  .poster-alert-media,
+  .poster-minimal-card,
+  .poster-urgent-header,
+  .poster-urgent-hero,
+  .poster-urgent-facts div {
     grid-template-columns: 1fr;
     display: grid;
   }
@@ -1100,6 +1405,25 @@ textarea {
 
   .poster-alert-photo {
     min-height: 220px;
+  }
+
+  .poster-minimal,
+  .poster-urgent {
+    padding: 18px;
+  }
+
+  .poster-minimal-header,
+  .poster-minimal-title {
+    grid-template-columns: 1fr;
+  }
+
+  .poster-minimal-header strong {
+    text-align: left;
+  }
+
+  .poster-minimal-photo,
+  .poster-urgent-photo {
+    min-height: 240px;
   }
 
   .poster-square {

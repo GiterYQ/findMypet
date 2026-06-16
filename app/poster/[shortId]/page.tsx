@@ -6,8 +6,10 @@
  */
 import Link from "next/link";
 import { NoticeAlertPoster } from "@/components/notice/NoticeAlertPoster";
+import { NoticeMinimalPoster } from "@/components/notice/NoticeMinimalPoster";
 import { NoticePoster } from "@/components/notice/NoticePoster";
 import { NoticeSquarePoster } from "@/components/notice/NoticeSquarePoster";
+import { NoticeUrgentPoster } from "@/components/notice/NoticeUrgentPoster";
 import { PosterActions } from "@/components/notice/PosterActions";
 import { getPosterTemplateHref, normalizePosterTemplate, posterTemplateOptions } from "@/lib/notice/poster-template";
 import { noticeService } from "@/lib/notice/notice.service";
@@ -52,6 +54,10 @@ export default async function PosterPage({ params, searchParams }: PageProps) {
         <NoticeSquarePoster className="poster-capture" id={posterElementId} notice={notice} />
       ) : template === "alert" ? (
         <NoticeAlertPoster className="poster-capture" id={posterElementId} notice={notice} />
+      ) : template === "minimal" ? (
+        <NoticeMinimalPoster className="poster-capture" id={posterElementId} notice={notice} />
+      ) : template === "urgent" ? (
+        <NoticeUrgentPoster className="poster-capture" id={posterElementId} notice={notice} />
       ) : (
         <NoticePoster className="poster-capture" id={posterElementId} notice={notice} />
       )}

@@ -51,3 +51,18 @@
   - `npm run build` 首次失败一次，原因是 `as const` 步骤字段元组在 `includes` 中被 TypeScript 推成 `never`。
   - 修复方式：将当前步骤字段显式拓宽为 `readonly NoticeFormStepField[]`。
   - 修复后 `npm run build` 通过。
+
+## 2026-06-16 阶段 2 执行记录
+
+- 完成新增模板：
+  - `minimal`：社区简洁模板，适合物业群、社区群和公告栏。
+  - `urgent`：危急大字模板，适合病危、需喂药、失明、交通危险等场景。
+  - `posterTemplateIds`、`posterTemplateOptions`、`normalizePosterTemplate` 和 `getPosterTemplateHref` 已支持 5 套模板。
+  - 海报页已接入 `NoticeMinimalPoster` 和 `NoticeUrgentPoster`。
+- TDD 记录：
+  - 先更新 `poster-template` 测试，确认 `minimal` / `urgent` 未接入时失败。
+  - 再实现模板配置、组件和渲染分支。
+- 验证记录：
+  - `npm test` 通过 20 项。
+  - `npm run lint` 通过。
+  - `npm run build` 通过。

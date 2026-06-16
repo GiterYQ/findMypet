@@ -1,10 +1,10 @@
 /**
  * Poster template
  * 作用：定义海报模板 ID 与 URL 参数归一化规则。
- * 联动：poster 页面、NoticePoster、NoticeAlertPoster、NoticeSquarePoster、tests/poster-template.test.mts。
+ * 联动：poster 页面、各 Notice*Poster 模板组件、tests/poster-template.test.mts。
  * 层级：utility
  */
-export const posterTemplateIds = ["classic", "alert", "square"] as const;
+export const posterTemplateIds = ["classic", "alert", "square", "minimal", "urgent"] as const;
 
 export type PosterTemplateId = (typeof posterTemplateIds)[number];
 
@@ -35,6 +35,18 @@ export const posterTemplateOptions: PosterTemplateOption[] = [
     label: "方图模板",
     useCase: "适合微信聊天、朋友圈、公众号文章配图",
     aspectLabel: "1:1 方图"
+  },
+  {
+    id: "minimal",
+    label: "社区简洁模板",
+    useCase: "适合物业群、社区群、公告栏，不显得过度压迫",
+    aspectLabel: "清爽竖版"
+  },
+  {
+    id: "urgent",
+    label: "危急大字模板",
+    useCase: "适合病危、需喂药、失明、车流危险等需要立刻行动的场景",
+    aspectLabel: "紧急版"
   }
 ];
 

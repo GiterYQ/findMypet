@@ -12,6 +12,8 @@ test("normalizePosterTemplate accepts known poster templates", () => {
   assert.equal(normalizePosterTemplate("classic"), "classic");
   assert.equal(normalizePosterTemplate("alert"), "alert");
   assert.equal(normalizePosterTemplate("square"), "square");
+  assert.equal(normalizePosterTemplate("minimal"), "minimal");
+  assert.equal(normalizePosterTemplate("urgent"), "urgent");
 });
 
 test("normalizePosterTemplate falls back to classic for unknown values", () => {
@@ -22,7 +24,7 @@ test("normalizePosterTemplate falls back to classic for unknown values", () => {
 test("posterTemplateOptions exposes user-facing metadata for each template", () => {
   assert.deepEqual(
     posterTemplateOptions.map((template) => template.id),
-    ["classic", "alert", "square"]
+    ["classic", "alert", "square", "minimal", "urgent"]
   );
   assert.ok(posterTemplateOptions.every((template) => template.label && template.useCase && template.aspectLabel));
 });
@@ -31,4 +33,6 @@ test("getPosterTemplateHref keeps classic URL clean and adds query for other tem
   assert.equal(getPosterTemplateHref("abc123", "classic"), "/poster/abc123");
   assert.equal(getPosterTemplateHref("abc123", "alert"), "/poster/abc123?template=alert");
   assert.equal(getPosterTemplateHref("abc123", "square"), "/poster/abc123?template=square");
+  assert.equal(getPosterTemplateHref("abc123", "minimal"), "/poster/abc123?template=minimal");
+  assert.equal(getPosterTemplateHref("abc123", "urgent"), "/poster/abc123?template=urgent");
 });
