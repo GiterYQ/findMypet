@@ -212,14 +212,88 @@ textarea {
 
 .notice-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 18px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 14px;
 }
 
 .notice-card {
+  align-items: start;
   display: grid;
-  gap: 14px;
-  padding: 18px;
+  gap: 12px;
+  grid-template-columns: 88px minmax(0, 1fr);
+  padding: 14px;
+  transition: box-shadow 160ms ease, transform 160ms ease;
+}
+
+.notice-card:hover {
+  box-shadow: 0 24px 62px rgba(42, 32, 18, 0.16);
+  transform: translateY(-1px);
+}
+
+.notice-card-photo-frame {
+  aspect-ratio: 1 / 1;
+  background: linear-gradient(135deg, rgba(211, 94, 56, 0.18), rgba(110, 90, 60, 0.16));
+  border: 1px solid rgba(215, 206, 192, 0.74);
+  border-radius: 16px;
+  overflow: hidden;
+  width: 88px;
+}
+
+.notice-card-photo {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+.notice-card-photo-placeholder {
+  background:
+    radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.62), transparent 24%),
+    linear-gradient(135deg, rgba(211, 94, 56, 0.18), rgba(110, 90, 60, 0.16));
+}
+
+.notice-card-body {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.notice-card h3 {
+  font-size: 1.08rem;
+  line-height: 1.15;
+  margin: 0 0 4px;
+}
+
+.notice-card .meta {
+  overflow-wrap: anywhere;
+}
+
+.notice-card-status-row {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+}
+
+.notice-card-reward {
+  color: var(--accent-dark);
+  font-size: 0.86rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.notice-card .tag-list {
+  gap: 6px;
+}
+
+.notice-card .tag {
+  font-size: 0.78rem;
+  padding: 4px 8px;
+}
+
+.notice-card-footer {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .notice-photo {
@@ -1424,6 +1498,27 @@ textarea {
 
   .notice-grid {
     grid-template-columns: 1fr;
+  }
+
+  .notice-card {
+    gap: 10px;
+    grid-template-columns: 76px minmax(0, 1fr);
+    padding: 12px;
+  }
+
+  .notice-card-photo-frame {
+    border-radius: 14px;
+    width: 76px;
+  }
+
+  .notice-card-status-row {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .notice-card-footer {
+    justify-content: flex-start;
   }
 
   .poster-template-picker {

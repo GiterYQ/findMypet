@@ -43,38 +43,44 @@ export function NoticeCard({ notice }: NoticeCardProps) {
 
   return (
     <Link className="panel notice-card" href={`/notice/${notice.shortId}`}>
-      {notice.primaryPhotoUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img alt={notice.petProfile.name} className="notice-photo" src={notice.primaryPhotoUrl} />
-      ) : (
-        <div className="notice-photo" />
-      )}
-
-      <span className={statusClassName(notice.businessStatus)}>
-        {getBusinessStatusLabel(notice.businessStatus, notice.noticeCategory)}
-      </span>
-
-      <div>
-        <h3>{notice.petProfile.name}</h3>
-        <div className="meta">
-          {getNoticeCategoryLabel(notice.noticeCategory)} · {getPetTypeLabel(notice.petProfile.type)} · {notice.lostInfo.location.addressText}
-        </div>
-        <div className="meta">{notice.lostInfo.lostTime.displayText ?? "时间待确认"}</div>
+      <div className="notice-card-photo-frame">
+        {notice.primaryPhotoUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img alt={notice.petProfile.name} className="notice-card-photo" src={notice.primaryPhotoUrl} />
+        ) : (
+          <div aria-hidden="true" className="notice-card-photo notice-card-photo-placeholder" />
+        )}
       </div>
 
-      {riskTags.length > 0 ? (
-        <div className="tag-list">
-          {riskTags.map((tag) => (
-            <span className="tag" key={tag}>
-              {tag}
-            </span>
-          ))}
+      <div className="notice-card-body">
+        <div className="notice-card-status-row">
+          <span className={statusClassName(notice.businessStatus)}>
+            {getBusinessStatusLabel(notice.businessStatus, notice.noticeCategory)}
+          </span>
+          <span className="notice-card-reward">{rewardLabel ? `悬赏 ${rewardLabel}` : "无悬赏"}</span>
         </div>
-      ) : null}
 
-      <div className="actions" style={{ justifyContent: "space-between" }}>
-        <span className="meta">{rewardLabel ? `悬赏 ${rewardLabel}` : "无悬赏"}</span>
-        <span className="meta">更新于 {new Date(notice.updatedAt).toLocaleString()}</span>
+        <div>
+          <h3>{notice.petProfile.name}</h3>
+          <div className="meta">
+            {getNoticeCategoryLabel(notice.noticeCategory)} · {getPetTypeLabel(notice.petProfile.type)} · {notice.lostInfo.location.addressText}
+          </div>
+          <div className="meta">{notice.lostInfo.lostTime.displayText ?? "时间待确认"}</div>
+        </div>
+
+        {riskTags.length > 0 ? (
+          <div className="tag-list">
+            {riskTags.map((tag) => (
+              <span className="tag" key={tag}>
+                {tag}
+              </span>
+            ))}
+          </div>
+        ) : null}
+
+        <div className="notice-card-footer">
+          <span className="meta">更新于 {new Date(notice.updatedAt).toLocaleString()}</span>
+        </div>
       </div>
     </Link>
   );
