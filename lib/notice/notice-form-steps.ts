@@ -27,6 +27,7 @@ type NoticeFormStep = {
   title: string;
   summary: string;
   fields: NoticeFormStepField[];
+  skippable: boolean;
 };
 
 export const noticeFormSteps = [
@@ -34,31 +35,36 @@ export const noticeFormSteps = [
     id: "essentials",
     title: "必要信息",
     summary: "先填能生成启事的最低信息。",
-    fields: ["noticeCategory", "petName", "petType", "addressText", "nearbyLandmark", "contact"]
+    fields: ["noticeCategory", "petName", "petType", "addressText", "nearbyLandmark", "contact"],
+    skippable: false
   },
   {
     id: "photo",
     title: "照片与描述",
     summary: "上传照片，补充可识别特征。",
-    fields: ["photoUpload", "description"]
+    fields: ["photoUpload", "description"],
+    skippable: true
   },
   {
     id: "time-risk",
     title: "时间与紧急程度",
     summary: "补充时间和风险标签，影响排序。",
-    fields: ["lostDate", "timePrecision", "lostDisplay", "riskFlags"]
+    fields: ["lostDate", "timePrecision", "lostDisplay", "riskFlags"],
+    skippable: true
   },
   {
     id: "reward-extra",
     title: "悬赏与找回",
     summary: "设置悬赏和管理链接邮箱。",
-    fields: ["rewardRecovery", "ownerEmail", "antiScam"]
+    fields: ["rewardRecovery", "ownerEmail", "antiScam"],
+    skippable: true
   },
   {
     id: "review",
     title: "预览生成",
     summary: "确认信息后生成分享页和海报。",
-    fields: ["submit"]
+    fields: ["submit"],
+    skippable: false
   }
 ] as const satisfies NoticeFormStep[];
 

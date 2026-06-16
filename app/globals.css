@@ -196,6 +196,11 @@ textarea {
   gap: 8px;
 }
 
+.risk-button {
+  min-height: 48px;
+  padding-inline: 16px;
+}
+
 .tag {
   padding: 6px 10px;
   border-radius: 999px;

@@ -9,6 +9,7 @@
 import { type ChangeEvent, useState } from "react";
 import { CopyButton } from "@/components/notice/CopyButton";
 import { compressImageFile, uploadCompressedImage } from "@/lib/media/client-image";
+import { formatAmountMinorForDisplay, majorAmountInputToMinor, minorAmountToMajorInput } from "@/lib/notice/money";
 import {
   getNoticeFormStep,
   type NoticeFormStepField,
@@ -173,6 +174,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
     .map((risk) => risk.label);
   const uploadedPhotoCount = payload.photos.filter((photo) => photo.url).length;
   const recoveryRewardMinor = Number(payload.rewards?.recovery?.amountMinor ?? 0);
+  const nextStepLabel = activeStep.skippable ? "跳过，稍后补充" : "下一步";
 
   function isFieldVisible(field: NoticeFormStepField) {
     return isEditMode || activeStepFields.includes(field);
@@ -765,13 +767,15 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
 
             {isFieldVisible("rewardRecovery") ? (
               <div className="field">
-              <label htmlFor="rewardRecovery">找回奖励（分）</label>
+              <label htmlFor="rewardRecovery">找回奖励（元）</label>
               <input
                 id="rewardRecovery"
-                max={10000000}
+                max={100000}
                 min={0}
+                placeholder="例如：500"
+                step="0.01"
                 type="number"
-                value={Number(payload.rewards?.recovery?.amountMinor ?? 0)}
+                value={minorAmountToMajorInput(payload.rewards?.recovery?.amountMinor)}
                 onChange={(event) =>
                   setPayload((current) => ({
                     ...current,
@@ -779,13 +783,14 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
                       ...current.rewards,
                       recovery: {
                         ...current.rewards?.recovery,
-                        enabled: Number(event.target.value) > 0,
-                        amountMinor: Number(event.target.value)
+                        enabled: majorAmountInputToMinor(event.target.value) > 0,
+                        amountMinor: majorAmountInputToMinor(event.target.value)
                       }
                     }
                   }))
                 }
               />
+              <div className="hint">这里只填“元”，系统会按最小货币单位保存，避免海报和排序金额不一致。</div>
             </div>
             ) : null}
 
@@ -795,7 +800,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
               <div className="tag-list">
                 {riskOptions.map((risk) => (
                   <button
-                    className={`button ${payload.riskFlags?.[risk.key] ? "button-primary" : "button-secondary"}`}
+                    className={`button risk-button ${payload.riskFlags?.[risk.key] ? "button-primary" : "button-secondary"}`}
                     key={risk.key}
                     onClick={() =>
                       setPayload((current) => ({
@@ -857,7 +862,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
               </div>
               <div>
                 <dt>找回奖励</dt>
-                <dd>{recoveryRewardMinor > 0 ? `${recoveryRewardMinor} 分` : "未设置"}</dd>
+                <dd>{formatAmountMinorForDisplay(recoveryRewardMinor, payload.rewards?.recovery?.currency ?? "CNY")}</dd>
               </div>
             </dl>
             <p className="hint">生成后会得到公开分享页、海报页和匿名管理链接。管理链接会保存在本机“我的启事”，如填写邮箱也会尝试发送到邮箱。</p>
@@ -876,7 +881,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
                 </button>
               ) : (
                 <button className="button button-primary" disabled={pending || uploadingImages} onClick={goToNextStep} type="button">
-                  {uploadingImages ? "图片处理中..." : "下一步"}
+                  {uploadingImages ? "图片处理中..." : nextStepLabel}
                 </button>
               )}
             </>

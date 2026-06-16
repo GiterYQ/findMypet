@@ -33,3 +33,9 @@ test("isNoticeFormStepField matches field ids to their owning step", () => {
   assert.equal(isNoticeFormStepField("photo", "description"), true);
   assert.equal(isNoticeFormStepField("review", "submit"), true);
 });
+
+test("detail steps are skippable after required essentials", () => {
+  const skippableStepIds = noticeFormSteps.filter((step) => step.skippable).map((step) => step.id);
+
+  assert.deepEqual(skippableStepIds, ["photo", "time-risk", "reward-extra"]);
+});

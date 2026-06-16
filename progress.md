@@ -66,3 +66,21 @@
   - `npm test` 通过 20 项。
   - `npm run lint` 通过。
   - `npm run build` 通过。
+
+## 2026-06-16 阶段 4 执行记录
+
+- 完成移动端表单体验优化：
+  - `photo`、`time-risk`、`reward-extra` 步骤增加 `skippable` 标记。
+  - 创建流程的可跳过步骤按钮文案改为“跳过，稍后补充”。
+  - 悬赏输入从“分”改成“元”，内部通过 `money.ts` 转为 `amountMinor` 保存。
+  - 生成前确认摘要使用统一金额展示格式。
+  - 风险标签按钮增加 `risk-button` 样式，扩大手机点击区域。
+- TDD 记录：
+  - 先新增金额转换测试和可跳过步骤测试，确认缺少实现时失败。
+  - 再实现 `lib/notice/money.ts`、步骤 `skippable` 字段和表单接入。
+- 验证记录：
+  - `npm test` 通过 24 项。
+  - `npm run lint` 通过。
+  - `npm run build` 首次失败一次，原因是非跳过步骤没有显式 `skippable` 属性，TypeScript 不允许直接访问。
+  - 修复方式：所有步骤显式声明 `skippable: boolean`。
+  - 修复后 `npm run build` 通过。
