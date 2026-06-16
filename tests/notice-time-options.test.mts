@@ -6,7 +6,7 @@
  */
 import assert from "node:assert/strict";
 import test from "node:test";
-import { getNoticeTimeDisplayOptions } from "../lib/notice/notice-time-options.ts";
+import { getHalfHourTimeOptions, getNoticeTimeDisplayOptions } from "../lib/notice/notice-time-options.ts";
 
 test("lost-pet time display options provide picker-friendly presets", () => {
   const values = getNoticeTimeDisplayOptions("lost-pet").map((option) => option.value);
@@ -24,4 +24,14 @@ test("found-owner time display options use found-scene wording", () => {
   assert.ok(values.includes("今天下午"));
   assert.ok(values.includes("不确定"));
   assert.ok(!values.includes("昨晚"));
+});
+
+test("getHalfHourTimeOptions covers 24 hours in 30 minute steps", () => {
+  const values = getHalfHourTimeOptions().map((option) => option.value);
+
+  assert.equal(values.length, 48);
+  assert.equal(values[0], "00:00");
+  assert.equal(values[1], "00:30");
+  assert.equal(values[24], "12:00");
+  assert.equal(values[47], "23:30");
 });

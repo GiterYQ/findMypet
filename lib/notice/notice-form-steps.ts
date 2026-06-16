@@ -27,6 +27,7 @@ type NoticeFormStep = {
   title: string;
   summary: string;
   fields: NoticeFormStepField[];
+  requiredFields: NoticeFormStepField[];
   skippable: boolean;
   tone: "ember" | "leaf" | "sky" | "gold" | "ink";
 };
@@ -37,6 +38,7 @@ export const noticeFormSteps = [
     title: "必要信息",
     summary: "先填能生成启事的最低信息。",
     fields: ["noticeCategory", "petName", "petType", "addressText", "nearbyLandmark", "contact"],
+    requiredFields: ["addressText", "contact"],
     skippable: false,
     tone: "ember"
   },
@@ -45,6 +47,7 @@ export const noticeFormSteps = [
     title: "照片与描述",
     summary: "上传照片，补充可识别特征。",
     fields: ["photoUpload", "description"],
+    requiredFields: [],
     skippable: true,
     tone: "leaf"
   },
@@ -53,6 +56,7 @@ export const noticeFormSteps = [
     title: "时间与紧急程度",
     summary: "补充时间和风险标签，影响排序。",
     fields: ["lostDate", "timePrecision", "lostDisplay", "riskFlags"],
+    requiredFields: [],
     skippable: true,
     tone: "sky"
   },
@@ -61,6 +65,7 @@ export const noticeFormSteps = [
     title: "悬赏与找回",
     summary: "设置悬赏和管理链接邮箱。",
     fields: ["rewardRecovery", "ownerEmail", "antiScam"],
+    requiredFields: [],
     skippable: true,
     tone: "gold"
   },
@@ -69,6 +74,7 @@ export const noticeFormSteps = [
     title: "预览生成",
     summary: "确认信息后生成分享页和海报。",
     fields: ["submit"],
+    requiredFields: [],
     skippable: false,
     tone: "ink"
   }

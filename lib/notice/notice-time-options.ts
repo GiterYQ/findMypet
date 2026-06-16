@@ -37,3 +37,16 @@ const foundOwnerTimeOptions: NoticeTimeDisplayOption[] = [
 export function getNoticeTimeDisplayOptions(category: NoticeCategory) {
   return category === "found-owner" ? foundOwnerTimeOptions : lostPetTimeOptions;
 }
+
+export function getHalfHourTimeOptions() {
+  return Array.from({ length: 48 }, (_, index) => {
+    const hour = Math.floor(index / 2);
+    const minute = index % 2 === 0 ? 0 : 30;
+    const value = `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+
+    return {
+      label: value,
+      value
+    };
+  });
+}

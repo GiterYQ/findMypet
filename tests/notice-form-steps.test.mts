@@ -33,6 +33,12 @@ test("essentials step stays within the first-screen field budget", () => {
   assert.deepEqual(step.fields, ["noticeCategory", "petName", "petType", "addressText", "nearbyLandmark", "contact"]);
 });
 
+test("essentials step only requires location and contact", () => {
+  const step = getNoticeFormStepById("essentials");
+
+  assert.deepEqual(step.requiredFields, ["addressText", "contact"]);
+});
+
 test("isNoticeFormStepField matches field ids to their owning step", () => {
   assert.equal(isNoticeFormStepField("essentials", "contact"), true);
   assert.equal(isNoticeFormStepField("essentials", "photoUpload"), false);

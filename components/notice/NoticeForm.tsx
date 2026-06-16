@@ -19,7 +19,7 @@ import {
 import { type NoticeCreateInput } from "@/lib/notice/notice.schema";
 import { getLocationFieldLabel, getNoticeCategoryLabel, getTimeFieldLabel } from "@/lib/notice/notice-display";
 import { saveManagedNotice } from "@/lib/manage/manage-history";
-import { getNoticeTimeDisplayOptions } from "@/lib/notice/notice-time-options";
+import { getHalfHourTimeOptions, getNoticeTimeDisplayOptions } from "@/lib/notice/notice-time-options";
 
 type NoticeFormProps = {
   initialValue?: Partial<NoticeCreateInput>;
@@ -152,6 +152,33 @@ function toLocalDateString(isoString: string): string {
   }
 }
 
+function toLocalTimeString(isoString?: string): string {
+  if (!isoString) {
+    return "12:00";
+  }
+
+  try {
+    const date = new Date(isoString);
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = date.getMinutes() < 30 ? "00" : "30";
+    return `${hours}:${minutes}`;
+  } catch {
+    return "12:00";
+  }
+}
+
+function buildLocalDateTimeIso(dateValue: string, timeValue: string): string | undefined {
+  if (!dateValue) {
+    return undefined;
+  }
+
+  return new Date(`${dateValue}T${timeValue || "12:00"}:00`).toISOString();
+}
+
+function isHalfHourTimeValue(value?: string): boolean {
+  return Boolean(value && /^\d{2}:(00|30)$/.test(value));
+}
+
 export function NoticeForm({ initialValue, manageToken, mode = "create", shortId }: NoticeFormProps) {
   const [payload, setPayload] = useState<NoticeCreateInput>(() => ({ ...defaultNotice, ...initialValue }));
   const [result, setResult] = useState<{ publicShareUrl: string; manageUrl: string } | null>(null);
@@ -179,6 +206,11 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
   const nextStepLabel = getNoticeFormNextButtonLabel(activeStep.id);
   const timeDisplayOptions = getNoticeTimeDisplayOptions(payload.noticeCategory);
   const currentTimeDisplay = String(payload.lostInfo.lostTime.displayText ?? "");
+  const halfHourTimeOptions = getHalfHourTimeOptions();
+  const selectedDateValue = payload.lostInfo.lostTime.startAt ? toLocalDateString(payload.lostInfo.lostTime.startAt) : "";
+  const selectedExactTimeValue = isHalfHourTimeValue(currentTimeDisplay)
+    ? currentTimeDisplay
+    : toLocalTimeString(payload.lostInfo.lostTime.startAt);
   const visibleTimeDisplayOptions =
     currentTimeDisplay && !timeDisplayOptions.some((option) => option.value === currentTimeDisplay)
       ? [{ label: currentTimeDisplay, value: currentTimeDisplay }, ...timeDisplayOptions]
@@ -234,7 +266,6 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
   }
 
   function validateForm(): string | null {
-    if (!payload.petProfile.name.trim() && payload.noticeCategory !== "found-owner") return "请填写宠物名称";
     if (payload.petProfile.name.length > 30) return "宠物名称不能超过 30 个字符";
     if (!payload.lostInfo.location.addressText.trim()) return `请填写${locationFieldLabel}详细地址`;
     if (payload.lostInfo.location.addressText.length > 200) return "详细地址不能超过 200 个字符";
@@ -249,7 +280,6 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
       return null;
     }
 
-    if (!payload.petProfile.name.trim() && payload.noticeCategory !== "found-owner") return "请填写宠物名称";
     if (payload.petProfile.name.length > 30) return "宠物名称不能超过 30 个字符";
     if (!payload.lostInfo.location.addressText.trim()) return `请填写${locationFieldLabel}详细地址`;
     if (payload.lostInfo.location.addressText.length > 200) return "详细地址不能超过 200 个字符";
@@ -283,7 +313,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
       ownerNotificationEmail: payload.ownerNotificationEmail?.trim() || undefined,
       petProfile: {
         ...payload.petProfile,
-        name: payload.petProfile.name.trim() || (payload.noticeCategory === "found-owner" ? "未知" : ""),
+        name: payload.petProfile.name.trim() || "未知",
         description: payload.petProfile.description || undefined
       },
       lostInfo: {
@@ -433,8 +463,8 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
                   }))
                 }
               />
-              {payload.noticeCategory === "found-owner" && !payload.petProfile.name.trim() ? (
-                <div className="hint">寻主启事不知道名字可留空，将自动填为&ldquo;未知&rdquo;</div>
+              {!payload.petProfile.name.trim() ? (
+                <div className="hint">可不填，生成时会自动显示为&ldquo;未知&rdquo;。</div>
               ) : null}
             </div>
             ) : null}
@@ -636,16 +666,17 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
                 <input
                   id="lostDate"
                   type="date"
-                  value={payload.lostInfo.lostTime.startAt ? toLocalDateString(payload.lostInfo.lostTime.startAt) : ""}
+                  value={selectedDateValue}
                   onChange={(event) => {
                     const dateValue = event.target.value;
+                    const timeValue = payload.lostInfo.lostTime.precision === "exact" ? selectedExactTimeValue : "12:00";
                     setPayload((current) => ({
                       ...current,
                       lostInfo: {
                         ...current.lostInfo,
                         lostTime: {
                           ...current.lostInfo.lostTime,
-                          startAt: dateValue ? new Date(`${dateValue}T12:00:00`).toISOString() : undefined
+                          startAt: buildLocalDateTimeIso(dateValue, timeValue)
                         }
                       }
                     }));
@@ -665,15 +696,25 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
                       <input
                         checked={payload.lostInfo.lostTime.precision === opt.value}
                         name="timePrecision"
-                        onChange={() =>
+                        onChange={() => {
+                          const dateValue = selectedDateValue || toLocalDateString(new Date().toISOString());
+                          const exactTimeValue = selectedExactTimeValue || "12:00";
                           setPayload((current) => ({
                             ...current,
                             lostInfo: {
                               ...current.lostInfo,
-                              lostTime: { ...current.lostInfo.lostTime, precision: opt.value }
+                              lostTime: {
+                                ...current.lostInfo.lostTime,
+                                precision: opt.value,
+                                startAt:
+                                  opt.value === "exact"
+                                    ? buildLocalDateTimeIso(dateValue, exactTimeValue)
+                                    : current.lostInfo.lostTime.startAt,
+                                displayText: opt.value === "exact" ? exactTimeValue : ""
+                              }
                             }
-                          }))
-                        }
+                          }));
+                        }}
                         type="radio"
                         value={opt.value}
                       />
@@ -684,31 +725,41 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
               </div>
 
               <div className="field" style={{ marginBottom: 0 }}>
-                <label htmlFor="lostDisplay">补充说明</label>
+                <label htmlFor="lostDisplay">{payload.lostInfo.lostTime.precision === "exact" ? "具体时间" : "补充说明"}</label>
                 <select
                   id="lostDisplay"
-                  value={String(payload.lostInfo.lostTime.displayText)}
-                  onChange={(event) =>
+                  value={payload.lostInfo.lostTime.precision === "exact" ? selectedExactTimeValue : currentTimeDisplay}
+                  onChange={(event) => {
+                    const nextDisplayValue = event.target.value;
+                    const dateValue = selectedDateValue || toLocalDateString(new Date().toISOString());
                     setPayload((current) => ({
                       ...current,
                       lostInfo: {
                         ...current.lostInfo,
                         lostTime: {
                           ...current.lostInfo.lostTime,
-                          displayText: event.target.value
+                          startAt:
+                            current.lostInfo.lostTime.precision === "exact"
+                              ? buildLocalDateTimeIso(dateValue, nextDisplayValue)
+                              : current.lostInfo.lostTime.startAt,
+                          displayText: nextDisplayValue
                         }
                       }
-                    }))
-                  }
+                    }));
+                  }}
                 >
-                  <option value="">请选择大概时间</option>
-                  {visibleTimeDisplayOptions.map((option) => (
+                  {payload.lostInfo.lostTime.precision === "exact" ? null : <option value="">请选择大概时间</option>}
+                  {(payload.lostInfo.lostTime.precision === "exact" ? halfHourTimeOptions : visibleTimeDisplayOptions).map((option) => (
                     <option key={option.value} value={option.value}>
                       {option.label}
                     </option>
                   ))}
                 </select>
-                <div className="hint">不用手打，直接选择最接近的时间段即可。</div>
+                <div className="hint">
+                  {payload.lostInfo.lostTime.precision === "exact"
+                    ? "按 30 分钟步进选择，例如 08:00、08:30。"
+                    : "不用手打，直接选择最接近的时间段即可。"}
+                </div>
               </div>
             </fieldset>
             ) : null}
@@ -855,7 +906,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
               <div>
                 <dt>宠物</dt>
                 <dd>
-                  {payload.petProfile.name.trim() || (payload.noticeCategory === "found-owner" ? "未知" : "未填写")} /{" "}
+                  {payload.petProfile.name.trim() || "未知"} /{" "}
                   {payload.petProfile.type === "cat" ? "猫" : payload.petProfile.type === "dog" ? "狗" : payload.petProfile.type === "bird" ? "鸟" : "其他"}
                 </dd>
               </div>
