@@ -48,7 +48,6 @@ export function NoticeUrgentPoster({ notice, id, className }: NoticeUrgentPoster
         <span>紧急</span>
         <div>
           <strong>{getNoticeCategoryLabel(notice.noticeCategory)}</strong>
-          <small>ID {notice.shortId} · 版本 {notice.posterVersion}</small>
         </div>
       </header>
 

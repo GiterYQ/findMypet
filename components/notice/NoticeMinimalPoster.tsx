@@ -31,7 +31,6 @@ export function NoticeMinimalPoster({ notice, id, className }: NoticeMinimalPost
       <header className="poster-minimal-header">
         <span>{getNoticeCategoryLabel(notice.noticeCategory)}</span>
         <strong>{statusLabel}</strong>
-        <small>ID {notice.shortId} · 版本 {notice.posterVersion}</small>
       </header>
 
       <section className="poster-minimal-title">

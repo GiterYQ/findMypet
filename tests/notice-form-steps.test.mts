@@ -6,7 +6,13 @@
  */
 import assert from "node:assert/strict";
 import test from "node:test";
-import { getNoticeFormStep, getNoticeFormStepById, isNoticeFormStepField, noticeFormSteps } from "../lib/notice/notice-form-steps.ts";
+import {
+  getNoticeFormNextButtonLabel,
+  getNoticeFormStep,
+  getNoticeFormStepById,
+  isNoticeFormStepField,
+  noticeFormSteps
+} from "../lib/notice/notice-form-steps.ts";
 
 test("noticeFormSteps keeps the create flow short and ordered", () => {
   assert.deepEqual(
@@ -38,4 +44,10 @@ test("detail steps are skippable after required essentials", () => {
   const skippableStepIds = noticeFormSteps.filter((step) => step.skippable).map((step) => step.id);
 
   assert.deepEqual(skippableStepIds, ["photo", "time-risk", "reward-extra"]);
+});
+
+test("skippable detail steps still use next as the primary action label", () => {
+  assert.equal(getNoticeFormNextButtonLabel("essentials"), "下一步");
+  assert.equal(getNoticeFormNextButtonLabel("photo"), "下一步");
+  assert.equal(getNoticeFormNextButtonLabel("reward-extra"), "下一步");
 });

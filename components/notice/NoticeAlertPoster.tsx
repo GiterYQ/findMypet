@@ -63,7 +63,6 @@ export function NoticeAlertPoster({ notice, id, className }: NoticeAlertPosterPr
         <div className="poster-alert-side">
           <span>{getNoticeCategoryLabel(notice.noticeCategory)}</span>
           <span>{statusLabel}</span>
-          <span>ID {notice.shortId}</span>
         </div>
       </header>
 
@@ -110,7 +109,7 @@ export function NoticeAlertPoster({ notice, id, className }: NoticeAlertPosterPr
 
       <footer className="poster-alert-footer">
         <strong>请勿提前转账，先核实宠物或主人信息。</strong>
-        <span>版本 {notice.posterVersion} · 更新于 {new Date(notice.updatedAt).toLocaleString()}</span>
+        <span>请以分享页最新状态为准 · 更新于 {new Date(notice.updatedAt).toLocaleString()}</span>
       </footer>
     </article>
   );

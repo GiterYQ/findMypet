@@ -83,3 +83,7 @@ export function isNoticeFormStepField(stepId: NoticeFormStepId, field: NoticeFor
   const fields: readonly NoticeFormStepField[] = getNoticeFormStepById(stepId).fields;
   return fields.includes(field);
 }
+
+export function getNoticeFormNextButtonLabel(stepId: NoticeFormStepId) {
+  return getNoticeFormStepById(stepId).id === "review" ? "生成" : "下一步";
+}

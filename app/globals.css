@@ -70,7 +70,7 @@ textarea {
 }
 
 .hero {
-  padding: 56px 0 24px;
+  padding: 34px 0 16px;
 }
 
 .hero h1 {
@@ -82,20 +82,20 @@ textarea {
 .hero p {
   max-width: 640px;
   color: var(--muted);
-  font-size: 1.05rem;
+  font-size: 0.98rem;
 }
 
 .panel {
   background: var(--panel);
   border: 1px solid rgba(215, 206, 192, 0.75);
-  border-radius: 24px;
+  border-radius: 18px;
   box-shadow: var(--shadow);
   backdrop-filter: blur(10px);
 }
 
 .grid {
   display: grid;
-  gap: 20px;
+  gap: 14px;
 }
 
 .two-col {
@@ -103,7 +103,7 @@ textarea {
 }
 
 .section {
-  padding: 20px;
+  padding: 16px;
 }
 
 .section h2,
@@ -113,8 +113,8 @@ textarea {
 
 .field {
   display: grid;
-  gap: 8px;
-  margin-bottom: 16px;
+  gap: 6px;
+  margin-bottom: 10px;
 }
 
 .field label {
@@ -126,31 +126,31 @@ textarea {
 .field textarea {
   border: 1px solid var(--line);
   background: rgba(255, 255, 255, 0.82);
-  border-radius: 14px;
-  padding: 12px 14px;
+  border-radius: 12px;
+  padding: 9px 12px;
 }
 
 .field textarea {
-  min-height: 120px;
+  min-height: 92px;
   resize: vertical;
 }
 
 .actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 10px;
 }
 
 .button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 12px 18px;
+  padding: 9px 15px;
   border-radius: 999px;
   border: 0;
   cursor: pointer;
   transition: transform 160ms ease, opacity 160ms ease;
-  min-height: 44px;
+  min-height: 40px;
   text-align: center;
 }
 
@@ -171,7 +171,7 @@ textarea {
 
 .radio-group {
   display: flex;
-  gap: 16px;
+  gap: 10px;
   flex-wrap: wrap;
 }
 
@@ -197,8 +197,8 @@ textarea {
 }
 
 .risk-button {
-  min-height: 48px;
-  padding-inline: 16px;
+  min-height: 42px;
+  padding-inline: 14px;
 }
 
 .tag {
@@ -276,17 +276,17 @@ textarea {
 .notice-stepper {
   border: 1px solid rgba(211, 94, 56, 0.16);
   background: linear-gradient(145deg, rgba(211, 94, 56, 0.1), rgba(255, 255, 255, 0.72));
-  border-radius: 22px;
+  border-radius: 16px;
   display: grid;
-  gap: 14px;
-  margin-bottom: 20px;
-  padding: 16px;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding: 12px;
 }
 
 .notice-stepper-header {
   align-items: start;
   display: grid;
-  gap: 12px;
+  gap: 10px;
   grid-template-columns: auto minmax(0, 1fr);
 }
 
@@ -296,22 +296,22 @@ textarea {
   color: #fff;
   font-size: 0.86rem;
   font-weight: 900;
-  padding: 7px 10px;
+  padding: 6px 9px;
 }
 
 .notice-stepper-header strong {
   display: block;
-  font-size: 1.18rem;
+  font-size: 1.08rem;
 }
 
 .notice-stepper-header p {
   color: var(--muted);
-  margin: 4px 0 0;
+  margin: 2px 0 0;
 }
 
 .notice-stepper-track {
   display: grid;
-  gap: 8px;
+  gap: 6px;
   grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 
@@ -322,7 +322,7 @@ textarea {
   color: var(--muted);
   display: grid;
   font-weight: 900;
-  min-height: 34px;
+  min-height: 28px;
   place-items: center;
 }
 
@@ -339,11 +339,11 @@ textarea {
 .notice-step-review {
   background: rgba(255, 255, 255, 0.7);
   border: 1px solid rgba(215, 206, 192, 0.82);
-  border-radius: 22px;
+  border-radius: 16px;
   display: grid;
-  gap: 12px;
+  gap: 10px;
   margin-top: 4px;
-  padding: 18px;
+  padding: 14px;
 }
 
 .notice-step-review h3 {
@@ -352,7 +352,7 @@ textarea {
 
 .notice-review-list {
   display: grid;
-  gap: 10px;
+  gap: 8px;
   margin: 0;
 }
 
@@ -360,9 +360,9 @@ textarea {
   align-items: start;
   border-bottom: 1px dashed rgba(215, 206, 192, 0.9);
   display: grid;
-  gap: 12px;
+  gap: 10px;
   grid-template-columns: 96px minmax(0, 1fr);
-  padding-bottom: 10px;
+  padding-bottom: 8px;
 }
 
 .notice-review-list div:last-child {
@@ -776,7 +776,7 @@ textarea {
   align-items: center;
   display: grid;
   gap: 10px;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: auto minmax(0, 1fr);
 }
 
 .poster-square-top span {
@@ -959,7 +959,7 @@ textarea {
   align-items: center;
   display: grid;
   gap: 12px;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: auto minmax(0, 1fr);
 }
 
 .poster-minimal-header span,
@@ -1284,7 +1284,7 @@ textarea {
   }
 
   .hero {
-    padding: 32px 0 18px;
+    padding: 22px 0 12px;
   }
 
   .hero h1 {
@@ -1293,26 +1293,26 @@ textarea {
   }
 
   .hero p {
-    font-size: 1rem;
+    font-size: 0.95rem;
   }
 
   .panel {
-    border-radius: 20px;
+    border-radius: 16px;
   }
 
   .section {
-    padding: 16px;
+    padding: 12px;
   }
 
   .field input,
   .field select,
   .field textarea {
     font-size: 16px;
-    min-height: 46px;
+    min-height: 40px;
   }
 
   .field textarea {
-    min-height: 108px;
+    min-height: 84px;
   }
 
   .actions {
@@ -1327,8 +1327,8 @@ textarea {
   }
 
   .notice-stepper {
-    border-radius: 18px;
-    padding: 14px;
+    border-radius: 15px;
+    padding: 10px;
   }
 
   .notice-stepper-header {
@@ -1347,21 +1347,21 @@ textarea {
   .notice-step-actions {
     background: rgba(246, 243, 236, 0.9);
     border: 1px solid rgba(215, 206, 192, 0.78);
-    border-radius: 20px;
+    border-radius: 16px;
     bottom: calc(env(safe-area-inset-bottom) + 10px);
     box-shadow: 0 18px 44px rgba(42, 32, 18, 0.14);
-    padding: 10px;
+    padding: 8px;
     position: sticky;
     z-index: 5;
   }
 
   .radio-group,
   .tag-list {
-    gap: 10px;
+    gap: 8px;
   }
 
   .radio-label {
-    min-height: 38px;
+    min-height: 32px;
   }
 
   .notice-grid {

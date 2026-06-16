@@ -48,7 +48,6 @@ export function NoticeSquarePoster({ notice, id, className }: NoticeSquarePoster
       <header className="poster-square-top">
         <span>{getNoticeCategoryLabel(notice.noticeCategory)}</span>
         <strong>{statusLabel}</strong>
-        <small>ID {notice.shortId}</small>
       </header>
 
       <section className="poster-square-photo">

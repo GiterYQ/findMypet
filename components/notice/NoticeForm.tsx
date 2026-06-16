@@ -11,6 +11,7 @@ import { CopyButton } from "@/components/notice/CopyButton";
 import { compressImageFile, uploadCompressedImage } from "@/lib/media/client-image";
 import { formatAmountMinorForDisplay, majorAmountInputToMinor, minorAmountToMajorInput } from "@/lib/notice/money";
 import {
+  getNoticeFormNextButtonLabel,
   getNoticeFormStep,
   type NoticeFormStepField,
   noticeFormSteps
@@ -174,7 +175,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
     .map((risk) => risk.label);
   const uploadedPhotoCount = payload.photos.filter((photo) => photo.url).length;
   const recoveryRewardMinor = Number(payload.rewards?.recovery?.amountMinor ?? 0);
-  const nextStepLabel = activeStep.skippable ? "跳过，稍后补充" : "下一步";
+  const nextStepLabel = getNoticeFormNextButtonLabel(activeStep.id);
 
   function isFieldVisible(field: NoticeFormStepField) {
     return isEditMode || activeStepFields.includes(field);
@@ -360,6 +361,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
               <div>
                 <strong>{activeStep.title}</strong>
                 <p>{activeStep.summary}</p>
+                {activeStep.skippable ? <p>这一步可不填，直接点下一步。</p> : null}
               </div>
             </div>
             <div className="notice-stepper-track">
@@ -495,7 +497,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
             ) : null}
 
             {isFieldVisible("addressText") || isFieldVisible("nearbyLandmark") ? (
-              <fieldset className="field" style={{ border: "1px solid var(--color-border, #ddd)", borderRadius: 6, padding: 16 }}>
+              <fieldset className="field" style={{ border: "1px solid var(--color-border, #ddd)", borderRadius: 8, padding: 10 }}>
               <legend>{locationFieldLabel}</legend>
 
               {isEditMode ? (
@@ -619,7 +621,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
             ) : null}
 
             {isFieldVisible("lostDate") || isFieldVisible("timePrecision") || isFieldVisible("lostDisplay") ? (
-              <fieldset className="field" style={{ border: "1px solid var(--color-border, #ddd)", borderRadius: 6, padding: 16 }}>
+              <fieldset className="field" style={{ border: "1px solid var(--color-border, #ddd)", borderRadius: 8, padding: 10 }}>
               <legend>{timeFieldLabel}</legend>
 
               <div className="field" style={{ marginBottom: 8 }}>
@@ -869,7 +871,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
           </div>
         ) : null}
 
-        <div className={`actions ${isStepFlow ? "notice-step-actions" : ""}`} style={{ marginTop: 20 }}>
+        <div className={`actions ${isStepFlow ? "notice-step-actions" : ""}`} style={{ marginTop: 12 }}>
           {isStepFlow ? (
             <>
               <button className="button button-secondary" disabled={activeStepIndex === 0 || pending || uploadingImages} onClick={goToPreviousStep} type="button">
@@ -894,7 +896,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
 
         {error ? <p className="danger-box">{error}</p> : null}
         {result && !isEditMode ? (
-          <div className="panel section" style={{ marginTop: 20 }}>
+          <div className="panel section" style={{ marginTop: 12 }}>
             <h3>启事已生成</h3>
             <div className="field">
               <label>公开分享页</label>

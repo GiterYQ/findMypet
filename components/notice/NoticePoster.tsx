@@ -38,10 +38,6 @@ export function NoticePoster({ notice, id, className }: NoticePosterProps) {
             {getNoticeCategoryLabel(notice.noticeCategory)} · {getPetTypeLabel(notice.petProfile.type)} · {notice.lostInfo.location.addressText}
           </p>
         </div>
-        <div className="poster-id-block">
-          <div className="poster-code">ID {notice.shortId}</div>
-          <div className="poster-version">版本 {notice.posterVersion}</div>
-        </div>
       </header>
 
       <section className="poster-grid">
