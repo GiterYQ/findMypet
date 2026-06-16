@@ -41,3 +41,21 @@ test("globals.css has mobile-only app chrome styles", async () => {
   assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.mobile-app-bar\s*{[^}]*display:\s*flex/s);
   assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.hero\s*{[^}]*display:\s*none/s);
 });
+
+test("globals.css covers compact standard large and Pro Max landscape iPhone viewports", async () => {
+  const source = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+
+  assert.match(source, /@media \(max-width: 360px\)/);
+  assert.match(source, /@media \(min-width: 361px\) and \(max-width: 430px\)/);
+  assert.match(source, /@media \(min-width: 431px\) and \(max-width: 760px\)/);
+  assert.match(source, /@media \(max-width: 760px\) and \(max-height: 700px\)/);
+  assert.match(source, /@media \(max-width: 960px\) and \(orientation: landscape\)/);
+});
+
+test("globals.css keeps tiny iPhones from being covered by stacked fixed controls", async () => {
+  const source = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+
+  assert.match(source, /@media \(max-width: 360px\)[\s\S]*\.notice-step-actions\s*{[^}]*position:\s*static/s);
+  assert.match(source, /@media \(max-width: 760px\) and \(max-height: 700px\)[\s\S]*\.notice-step-actions\s*{[^}]*position:\s*static/s);
+  assert.match(source, /@media \(max-width: 960px\) and \(orientation: landscape\)[\s\S]*\.mobile-bottom-tabs\s*{[^}]*display:\s*none/s);
+});

@@ -170,3 +170,19 @@
   - `npm test` 通过 38 项。
   - `npm run lint` 通过。
   - `npm run build` 通过。
+
+## 2026-06-16 iPhone 全机型断点优化
+
+- 完成用户反馈：
+  - 针对窄屏 iPhone（含 SE/mini 级别）收紧页面 padding、顶部栏、底部 tab、输入框和卡片尺寸。
+  - 针对标准 iPhone 宽度稳定表单最大宽度、底部 tab 宽度和公开列表缩略图比例。
+  - 针对 Plus/Pro Max 级别机型放宽左右留白和卡片尺寸，避免大屏手机显得过度拥挤。
+  - 针对短屏和横屏 iPhone，将浮动步骤操作区回到文档流，避免按钮叠住输入区域。
+  - 横屏保护覆盖到 960px，兼容 Pro Max 级别横向视口。
+- TDD 记录：
+  - 先把横屏断点测试从 932px 提升到 960px，确认当前 CSS 失败。
+  - 再调整 `app/globals.css` 的 iPhone 横屏媒体查询并确认测试恢复通过。
+- 验证记录：
+  - `npm test` 通过 40 项。
+  - `npm run lint` 通过。
+  - `npm run build` 通过。
