@@ -112,7 +112,7 @@
 
 ## 阶段 5：真实预览与回归
 
-状态：pending
+状态：complete
 
 任务：
 - 使用本地 dev:mobile 预览首页、创建页、管理页、三类海报。
@@ -124,6 +124,13 @@
 - `npm test`、`npm run lint`、`npm run build` 通过。
 - 首页、分享页、管理页、海报页 HTTP 200。
 - 手机局域网地址可打开。
+
+完成记录：
+- `npm run dev:mobile` 已启动，局域网预览地址为 `http://192.168.10.33:3000`。
+- 首页 `/`、我的启事 `/mine`、公开列表 `/api/notices` 返回 200。
+- 使用本地测试启事 `vYPV3jRq` 验证分享页 `/notice/vYPV3jRq` 返回 200。
+- 5 套海报入口均返回 200：classic、alert、square、minimal、urgent。
+- 注意：本机 `127.0.0.1` 直连在一次内容 grep 时出现连接拒绝，改用 `localhost` 和 dev server 日志确认路由可达。
 
 ## 当前优先级
 

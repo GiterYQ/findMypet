@@ -84,3 +84,25 @@
   - `npm run build` 首次失败一次，原因是非跳过步骤没有显式 `skippable` 属性，TypeScript 不允许直接访问。
   - 修复方式：所有步骤显式声明 `skippable: boolean`。
   - 修复后 `npm run build` 通过。
+
+## 2026-06-16 阶段 5 执行记录
+
+- 完成真实预览与回归：
+  - `npm test` 通过 24 项。
+  - `npm run lint` 通过。
+  - `npm run build` 通过。
+  - 重启 `npm run dev:mobile` 后服务 ready。
+  - 局域网预览地址：`http://192.168.10.33:3000`。
+- HTTP 检查：
+  - `/` 返回 200。
+  - `/mine` 返回 200。
+  - `/api/notices` 返回 200，并返回本地测试启事 `vYPV3jRq`。
+  - `/notice/vYPV3jRq` 返回 200。
+  - `/poster/vYPV3jRq` 返回 200。
+  - `/poster/vYPV3jRq?template=alert` 返回 200。
+  - `/poster/vYPV3jRq?template=square` 返回 200。
+  - `/poster/vYPV3jRq?template=minimal` 返回 200。
+  - `/poster/vYPV3jRq?template=urgent` 返回 200。
+- 注意：
+  - 初次 curl 被本机代理拦截为 502，使用 `--noproxy '*'` 后可直连。
+  - 一次针对 HTML 内容的 grep 检查遇到 `127.0.0.1` 连接拒绝，随后用 `localhost` 首页 200 和 dev server 访问日志确认服务仍可用。
