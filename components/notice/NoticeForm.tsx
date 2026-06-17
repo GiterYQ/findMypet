@@ -21,6 +21,7 @@ import { type NoticeCreateInput } from "@/lib/notice/notice.schema";
 import { getFullLocationText, getLocationFieldLabel, getNoticeCategoryLabel, getPetTypeDisplayName, getTimeFieldLabel } from "@/lib/notice/notice-display";
 import { saveManagedNotice } from "@/lib/manage/manage-history";
 import { getHalfHourTimeOptions, getNoticeTimeDisplayOptions } from "@/lib/notice/notice-time-options";
+import { posterTemplateOptions, type PosterTemplateId } from "@/lib/notice/poster-template";
 
 type NoticeFormProps = {
   initialValue?: Partial<NoticeCreateInput>;
@@ -255,6 +256,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
   const [streetOptions, setStreetOptions] = useState<ChinaDivisionOption[]>([]);
   const [showNearbyLandmark, setShowNearbyLandmark] = useState(() => Boolean(initialValue?.lostInfo?.location?.nearbyLandmark));
   const [activeStepIndex, setActiveStepIndex] = useState(0);
+  const [selectedPosterTemplate, setSelectedPosterTemplate] = useState<PosterTemplateId>("square");
   const isEditMode = mode === "edit";
   const isStepFlow = !isEditMode;
   const activeStep = getNoticeFormStep(activeStepIndex);
@@ -1398,8 +1400,22 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
           ) : null}
 
           {isStepFlow ? (
-            <aside className="notice-live-preview" aria-label="实时海报预览">
+            <aside className={`notice-live-preview notice-live-preview-template-${selectedPosterTemplate}`} aria-label="实时海报预览">
               <span>实时预览</span>
+              <div className="notice-template-picker" aria-label="选择海报模板">
+                {posterTemplateOptions.map((template) => (
+                  <button
+                    aria-pressed={selectedPosterTemplate === template.id}
+                    className={`notice-template-option ${selectedPosterTemplate === template.id ? "notice-template-option-active" : ""}`}
+                    key={template.id}
+                    onClick={() => setSelectedPosterTemplate(template.id)}
+                    type="button"
+                  >
+                    <strong>{template.label}</strong>
+                    <small>{template.aspectLabel}</small>
+                  </button>
+                ))}
+              </div>
               <div className="notice-live-preview-card">
                 <div className="notice-live-preview-media" aria-label={hasPreviewPhoto ? "已上传照片预览" : "照片骨架预览"}>
                   {previewPhoto ? (

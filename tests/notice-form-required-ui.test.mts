@@ -137,6 +137,23 @@ test("NoticeForm renders a live poster preview while editing", async () => {
   assert.match(source, /notice-live-preview-contact-label/);
 });
 
+test("NoticeForm lets users switch poster template before generating", async () => {
+  const source = await readFile(new URL("../components/notice/NoticeForm.tsx", import.meta.url), "utf8");
+  const styleSource = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+
+  assert.match(source, /posterTemplateOptions/);
+  assert.match(source, /selectedPosterTemplate/);
+  assert.match(source, /notice-template-picker/);
+  assert.match(source, /notice-template-option/);
+  assert.match(source, /notice-live-preview-template-/);
+  assert.match(styleSource, /\.notice-template-picker\s*{/);
+  assert.match(styleSource, /\.notice-template-option\s*{/);
+  assert.match(styleSource, /\.notice-template-option-active\s*{/);
+  assert.match(styleSource, /\.notice-live-preview-template-alert\s+\.notice-live-preview-card\s*{/);
+  assert.match(styleSource, /\.notice-live-preview-template-square\s+\.notice-live-preview-card\s*{/);
+  assert.match(styleSource, /\.notice-live-preview-template-urgent\s+\.notice-live-preview-card\s*{/);
+});
+
 test("NoticeForm keeps uploaded photo previews as small thumbnails", async () => {
   const formSource = await readFile(new URL("../components/notice/NoticeForm.tsx", import.meta.url), "utf8");
   const styleSource = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
