@@ -154,6 +154,18 @@ test("NoticeForm lets users switch poster template before generating", async () 
   assert.match(styleSource, /\.notice-live-preview-template-urgent\s+\.notice-live-preview-card\s*{/);
 });
 
+test("NoticeForm autosaves create drafts locally and clears them after submit", async () => {
+  const source = await readFile(new URL("../components/notice/NoticeForm.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /NOTICE_FORM_DRAFT_STORAGE_KEY/);
+  assert.match(source, /loadNoticeFormDraft/);
+  assert.match(source, /saveNoticeFormDraft/);
+  assert.match(source, /clearNoticeFormDraft/);
+  assert.match(source, /findMypet.noticeFormDraft.v1/);
+  assert.match(source, /草稿已自动保存在当前浏览器/);
+  assert.match(source, /localStorage\.removeItem\(NOTICE_FORM_DRAFT_STORAGE_KEY\)/);
+});
+
 test("NoticeForm keeps uploaded photo previews as small thumbnails", async () => {
   const formSource = await readFile(new URL("../components/notice/NoticeForm.tsx", import.meta.url), "utf8");
   const styleSource = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");

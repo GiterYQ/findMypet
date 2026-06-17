@@ -21,7 +21,7 @@ import { type NoticeCreateInput } from "@/lib/notice/notice.schema";
 import { getFullLocationText, getLocationFieldLabel, getNoticeCategoryLabel, getPetTypeDisplayName, getTimeFieldLabel } from "@/lib/notice/notice-display";
 import { saveManagedNotice } from "@/lib/manage/manage-history";
 import { getHalfHourTimeOptions, getNoticeTimeDisplayOptions } from "@/lib/notice/notice-time-options";
-import { posterTemplateOptions, type PosterTemplateId } from "@/lib/notice/poster-template";
+import { normalizePosterTemplate, posterTemplateOptions, type PosterTemplateId } from "@/lib/notice/poster-template";
 
 type NoticeFormProps = {
   initialValue?: Partial<NoticeCreateInput>;
@@ -34,6 +34,15 @@ type ChinaDivisionOption = {
   code: string;
   name: string;
 };
+
+type NoticeFormDraft = {
+  payload: NoticeCreateInput;
+  selectedPosterTemplate: PosterTemplateId;
+  activeStepIndex: number;
+  savedAt: string;
+};
+
+const NOTICE_FORM_DRAFT_STORAGE_KEY = "findMypet.noticeFormDraft.v1";
 
 const defaultNotice: NoticeCreateInput = {
   locale: "zh-CN",
@@ -239,6 +248,67 @@ async function loadChinaDivisionOptions(params: Record<string, string>) {
   return data.options ?? [];
 }
 
+function isDraftPayload(value: unknown): value is NoticeCreateInput {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const payload = value as Partial<NoticeCreateInput>;
+
+  return (
+    (payload.noticeCategory === "lost-pet" || payload.noticeCategory === "found-owner") &&
+    typeof payload.petProfile === "object" &&
+    typeof payload.lostInfo === "object" &&
+    Array.isArray(payload.contactMethods) &&
+    Array.isArray(payload.photos)
+  );
+}
+
+function loadNoticeFormDraft(): NoticeFormDraft | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  try {
+    const rawDraft = window.localStorage.getItem(NOTICE_FORM_DRAFT_STORAGE_KEY);
+
+    if (!rawDraft) {
+      return null;
+    }
+
+    const parsed = JSON.parse(rawDraft) as Partial<NoticeFormDraft>;
+
+    if (!isDraftPayload(parsed.payload)) {
+      return null;
+    }
+
+    return {
+      payload: parsed.payload,
+      selectedPosterTemplate: normalizePosterTemplate(parsed.selectedPosterTemplate),
+      activeStepIndex: Math.min(Math.max(Number(parsed.activeStepIndex ?? 0), 0), noticeFormSteps.length - 1),
+      savedAt: typeof parsed.savedAt === "string" ? parsed.savedAt : new Date().toISOString()
+    };
+  } catch {
+    return null;
+  }
+}
+
+function saveNoticeFormDraft(draft: NoticeFormDraft) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  window.localStorage.setItem(NOTICE_FORM_DRAFT_STORAGE_KEY, JSON.stringify(draft));
+}
+
+function clearNoticeFormDraft() {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  window.localStorage.removeItem(NOTICE_FORM_DRAFT_STORAGE_KEY);
+}
+
 export function NoticeForm({ initialValue, manageToken, mode = "create", shortId }: NoticeFormProps) {
   const [payload, setPayload] = useState<NoticeCreateInput>(() => ({ ...defaultNotice, ...initialValue }));
   const [result, setResult] = useState<{ publicShareUrl: string; manageUrl: string } | null>(null);
@@ -257,6 +327,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
   const [showNearbyLandmark, setShowNearbyLandmark] = useState(() => Boolean(initialValue?.lostInfo?.location?.nearbyLandmark));
   const [activeStepIndex, setActiveStepIndex] = useState(0);
   const [selectedPosterTemplate, setSelectedPosterTemplate] = useState<PosterTemplateId>("square");
+  const [draftHydrated, setDraftHydrated] = useState(false);
   const isEditMode = mode === "edit";
   const isStepFlow = !isEditMode;
   const activeStep = getNoticeFormStep(activeStepIndex);
@@ -390,6 +461,36 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
       cancelled = true;
     };
   }, [canShowManualLocationFields, selectedDistrictOption?.code]);
+
+  useEffect(() => {
+    if (!isStepFlow || initialValue) {
+      setDraftHydrated(true);
+      return;
+    }
+
+    const draft = loadNoticeFormDraft();
+
+    if (draft) {
+      setPayload(draft.payload);
+      setSelectedPosterTemplate(draft.selectedPosterTemplate);
+      setActiveStepIndex(draft.activeStepIndex);
+    }
+
+    setDraftHydrated(true);
+  }, [initialValue, isStepFlow]);
+
+  useEffect(() => {
+    if (!isStepFlow || !draftHydrated || result) {
+      return;
+    }
+
+    saveNoticeFormDraft({
+      payload,
+      selectedPosterTemplate,
+      activeStepIndex,
+      savedAt: new Date().toISOString()
+    });
+  }, [activeStepIndex, draftHydrated, isStepFlow, payload, result, selectedPosterTemplate]);
 
   function isFieldVisible(field: NoticeFormStepField) {
     return isEditMode || activeStepFields.includes(field);
@@ -686,6 +787,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
           publicShareUrl: data.publicShareUrl,
           manageUrl: data.manageUrl
         });
+        clearNoticeFormDraft();
         localStorage.setItem("findMypet.latestManageUrl", data.manageUrl);
         saveManagedNotice({
           shortId: data.shortId,
@@ -1467,6 +1569,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
             </button>
           )}
         </div>
+        {isStepFlow && !result ? <p className="hint">草稿已自动保存在当前浏览器；换设备或清理浏览器后不会保留。</p> : null}
 
         {error ? <p className="danger-box">{error}</p> : null}
         {result && !isEditMode ? (
