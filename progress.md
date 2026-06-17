@@ -186,3 +186,18 @@
   - `npm test` 通过 40 项。
   - `npm run lint` 通过。
   - `npm run build` 通过。
+
+## 2026-06-17 手机发布步骤上下文提示优化
+
+- 完成用户反馈：
+  - 创建流程顶部增加“当前任务”提示条，明确本步目标、预计耗时、已完成步骤和剩余步骤。
+  - 每个步骤配置补充 `goal` 和 `estimate`，让表单文案继续集中在 `notice-form-steps.ts` 管理。
+  - 手机端提示条采用单列 App 卡片样式，窄屏 iPhone 下进一步压缩字号和间距，避免增加首屏负担。
+- TDD 记录：
+  - 先新增步骤元信息测试，确认 `goal` / `estimate` 缺失时失败。
+  - 先新增表单和 CSS 静态测试，确认 `notice-step-context` 相关 class 未实现时失败。
+  - 再实现步骤配置、表单提示条和响应式样式。
+- 验证记录：
+  - `npm test` 通过 43 项。
+  - `npm run lint` 通过。
+  - `npm run build` 通过。

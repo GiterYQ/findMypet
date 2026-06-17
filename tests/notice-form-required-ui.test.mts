@@ -16,6 +16,16 @@ test("NoticeForm renders step required summary and field requirement badges", as
   assert.match(source, /isNoticeFormFieldRequired/);
 });
 
+test("NoticeForm renders mobile step context summary", async () => {
+  const source = await readFile(new URL("../components/notice/NoticeForm.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /notice-step-context/);
+  assert.match(source, /notice-step-context-meter/);
+  assert.match(source, /notice-step-context-stat/);
+  assert.match(source, /activeStep\.goal/);
+  assert.match(source, /activeStep\.estimate/);
+});
+
 test("globals.css styles field requirement badges", async () => {
   const source = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
 
@@ -23,6 +33,15 @@ test("globals.css styles field requirement badges", async () => {
   assert.match(source, /\.notice-field-badge\s*{/);
   assert.match(source, /\.notice-field-badge-required\s*{/);
   assert.match(source, /\.notice-field-badge-optional\s*{/);
+});
+
+test("globals.css styles mobile step context summary", async () => {
+  const source = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+
+  assert.match(source, /\.notice-step-context\s*{/);
+  assert.match(source, /\.notice-step-context-meter\s*{/);
+  assert.match(source, /\.notice-step-context-stat\s*{/);
+  assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-step-context\s*{/);
 });
 
 test("home page exposes mobile app chrome classes", async () => {

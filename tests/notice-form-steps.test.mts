@@ -77,3 +77,12 @@ test("noticeFormSteps gives every step a distinct visual tone", () => {
 
   assert.equal(new Set(tones).size, noticeFormSteps.length);
 });
+
+test("noticeFormSteps exposes mobile context copy for each step", () => {
+  for (const step of noticeFormSteps) {
+    assert.equal(typeof step.goal, "string");
+    assert.notEqual(step.goal.trim(), "");
+    assert.equal(typeof step.estimate, "string");
+    assert.match(step.estimate, /分钟|秒|立即/);
+  }
+});

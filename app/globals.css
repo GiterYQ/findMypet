@@ -427,6 +427,58 @@ textarea {
   grid-template-columns: auto minmax(0, 1fr);
 }
 
+.notice-step-context {
+  align-items: center;
+  background:
+    radial-gradient(circle at 10% 0%, color-mix(in srgb, var(--step-accent) 18%, transparent), transparent 32%),
+    rgba(255, 255, 255, 0.74);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 16px;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: 10px 12px;
+}
+
+.notice-step-context-kicker {
+  color: var(--step-accent-dark, var(--accent-dark));
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.notice-step-context strong {
+  display: block;
+  line-height: 1.2;
+}
+
+.notice-step-context-meter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.notice-step-context-stat {
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(215, 206, 192, 0.68);
+  border-radius: 999px;
+  color: var(--muted);
+  display: inline-flex;
+  font-size: 0.78rem;
+  font-weight: 900;
+  gap: 4px;
+  padding: 5px 8px;
+  white-space: nowrap;
+}
+
+.notice-step-context-stat strong {
+  color: var(--step-accent-dark, var(--accent-dark));
+  display: inline;
+}
+
 .notice-stepper-header > span {
   background: var(--step-accent, var(--text));
   border-radius: 999px;
@@ -1653,6 +1705,29 @@ textarea {
     width: fit-content;
   }
 
+  .notice-step-context {
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.94), color-mix(in srgb, var(--step-accent) 10%, #fff)),
+      rgba(255, 255, 255, 0.84);
+    border-radius: 20px;
+    gap: 8px;
+    grid-template-columns: 1fr;
+    padding: 11px;
+  }
+
+  .notice-step-context strong {
+    font-size: 0.98rem;
+  }
+
+  .notice-step-context-meter {
+    justify-content: flex-start;
+  }
+
+  .notice-step-context-stat {
+    font-size: 0.74rem;
+    padding: 5px 8px;
+  }
+
   .notice-step-theme .field > label,
   .notice-step-theme fieldset.field > legend {
     border-left-width: 0;
@@ -1895,6 +1970,28 @@ textarea {
 
   .notice-stepper-header p {
     font-size: 0.86rem;
+  }
+
+  .notice-step-context {
+    border-radius: 16px;
+    padding: 9px;
+  }
+
+  .notice-step-context-kicker {
+    font-size: 0.68rem;
+  }
+
+  .notice-step-context strong {
+    font-size: 0.92rem;
+  }
+
+  .notice-step-context-meter {
+    gap: 4px;
+  }
+
+  .notice-step-context-stat {
+    font-size: 0.68rem;
+    padding: 4px 7px;
   }
 
   .notice-step-pill {

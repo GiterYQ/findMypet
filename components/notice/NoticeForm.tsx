@@ -218,6 +218,8 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
       ? [{ label: currentTimeDisplay, value: currentTimeDisplay }, ...timeDisplayOptions]
       : timeDisplayOptions;
   const requiredSummary = getNoticeFormRequiredSummary(activeStep.id);
+  const completedStepCount = activeStepIndex;
+  const remainingStepCount = Math.max(noticeFormSteps.length - activeStepIndex - 1, 0);
 
   function isFieldVisible(field: NoticeFormStepField) {
     return isEditMode || activeStepFields.includes(field);
@@ -426,6 +428,21 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
         <h2>{isEditMode ? `编辑${categoryLabel}启事` : `创建${categoryLabel}启事`}</h2>
         {isStepFlow ? (
           <div className="notice-stepper" aria-label="创建进度">
+            <div className="notice-step-context" aria-label="当前步骤说明">
+              <div>
+                <span className="notice-step-context-kicker">当前任务</span>
+                <strong>{activeStep.goal}</strong>
+              </div>
+              <div className="notice-step-context-meter">
+                <span className="notice-step-context-stat">
+                  已完成 <strong>{completedStepCount}</strong>
+                </span>
+                <span className="notice-step-context-stat">
+                  剩余 <strong>{remainingStepCount}</strong>
+                </span>
+                <span className="notice-step-context-stat">{activeStep.estimate}</span>
+              </div>
+            </div>
             <div className="notice-stepper-header">
               <span>
                 {activeStepIndex + 1}/{noticeFormSteps.length}
