@@ -29,6 +29,7 @@ test("NoticeForm renders mobile step context summary", async () => {
   const source = await readFile(new URL("../components/notice/NoticeForm.tsx", import.meta.url), "utf8");
 
   assert.match(source, /notice-step-context/);
+  assert.match(source, /notice-step-context-main/);
   assert.match(source, /notice-step-context-meter/);
   assert.match(source, /notice-step-context-stat/);
   assert.match(source, /notice-optional-divider/);
@@ -177,13 +178,16 @@ test("globals.css styles mobile step context summary", async () => {
 test("globals.css fixes current task context height across all steps", async () => {
   const source = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
 
-  assert.match(source, /\.notice-step-context\s*{[^}]*min-height:\s*64px/s);
-  assert.match(source, /\.notice-step-context > div:first-child\s*{[^}]*min-width:\s*0/s);
+  assert.match(source, /\.notice-step-context\s*{[^}]*min-height:\s*44px/s);
+  assert.match(source, /\.notice-step-context-main\s*{[^}]*align-items:\s*center/s);
+  assert.match(source, /\.notice-step-context-main\s*{[^}]*display:\s*flex/s);
+  assert.match(source, /\.notice-step-context-main\s*{[^}]*min-width:\s*0/s);
+  assert.match(source, /\.notice-step-context-kicker\s*{[^}]*white-space:\s*nowrap/s);
   assert.match(source, /\.notice-step-context strong\s*{[^}]*overflow:\s*hidden/s);
   assert.match(source, /\.notice-step-context strong\s*{[^}]*text-overflow:\s*ellipsis/s);
   assert.match(source, /\.notice-step-context strong\s*{[^}]*white-space:\s*nowrap/s);
   assert.match(source, /\.notice-step-context-meter\s*{[^}]*min-height:\s*26px/s);
-  assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-step-context\s*{[^}]*min-height:\s*96px/s);
+  assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-step-context\s*{[^}]*min-height:\s*44px/s);
   assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-step-context strong\s*{[^}]*white-space:\s*nowrap/s);
 });
 
@@ -191,7 +195,7 @@ test("globals.css fixes stepper header height and inline title copy", async () =
   const source = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
 
   assert.match(source, /\.notice-stepper-header\s*{[^}]*align-items:\s*center/s);
-  assert.match(source, /\.notice-stepper-header\s*{[^}]*min-height:\s*56px/s);
+  assert.match(source, /\.notice-stepper-header\s*{[^}]*height:\s*58px/s);
   assert.match(source, /\.notice-stepper-title-row\s*{[^}]*align-items:\s*baseline/s);
   assert.match(source, /\.notice-stepper-title-row\s*{[^}]*grid-template-columns:\s*auto minmax\(0,\s*1fr\)/s);
   assert.match(source, /\.notice-stepper-summary\s*{[^}]*color:\s*var\(--muted\)/s);

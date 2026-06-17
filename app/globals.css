@@ -459,7 +459,7 @@ textarea {
   display: grid;
   gap: 10px;
   grid-template-columns: auto minmax(0, 1fr);
-  min-height: 56px;
+  height: 58px;
 }
 
 .notice-stepper-copy {
@@ -478,21 +478,25 @@ textarea {
   display: grid;
   gap: 10px;
   grid-template-columns: minmax(0, 1fr) auto;
-  min-height: 64px;
+  min-height: 44px;
   padding: 10px 12px;
 }
 
-.notice-step-context > div:first-child {
+.notice-step-context-main {
+  align-items: center;
+  display: flex;
+  gap: 8px;
   min-width: 0;
 }
 
 .notice-step-context-kicker {
   color: var(--step-accent-dark, var(--accent-dark));
-  display: block;
+  display: inline-flex;
   font-size: 0.72rem;
   font-weight: 900;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .notice-step-context strong {
@@ -2126,8 +2130,8 @@ textarea {
       rgba(255, 255, 255, 0.84);
     border-radius: 20px;
     gap: 8px;
-    grid-template-columns: 1fr;
-    min-height: 96px;
+    grid-template-columns: minmax(0, 1fr) auto;
+    min-height: 44px;
     padding: 11px;
   }
 

@@ -710,7 +710,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
         {isStepFlow ? (
           <div className="notice-stepper" aria-label="创建进度">
             <div className="notice-step-context" aria-label="当前步骤说明">
-              <div>
+              <div className="notice-step-context-main">
                 <span className="notice-step-context-kicker">当前任务</span>
                 <strong>{activeStep.goal}</strong>
               </div>
