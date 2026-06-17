@@ -36,6 +36,17 @@ test("NoticeForm renders mobile step context summary", async () => {
   assert.match(source, /activeStep\.estimate/);
 });
 
+test("NoticeForm keeps stepper header copy in a stable row structure", async () => {
+  const source = await readFile(new URL("../components/notice/NoticeForm.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /notice-stepper-title-row/);
+  assert.match(source, /notice-stepper-summary/);
+  assert.match(source, /notice-step-required-summary/);
+  assert.match(source, /<strong>\{activeStep\.title\}<\/strong>[\s\S]*<span className="notice-stepper-summary">\{activeStep\.summary\}<\/span>/);
+  assert.doesNotMatch(source, /activeStep\.skippable \? <p>/);
+  assert.doesNotMatch(source, /这一步可不填，直接点下一步。/);
+});
+
 test("NoticeForm renders required essentials before optional pet details", async () => {
   const source = await readFile(new URL("../components/notice/NoticeForm.tsx", import.meta.url), "utf8");
   const addressIndex = source.indexOf('isFieldVisible("addressText")');
@@ -161,6 +172,18 @@ test("globals.css styles mobile step context summary", async () => {
   assert.match(source, /\.notice-step-context-stat\s*{/);
   assert.match(source, /\.notice-optional-divider\s*{/);
   assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-step-context\s*{/);
+});
+
+test("globals.css fixes stepper header height and inline title copy", async () => {
+  const source = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+
+  assert.match(source, /\.notice-stepper-header\s*{[^}]*align-items:\s*center/s);
+  assert.match(source, /\.notice-stepper-header\s*{[^}]*min-height:\s*56px/s);
+  assert.match(source, /\.notice-stepper-title-row\s*{[^}]*align-items:\s*baseline/s);
+  assert.match(source, /\.notice-stepper-title-row\s*{[^}]*grid-template-columns:\s*auto minmax\(0,\s*1fr\)/s);
+  assert.match(source, /\.notice-stepper-summary\s*{[^}]*color:\s*var\(--muted\)/s);
+  assert.match(source, /\.notice-stepper-summary\s*{[^}]*white-space:\s*nowrap/s);
+  assert.match(source, /\.notice-step-required-summary\s*{[^}]*min-height:\s*20px/s);
 });
 
 test("globals.css styles location geolocation action", async () => {

@@ -455,10 +455,17 @@ textarea {
 }
 
 .notice-stepper-header {
-  align-items: start;
+  align-items: center;
   display: grid;
   gap: 10px;
   grid-template-columns: auto minmax(0, 1fr);
+  min-height: 56px;
+}
+
+.notice-stepper-copy {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
 }
 
 .notice-step-context {
@@ -866,6 +873,23 @@ textarea {
   font-size: 1.08rem;
 }
 
+.notice-stepper-title-row {
+  align-items: baseline;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: auto minmax(0, 1fr);
+  min-width: 0;
+}
+
+.notice-stepper-summary {
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 800;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .notice-stepper-header p {
   color: var(--muted);
   margin: 2px 0 0;
@@ -874,6 +898,7 @@ textarea {
 .notice-step-required-summary {
   color: var(--accent-dark) !important;
   font-weight: 900;
+  min-height: 20px;
 }
 
 .notice-stepper-track {

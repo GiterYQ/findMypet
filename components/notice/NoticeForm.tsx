@@ -728,11 +728,12 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
               <span>
                 {activeStepIndex + 1}/{noticeFormSteps.length}
               </span>
-              <div>
-                <strong>{activeStep.title}</strong>
-                <p>{activeStep.summary}</p>
+              <div className="notice-stepper-copy">
+                <div className="notice-stepper-title-row">
+                  <strong>{activeStep.title}</strong>
+                  <span className="notice-stepper-summary">{activeStep.summary}</span>
+                </div>
                 <p className="notice-step-required-summary">{requiredSummary}</p>
-                {activeStep.skippable ? <p>这一步可不填，直接点下一步。</p> : null}
               </div>
             </div>
             <div className="notice-stepper-track">
