@@ -273,9 +273,13 @@ test("globals.css fixes live preview size to prevent layout jumping while typing
 
 test("globals.css keeps live preview before form columns on desktop and mobile", async () => {
   const source = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+  const formSource = await readFile(new URL("../components/notice/NoticeForm.tsx", import.meta.url), "utf8");
 
   assert.match(source, /\.notice-step-grid-with-preview\s*{[^}]*grid-template-columns:\s*minmax\(560px,\s*0\.92fr\) minmax\(0,\s*1fr\)/s);
+  assert.match(source, /\.notice-step-grid:not\(\.notice-step-grid-with-preview\)\s*{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)/s);
   assert.match(source, /\.notice-step-grid-form-column\s*{[^}]*grid-column:\s*2/s);
+  assert.match(source, /\.notice-step-grid-placeholder\s*{[^}]*grid-column:\s*2/s);
+  assert.match(formSource, /notice-step-grid-placeholder/);
   assert.match(source, /\.notice-live-preview\s*{[^}]*grid-column:\s*1/s);
   assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-live-preview\s*{[^}]*order:\s*-1/s);
 });

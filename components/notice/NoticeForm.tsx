@@ -1353,7 +1353,11 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
               防骗提示：未核实前，请勿提前支付任何费用。高风险标签会影响公开列表排序，请如实填写。
             </div>
             ) : null}
-          </div>
+            </div>
+          ) : null}
+
+          {isStepFlow && !hasLeftColumnFields && !hasRightColumnFields ? (
+            <div className="notice-step-grid-placeholder" aria-hidden="true" />
           ) : null}
 
           {isStepFlow ? (
