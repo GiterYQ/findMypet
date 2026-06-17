@@ -689,6 +689,7 @@ textarea {
   grid-column: 1;
   grid-row: 1 / span 2;
   justify-self: start;
+  min-height: 588px;
   position: sticky;
   top: 14px;
   width: 100%;
@@ -713,8 +714,8 @@ textarea {
   gap: 9px;
   grid-template-rows: 286px 146px 8px 54px;
   height: 560px;
-  max-height: 580px;
-  min-height: 540px;
+  max-height: 560px;
+  min-height: 560px;
   overflow: hidden;
   padding: 18px;
   width: 100%;
@@ -2204,6 +2205,7 @@ textarea {
   .notice-live-preview {
     grid-column: auto;
     grid-row: auto;
+    min-height: 366px;
     order: -1;
     position: static;
     width: 100%;
@@ -2214,8 +2216,8 @@ textarea {
     gap: 7px;
     grid-template-rows: 140px 110px 5px 40px;
     height: 340px;
-    max-height: 350px;
-    min-height: 320px;
+    max-height: 340px;
+    min-height: 340px;
     padding: 12px;
     width: 100%;
   }

@@ -240,12 +240,15 @@ test("globals.css keeps desktop form preview wide enough for web review", async 
 test("globals.css keeps live preview large and skeletonized on desktop", async () => {
   const source = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
 
-  assert.match(source, /\.notice-live-preview-card\s*{[^}]*min-height:\s*540px/s);
-  assert.match(source, /\.notice-live-preview-card\s*{[^}]*max-height:\s*580px/s);
+  assert.match(source, /\.notice-live-preview\s*{[^}]*min-height:\s*588px/s);
+  assert.match(source, /\.notice-live-preview-card\s*{[^}]*min-height:\s*560px/s);
+  assert.match(source, /\.notice-live-preview-card\s*{[^}]*max-height:\s*560px/s);
   assert.match(source, /\.notice-live-preview-media\s*{/);
   assert.match(source, /\.notice-preview-skeleton\s*{/);
   assert.match(source, /\.notice-preview-skeleton-line\s*{/);
-  assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-live-preview-card\s*{[^}]*min-height:\s*320px/s);
+  assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-live-preview\s*{[^}]*min-height:\s*366px/s);
+  assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-live-preview-card\s*{[^}]*min-height:\s*340px/s);
+  assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-live-preview-card\s*{[^}]*max-height:\s*340px/s);
 });
 
 test("globals.css fixes live preview size to prevent layout jumping while typing", async () => {
