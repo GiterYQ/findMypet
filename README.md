@@ -1,51 +1,232 @@
 # findMypet
 
-A lightweight global lost-pet notice tool built with Next.js and Prisma.
+面向 H5/Web 的轻量寻宠与寻主 notice 工具。首版重点不是做完整社区平台，而是让用户快速生成可传播的启事、海报和稳定分享页，并支持匿名管理、刷新状态和找回后停止扩散。
 
-## Local setup
+## 当前产品定位
 
-1. Copy `.env.example` to `.env`
-2. Run `npm install`
-3. Run `TMPDIR=/tmp npx prisma db push`
-4. Run `npm run dev`
+findMypet 当前更接近一个“轻量 notice 系统”，不是单纯海报生成器。
 
-## Mobile LAN testing
+核心闭环：
 
-1. Make sure your phone and computer are on the same Wi-Fi.
-2. Run `npm run dev:mobile`.
-3. Find your computer LAN IP, for example `ipconfig getifaddr en0` on macOS.
-4. Open `http://<LAN-IP>:3000` on the phone.
+1. 用户分步填写必要信息。
+2. 可上传照片，浏览器先压缩。
+3. 生成公开分享页、匿名管理链接和多套海报模板。
+4. 管理者可刷新、改状态、重新打开。
+5. 公开列表按状态、活跃度、风险和悬赏做基础展示。
 
-During local development, share and manage links use the request origin when `APP_BASE_URL` still points to `localhost`, so phone-created notices will generate phone-accessible LAN links.
+## 已支持能力
 
-## Environment
+- 匿名创建：无需账号，创建后返回公开链接和管理链接。
+- 管理链接：通过 token 管理自己的启事，token 只保存哈希。
+- 本地找回：`/mine` 使用浏览器本地记录找回管理入口。
+- 邮箱找回：可选填写管理邮箱；未配置邮件服务时不影响创建。
+- 分步发布：移动端优先，先填必要信息，再引导补充照片、时间、风险、悬赏。
+- 定位辅助：点击后请求浏览器定位，保存近似坐标，不自动反查地址。
+- 宠物类型：猫、狗、鸟、异宠。
+- 发布类型：寻宠、寻主。
+- 海报模板：classic、alert、square、minimal、urgent。
+- 公开分享页：展示状态、联系方式、防骗提示、地图跳转入口。
+- 公开列表：支持地区和宠物类型筛选，缩略图展示。
+- 状态管理：active、recovered、closed；fresh、stale、archived。
+- 举报和审核状态：支持基础 report、downrank、hidden 数据结构。
+- 风险排序：病危、需喂药、失明/听障、行动障碍、老年/幼宠、高车流、极端天气等会进入优先级计算。
 
-- `DATABASE_URL`: local SQLite or production database URL
-- `APP_BASE_URL`: public site origin used when generating share and manage links
-- `RESEND_API_KEY`: optional Resend API key for owner manage-link emails
-- `RESEND_FROM_EMAIL`: optional sender address for manage-link emails
-- `CRON_SECRET`: secret for `/api/cron/notices/activity` when running scheduled stale/archive maintenance
+## 技术栈
 
-If email is not configured or delivery fails, notice creation still succeeds. Users should copy the manage link or recover it from the local `/mine` page on the same browser.
+- Next.js 15 App Router
+- React 19
+- Prisma 6
+- SQLite for local MVP
+- Zod
+- Node test runner
 
-## Operations
+## 目录结构
 
-- Run `GET /api/cron/notices/activity` or `POST /api/cron/notices/activity` on a schedule to move old active notices from `fresh` to `stale` and then `archived`.
-- In production, call the cron endpoint with `Authorization: Bearer <CRON_SECRET>` or `?secret=<CRON_SECRET>`.
-- Without `CRON_SECRET`, the cron endpoint is only allowed outside production.
+```text
+app/
+  page.tsx                         首页、创建表单、公开列表
+  notice/[shortId]/page.tsx        公开分享页
+  manage/[shortId]/page.tsx        匿名管理页
+  poster/[shortId]/page.tsx        海报模板页
+  mine/page.tsx                    本机管理历史
+  api/notices/**                   notice 创建、读取、编辑、状态、举报、刷新
+  api/uploads/images/route.ts      图片上传入口
+  api/cron/notices/activity        fresh/stale/archived 定时推进
 
-## Current MVP slice
+components/notice/
+  NoticeForm.tsx                   创建/编辑表单
+  NoticeCard.tsx                   公开列表卡片
+  NoticeFilters.tsx                列表筛选
+  ManageConsole.tsx                管理操作台
+  Notice*Poster.tsx                海报模板组件
+  PosterActions.tsx                下载 PNG / 打印 PDF
+  LocationLinkCard.tsx             地图跳转
+  ContactMethodsCard.tsx           联系方式展示
 
-- Anonymous notice creation
-- Hosted share page and owner manage URL
-- Local `/mine` page for anonymous manage-link recovery
-- Prisma schema with notice state machine
-- Public/admin payload split
-- Risk-based priority scoring
-- Report and moderation downrank/hide flow
+lib/notice/
+  notice.schema.ts                 Zod 输入边界
+  notice.types.ts                  领域类型
+  notice.service.ts                业务状态、创建、编辑、排序、举报
+  notice.repository.ts             Prisma 读写
+  notice.mapper.ts                 public/admin payload 隔离
+  notice-form-steps.ts             分步发布配置
+  poster-template.ts               海报模板配置
+  notice-display.ts                统一展示文案
+  activity-maintenance.ts          stale/archive 推进规则
+  money.ts                         金额最小单位转换
 
-## Verification
+lib/media/
+  client-image.ts                  前端压缩和上传
+  image-validation.ts              后端图片类型校验
 
-- `npm test`
-- `npm run lint`
-- `npm run build`
+lib/manage/
+  manage-url.ts                    管理链接解析
+  manage-history.ts                本地管理历史
+
+prisma/
+  schema.prisma                    数据模型和枚举
+```
+
+## 本地运行
+
+1. 安装依赖：
+
+```bash
+npm install
+```
+
+2. 准备环境变量：
+
+```bash
+cp .env.example .env
+```
+
+3. 初始化数据库：
+
+```bash
+TMPDIR=/tmp npx prisma db push
+```
+
+4. 启动本机预览：
+
+```bash
+npm run dev
+```
+
+5. 启动手机同 Wi-Fi 预览：
+
+```bash
+npm run dev:mobile
+```
+
+macOS 可通过 `ifconfig` 查找当前活跃内网 IP，然后在手机打开：
+
+```text
+http://<LAN-IP>:3000
+```
+
+当前浏览器定位在真实手机上通常需要 HTTPS；`localhost` 可用，局域网 HTTP 可能被部分浏览器拦截定位权限。
+
+## 环境变量
+
+```text
+DATABASE_URL          数据库连接。本地默认 file:./dev.db
+APP_BASE_URL          公开站点 origin，用于生成分享链接和管理链接
+RESEND_API_KEY        可选，Resend 邮件 API key
+RESEND_FROM_EMAIL     可选，管理链接邮件发件地址
+CRON_SECRET           生产环境调用 cron 接口的密钥
+```
+
+如果邮件未配置或发送失败，创建仍会成功。用户需要复制管理链接，或在同一浏览器的 `/mine` 找回。
+
+## 验证命令
+
+```bash
+npm test
+npm run lint
+npm run build
+```
+
+每个独立功能应单独 commit。提交前至少跑以上三条。
+
+## 生产部署清单
+
+当前项目可用于 MVP 演示和本地试用。若要实际公开上线，建议至少补齐：
+
+- 数据库：SQLite 换 PostgreSQL。
+- 图片存储：本地存储换对象存储，例如 S3、R2、OSS 或 COS。
+- CDN：图片和海报资源走 CDN。
+- 邮件：配置 Resend 或同类邮件服务。
+- 环境：配置 `APP_BASE_URL`、`CRON_SECRET`、数据库 URL、邮件 key。
+- 定时任务：定期调用 `/api/cron/notices/activity`。
+- HTTPS：真实定位、微信内访问、PWA 安装都需要 HTTPS。
+- 限流：创建、上传、举报接口需要基础限流。
+- 内容审核：公开图片上传需要接入鉴黄、暴恐、违规图检测。
+- 备份：数据库和对象存储要有备份策略。
+
+## 微信公众号接入方向
+
+适合先接“公众号菜单 + H5 页面”，不要一开始做小程序。
+
+推荐路径：
+
+1. 部署 Web 到 HTTPS 域名。
+2. 微信公众号后台配置菜单：
+   - 发布寻宠：`https://domain.com/#create-notice`
+   - 最新启事：`https://domain.com/`
+   - 我的启事：`https://domain.com/mine`
+3. 做微信内浏览器适配：
+   - 顶部提示“请保存管理链接”。
+   - 分享文案和海报二维码更醒目。
+   - 地图跳转失败时提供复制地址和坐标。
+4. 后续再接公众号消息能力：
+   - 发送管理链接到用户邮箱。
+   - 通过关键词返回最近启事。
+   - 用模板消息提醒刷新。
+
+不建议首版直接做 OAuth 登录。匿名管理链接 + 邮箱找回更符合当前 MVP 成本。
+
+## 后续拓展优先级
+
+### P0：上线地基
+
+- PostgreSQL
+- 对象存储
+- HTTPS 部署
+- 邮件服务
+- 限流和上传审核
+- cron 定时推进 stale/archive
+
+### P1：发布成功率
+
+- 地址反查和地图选点
+- 更多宠物类型细分
+- AI 照片特征建议
+- 更短的手机首屏
+- 管理链接邮件重发
+
+### P2：传播效果
+
+- 海报二维码
+- 微信分享文案优化
+- 更多真实场景模板
+- 海报模板预览缩略图
+- 找回后自动生成“已找回，停止扩散”海报
+
+### P3：平台化
+
+- 志愿者协助刷新
+- 区域聚合页
+- 更精细的排序权重
+- 站内线索提交
+- 后台审核面板
+- 数据统计和转化漏斗
+
+## 当前边界
+
+- 不做完整账号体系。
+- 不做站内私信。
+- 不做模板拖拽编辑器。
+- 不做复杂地图供应商适配。
+- 不做小程序。
+- 不承诺 AI 自动识别一定准确，未来只作为“待确认建议值”。
