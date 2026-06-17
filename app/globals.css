@@ -70,6 +70,10 @@ textarea {
   margin: 0 auto;
 }
 
+.app-shell {
+  width: min(1760px, calc(100% - 32px));
+}
+
 .hero {
   padding: 34px 0 16px;
 }
@@ -652,7 +656,7 @@ textarea {
 
 .notice-step-grid-with-preview {
   align-items: start;
-  grid-template-columns: minmax(240px, 1fr) minmax(0, 2fr);
+  grid-template-columns: minmax(560px, 0.92fr) minmax(0, 1fr);
 }
 
 .notice-step-grid-form-column {
@@ -687,12 +691,12 @@ textarea {
   box-shadow: 0 18px 40px rgba(42, 32, 18, 0.1);
   display: grid;
   gap: 9px;
-  grid-template-rows: 188px 116px 6px 42px;
-  height: 420px;
-  max-height: 440px;
-  min-height: 400px;
+  grid-template-rows: 286px 146px 8px 54px;
+  height: 560px;
+  max-height: 580px;
+  min-height: 540px;
   overflow: hidden;
-  padding: 16px;
+  padding: 18px;
   width: 100%;
 }
 
@@ -745,9 +749,9 @@ textarea {
   background: var(--step-accent, var(--accent));
   border-radius: 999px;
   color: #fff;
-  font-size: 0.78rem;
+  font-size: 0.86rem;
   font-weight: 900;
-  padding: 5px 9px;
+  padding: 6px 11px;
   width: fit-content;
 }
 
@@ -755,7 +759,7 @@ textarea {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
   display: -webkit-box;
-  font-size: clamp(1.12rem, 2.5vw, 1.46rem);
+  font-size: clamp(1.36rem, 2.5vw, 1.9rem);
   line-height: 0.95;
   overflow: hidden;
 }
@@ -772,11 +776,11 @@ textarea {
   background: rgba(37, 29, 25, 0.08);
   border-radius: 999px;
   color: var(--muted);
-  font-size: 0.76rem;
+  font-size: 0.86rem;
   font-weight: 900;
-  max-width: 86px;
+  max-width: 110px;
   overflow: hidden;
-  padding: 4px 8px;
+  padding: 5px 10px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -786,9 +790,9 @@ textarea {
   -webkit-line-clamp: 3;
   color: var(--muted);
   display: -webkit-box;
-  font-size: 0.88rem;
+  font-size: 1rem;
   font-weight: 800;
-  line-height: 1.25;
+  line-height: 1.32;
   margin: 0;
   overflow: hidden;
 }
@@ -809,20 +813,20 @@ textarea {
   gap: 6px;
   grid-template-columns: auto minmax(0, 1fr);
   font-weight: 1000;
-  height: 42px;
+  height: 54px;
   overflow: hidden;
-  padding: 10px 12px;
+  padding: 12px 14px;
 }
 
 .notice-live-preview-contact-label {
   color: rgba(255, 255, 255, 0.62);
-  font-size: 0.76rem;
+  font-size: 0.84rem;
   font-weight: 900;
 }
 
 .notice-live-preview-contact strong {
   display: block;
-  font-size: 0.96rem;
+  font-size: 1.16rem;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;

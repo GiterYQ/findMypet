@@ -182,22 +182,23 @@ test("globals.css styles location geolocation action", async () => {
   assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-location-tools\s*{/);
 });
 
-test("globals.css keeps desktop form preview at one third and form at two thirds", async () => {
+test("globals.css keeps desktop form preview wide enough for web review", async () => {
   const source = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
 
   assert.match(source, /scrollbar-gutter:\s*stable/);
-  assert.match(source, /\.notice-step-grid-with-preview\s*{[^}]*grid-template-columns:\s*minmax\(240px,\s*1fr\) minmax\(0,\s*2fr\)/s);
+  assert.match(source, /\.app-shell\s*{[^}]*width:\s*min\(1760px,\s*calc\(100% - 32px\)\)/s);
+  assert.match(source, /\.notice-step-grid-with-preview\s*{[^}]*grid-template-columns:\s*minmax\(560px,\s*0\.92fr\) minmax\(0,\s*1fr\)/s);
   assert.match(source, /\.notice-live-preview\s*{[^}]*width:\s*100%/s);
   assert.match(source, /\.notice-live-preview-card\s*{[^}]*width:\s*100%/s);
   assert.doesNotMatch(source, /\.notice-live-preview\s*{[^}]*width:\s*320px/s);
   assert.doesNotMatch(source, /\.notice-live-preview-card\s*{[^}]*width:\s*320px/s);
 });
 
-test("globals.css keeps live preview compact and skeletonized", async () => {
+test("globals.css keeps live preview large and skeletonized on desktop", async () => {
   const source = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
 
-  assert.match(source, /\.notice-live-preview-card\s*{[^}]*min-height:\s*400px/s);
-  assert.match(source, /\.notice-live-preview-card\s*{[^}]*max-height:\s*440px/s);
+  assert.match(source, /\.notice-live-preview-card\s*{[^}]*min-height:\s*540px/s);
+  assert.match(source, /\.notice-live-preview-card\s*{[^}]*max-height:\s*580px/s);
   assert.match(source, /\.notice-live-preview-media\s*{/);
   assert.match(source, /\.notice-preview-skeleton\s*{/);
   assert.match(source, /\.notice-preview-skeleton-line\s*{/);
@@ -209,15 +210,15 @@ test("globals.css fixes live preview size to prevent layout jumping while typing
 
   assert.match(source, /\.notice-live-preview\s*{[^}]*width:\s*100%/s);
   assert.match(source, /\.notice-live-preview\s*{[^}]*justify-self:\s*start/s);
-  assert.match(source, /\.notice-live-preview-card\s*{[^}]*height:\s*420px/s);
+  assert.match(source, /\.notice-live-preview-card\s*{[^}]*height:\s*560px/s);
   assert.match(source, /\.notice-live-preview-card\s*{[^}]*width:\s*100%/s);
-  assert.match(source, /\.notice-live-preview-card\s*{[^}]*grid-template-rows:\s*188px 116px 6px 42px/s);
+  assert.match(source, /\.notice-live-preview-card\s*{[^}]*grid-template-rows:\s*286px 146px 8px 54px/s);
   assert.match(source, /\.notice-live-preview-content\s*{[^}]*overflow:\s*hidden/s);
   assert.match(source, /\.notice-live-preview-title-row\s*{/);
   assert.match(source, /\.notice-live-preview-location\s*{/);
   assert.match(source, /\.notice-live-preview-card strong\s*{[^}]*-webkit-line-clamp:\s*1/s);
   assert.match(source, /\.notice-live-preview-location\s*{[^}]*-webkit-line-clamp:\s*3/s);
-  assert.match(source, /\.notice-live-preview-contact\s*{[^}]*height:\s*42px/s);
+  assert.match(source, /\.notice-live-preview-contact\s*{[^}]*height:\s*54px/s);
   assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-live-preview\s*{[^}]*width:\s*100%/s);
   assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-live-preview-card\s*{[^}]*height:\s*340px/s);
   assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-live-preview-card\s*{[^}]*width:\s*100%/s);
@@ -227,7 +228,7 @@ test("globals.css fixes live preview size to prevent layout jumping while typing
 test("globals.css keeps live preview before form columns on desktop and mobile", async () => {
   const source = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
 
-  assert.match(source, /\.notice-step-grid-with-preview\s*{[^}]*grid-template-columns:\s*minmax\(240px,\s*1fr\) minmax\(0,\s*2fr\)/s);
+  assert.match(source, /\.notice-step-grid-with-preview\s*{[^}]*grid-template-columns:\s*minmax\(560px,\s*0\.92fr\) minmax\(0,\s*1fr\)/s);
   assert.match(source, /\.notice-step-grid-form-column\s*{[^}]*grid-column:\s*2/s);
   assert.match(source, /\.notice-live-preview\s*{[^}]*grid-column:\s*1/s);
   assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-live-preview\s*{[^}]*order:\s*-1/s);
