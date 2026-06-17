@@ -5,11 +5,12 @@
  * 层级：component
  */
 import Link from "next/link";
+import { type RegionFilterOption } from "@/lib/notice/notice.types";
 
 type NoticeFiltersProps = {
   selectedRegionCode?: string;
   selectedPetType?: string;
-  regionOptions: string[];
+  regionOptions: RegionFilterOption[];
 };
 
 const petTypeOptions = [
@@ -23,14 +24,17 @@ const petTypeOptions = [
 export function NoticeFilters({ selectedRegionCode, selectedPetType, regionOptions }: NoticeFiltersProps) {
   return (
     <form className="panel section" method="GET">
+      <div className="notice-filter-intro">
+        筛选本站已发布的公开启事，不是抓取外部平台帖子。
+      </div>
       <div className="grid two-col">
         <div className="field">
           <label htmlFor="regionCode">地区</label>
           <select defaultValue={selectedRegionCode ?? ""} id="regionCode" name="regionCode">
             <option value="">全部地区</option>
-            {regionOptions.map((regionCode) => (
-              <option key={regionCode} value={regionCode}>
-                {regionCode}
+            {regionOptions.map((regionOption) => (
+              <option key={regionOption.code} value={regionOption.code}>
+                {regionOption.label}
               </option>
             ))}
           </select>

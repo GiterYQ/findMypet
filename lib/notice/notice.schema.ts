@@ -14,6 +14,7 @@ export const activityStateSchema = z.enum(["fresh", "stale", "archived"]);
 export const petProfileSchema = z.object({
   name: z.string().min(1).max(30),
   type: z.enum(["dog", "cat", "bird", "other"]),
+  customType: z.string().max(30).optional(),
   breed: z.string().max(30).optional(),
   breedConfidence: z.number().min(0).max(1).optional(),
   color: z.array(z.string().max(20)).max(5).optional(),

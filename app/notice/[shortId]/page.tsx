@@ -14,7 +14,7 @@ import {
   getFullLocationText,
   getLocationFieldLabel,
   getNoticeCategoryLabel,
-  getPetTypeLabel,
+  getPetTypeDisplayName,
   getRiskFlagLabels,
   getTimeFieldLabel
 } from "@/lib/notice/notice-display";
@@ -46,7 +46,7 @@ export default async function NoticeSharePage({ params }: PageProps) {
           </span>
           <p className="mono">ID: {notice.shortId}</p>
           <p>类型：{getNoticeCategoryLabel(notice.noticeCategory)}</p>
-          <p>宠物类型：{getPetTypeLabel(notice.petProfile.type)}</p>
+          <p>宠物类型：{getPetTypeDisplayName(notice.petProfile)}</p>
           <p>更新时间：{new Date(notice.updatedAt).toLocaleString()}</p>
           <p>
             最近活跃：{new Date(notice.lastRefreshedAt).toLocaleString()} · {getActivityStateLabel(notice.activityState)}

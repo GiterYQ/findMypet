@@ -10,6 +10,7 @@ export type NoticeCategory = "lost-pet" | "found-owner";
 export type PetProfile = {
   name: string;
   type: "dog" | "cat" | "bird" | "other";
+  customType?: string;
   breed?: string;
   breedConfidence?: number;
   color?: string[];
@@ -126,4 +127,9 @@ export type AdminNoticePayload = PublicNoticePayload & {
 export type NoticeListFilters = {
   regionCode?: string;
   petType?: PetProfile["type"];
+};
+
+export type RegionFilterOption = {
+  code: string;
+  label: string;
 };

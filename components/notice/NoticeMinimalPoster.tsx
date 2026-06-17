@@ -9,7 +9,7 @@ import {
   getContactDisplayValue,
   getContactTypeLabel,
   getNoticeCategoryLabel,
-  getPetTypeLabel,
+  getPetTypeDisplayName,
   getPosterAddressLine,
   getPrimaryContactPrompt,
   getTimeFieldLabel
@@ -37,7 +37,7 @@ export function NoticeMinimalPoster({ notice, id, className }: NoticeMinimalPost
       <section className="poster-minimal-title">
         <p>请帮忙留意</p>
         <h1>{notice.petProfile.name}</h1>
-        <span>{getPetTypeLabel(notice.petProfile.type)}</span>
+        <span>{getPetTypeDisplayName(notice.petProfile)}</span>
       </section>
 
       <section className="poster-minimal-card">

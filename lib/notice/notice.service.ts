@@ -9,6 +9,7 @@ import { nanoid } from "nanoid";
 import { AppError } from "@/lib/core/app-error";
 import { getActivityMaintenanceCutoffs, getNextActivityStateForMaintenance } from "@/lib/notice/activity-maintenance";
 import { sendManageLinkEmail } from "@/lib/notice/notice-email.service";
+import { getChinaDivisionLabel } from "@/lib/location/china-divisions";
 import { ARCHIVE_WINDOW_HOURS, FRESH_WINDOW_HOURS, REFRESH_COOLDOWN_HOURS, riskWeights } from "@/lib/notice/notice.constants";
 import { toAdminNoticePayload, toPublicNoticePayload } from "@/lib/notice/notice.mapper";
 import { noticeRepository } from "@/lib/notice/notice.repository";
@@ -177,7 +178,13 @@ export const noticeService = {
 
   async listVisibleFilterOptions() {
     const notices = await noticeRepository.findVisibleFreshList();
-    const regionOptions = Array.from(new Set(notices.map((notice) => notice.regionCode).filter((value): value is string => Boolean(value)))).sort();
+    const regionCodes = Array.from(new Set(notices.map((notice) => notice.regionCode).filter((value): value is string => Boolean(value)))).sort();
+    const regionOptions = await Promise.all(
+      regionCodes.map(async (code) => ({
+        code,
+        label: await getChinaDivisionLabel(code)
+      }))
+    );
 
     return {
       regionOptions

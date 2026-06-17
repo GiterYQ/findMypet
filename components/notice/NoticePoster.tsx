@@ -10,7 +10,7 @@ import {
   getContactDisplayValue,
   getContactTypeLabel,
   getNoticeCategoryLabel,
-  getPetTypeLabel,
+  getPetTypeDisplayName,
   getPosterAddressLine,
   getPrimaryContactPrompt,
   getRiskFlagLabels,
@@ -36,7 +36,7 @@ export function NoticePoster({ notice, id, className }: NoticePosterProps) {
           <div className="poster-kicker">{getBusinessStatusLabel(notice.businessStatus)}</div>
           <h1>{notice.petProfile.name}</h1>
           <p>
-            {getNoticeCategoryLabel(notice.noticeCategory)} · {getPetTypeLabel(notice.petProfile.type)} · {posterAddressLine}
+            {getNoticeCategoryLabel(notice.noticeCategory)} · {getPetTypeDisplayName(notice.petProfile)} · {posterAddressLine}
           </p>
         </div>
       </header>

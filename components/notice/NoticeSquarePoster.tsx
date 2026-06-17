@@ -9,7 +9,7 @@ import {
   getContactDisplayValue,
   getContactTypeLabel,
   getNoticeCategoryLabel,
-  getPetTypeLabel,
+  getPetTypeDisplayName,
   getPosterAddressLine,
   getPrimaryContactPrompt,
   getRiskFlagLabels,
@@ -43,6 +43,7 @@ export function NoticeSquarePoster({ notice, id, className }: NoticeSquarePoster
     formatReward(notice.rewards?.clue?.amountMinor, notice.rewards?.clue?.currency);
   const statusLabel = getBusinessStatusLabel(notice.businessStatus, notice.noticeCategory);
   const posterAddressLine = getPosterAddressLine(notice.lostInfo.location);
+  const petTypeDisplayName = getPetTypeDisplayName(notice.petProfile);
 
   return (
     <article className={className ? `poster-square ${className}` : "poster-square"} id={id}>
@@ -57,7 +58,7 @@ export function NoticeSquarePoster({ notice, id, className }: NoticeSquarePoster
           <img alt={notice.petProfile.name} src={notice.primaryPhotoUrl} />
         ) : (
           <div>
-            <strong>{getPetTypeLabel(notice.petProfile.type)}</strong>
+            <strong>{petTypeDisplayName}</strong>
             <span>暂无照片</span>
           </div>
         )}
@@ -65,7 +66,7 @@ export function NoticeSquarePoster({ notice, id, className }: NoticeSquarePoster
 
       <section className="poster-square-body">
         <div>
-          <p>{getPetTypeLabel(notice.petProfile.type)}</p>
+          <p>{petTypeDisplayName}</p>
           <h1>{notice.petProfile.name}</h1>
         </div>
         <div className="poster-square-reward">

@@ -64,7 +64,8 @@ test("NoticeForm offers manual structured address fallback when geocoding cannot
   assert.match(source, /<select[\s\S]*id="province"/);
   assert.match(source, /<select[\s\S]*id="city"/);
   assert.match(source, /<select[\s\S]*id="district"/);
-  assert.match(source, /streetOptions/);
+  assert.match(source, /loadChinaDivisionOptions/);
+  assert.match(source, /level: "streets"/);
 });
 
 test("NoticeForm collapses nearby landmark behind an add button", async () => {

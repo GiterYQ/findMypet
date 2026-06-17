@@ -9,7 +9,7 @@ import {
   getContactDisplayValue,
   getContactTypeLabel,
   getNoticeCategoryLabel,
-  getPetTypeLabel,
+  getPetTypeDisplayName,
   getPosterAddressLine,
   getRiskFlagLabels,
   getTimeFieldLabel
@@ -54,7 +54,8 @@ export function NoticeAlertPoster({ notice, id, className }: NoticeAlertPosterPr
   const primaryContact = notice.contactMethods.find((item) => item.isPrimary) ?? notice.contactMethods[0];
   const statusLabel = getBusinessStatusLabel(notice.businessStatus, notice.noticeCategory);
   const commandLine = notice.noticeCategory === "found-owner" ? "见过主人请立即联系" : "见到或有线索请立即联系";
-  const detailLine = notice.petProfile.description || `${getPetTypeLabel(notice.petProfile.type)}，${statusLabel}，请扩散。`;
+  const petTypeDisplayName = getPetTypeDisplayName(notice.petProfile);
+  const detailLine = notice.petProfile.description || `${petTypeDisplayName}，${statusLabel}，请扩散。`;
   const posterAddressLine = getPosterAddressLine(notice.lostInfo.location);
 
   return (
@@ -74,7 +75,7 @@ export function NoticeAlertPoster({ notice, id, className }: NoticeAlertPosterPr
         </div>
         <div>
           <p>类型</p>
-          <strong>{getPetTypeLabel(notice.petProfile.type)}</strong>
+          <strong>{petTypeDisplayName}</strong>
         </div>
       </section>
 

@@ -21,8 +21,9 @@ findMypet 当前更接近一个“轻量 notice 系统”，不是单纯海报�
 - 本地找回：`/mine` 使用浏览器本地记录找回管理入口。
 - 邮箱找回：可选填写管理邮箱；未配置邮件服务时不影响创建。
 - 分步发布：移动端优先，先填必要信息，再引导补充照片、时间、风险、悬赏。
-- 定位辅助：点击后请求浏览器定位，保存近似坐标，不自动反查地址。
-- 宠物类型：猫、狗、鸟、异宠。
+- 定位辅助：点击后请求浏览器定位，保存近似坐标，并通过后端反查尝试回填省市区街道。
+- 中国地址选择：省/市/区县/街道使用本地版本化公开数据，找不到时可手动填写详细地址。
+- 宠物类型：猫、狗、鸟、异宠；异宠支持填写具体类型。
 - 发布类型：寻宠、寻主。
 - 海报模板：classic、alert、square、minimal、urgent。
 - 公开分享页：展示状态、联系方式、防骗提示、地图跳转入口。
@@ -83,6 +84,16 @@ lib/manage/
   manage-url.ts                    管理链接解析
   manage-history.ts                本地管理历史
 
+lib/location/
+  map-link.ts                      地图跳转链接
+  reverse-geocode.ts               坐标反查地址
+  china-divisions.ts               本地中国行政区划数据查询
+
+data/china-divisions/
+  pca-code.json                    省/市/区县数据
+  streets.json                     街道/乡镇数据
+  README.md                        数据来源、限制和更新策略
+
 prisma/
   schema.prisma                    数据模型和枚举
 ```
@@ -142,6 +153,8 @@ REVERSE_GEOCODE_EMAIL     可选，公共 Nominatim 使用时用于识别应用�
 如果邮件未配置或发送失败，创建仍会成功。用户需要复制管理链接，或在同一浏览器的 `/mine` 找回。
 
 定位地址回填通过后端 `/api/location/reverse-geocode` 调用反查服务。默认使用 Nominatim 公共服务，只适合低频 MVP 演示；生产环境建议替换为高德、Google、Mapbox 或自有可商用服务。
+
+中国省市区街道下拉通过 `/api/location/china-divisions` 读取本地 `data/china-divisions` 数据。当前数据来自 `modood/Administrative-divisions-of-China`，上游标注数据截止 `2023-06-30`、发布时间 `2023-09-11`。`https://www.bmcx.com/api/` 是 iframe/工具嵌入生成页，不是稳定 JSON 接口，因此只可人工参考，不作为运行时依赖。
 
 ## 验证命令
 

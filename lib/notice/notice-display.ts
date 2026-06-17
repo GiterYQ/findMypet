@@ -71,6 +71,14 @@ export function getPetTypeLabel(type: PetProfile["type"]) {
   return petTypeLabels[type];
 }
 
+export function getPetTypeDisplayName(petProfile: Pick<PetProfile, "type" | "customType">) {
+  if (petProfile.type === "other" && petProfile.customType?.trim()) {
+    return petProfile.customType.trim();
+  }
+
+  return getPetTypeLabel(petProfile.type);
+}
+
 export function getNoticeCategoryLabel(category: NoticeCategory) {
   return noticeCategoryLabels[category];
 }
