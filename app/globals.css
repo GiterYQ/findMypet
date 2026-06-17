@@ -478,7 +478,12 @@ textarea {
   display: grid;
   gap: 10px;
   grid-template-columns: minmax(0, 1fr) auto;
+  min-height: 64px;
   padding: 10px 12px;
+}
+
+.notice-step-context > div:first-child {
+  min-width: 0;
 }
 
 .notice-step-context-kicker {
@@ -493,6 +498,9 @@ textarea {
 .notice-step-context strong {
   display: block;
   line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .notice-step-context-meter {
@@ -500,6 +508,7 @@ textarea {
   flex-wrap: wrap;
   gap: 6px;
   justify-content: flex-end;
+  min-height: 26px;
 }
 
 .notice-step-context-stat {
@@ -2118,11 +2127,13 @@ textarea {
     border-radius: 20px;
     gap: 8px;
     grid-template-columns: 1fr;
+    min-height: 96px;
     padding: 11px;
   }
 
   .notice-step-context strong {
     font-size: 0.98rem;
+    white-space: nowrap;
   }
 
   .notice-step-context-meter {

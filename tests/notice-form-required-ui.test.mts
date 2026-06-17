@@ -174,6 +174,19 @@ test("globals.css styles mobile step context summary", async () => {
   assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-step-context\s*{/);
 });
 
+test("globals.css fixes current task context height across all steps", async () => {
+  const source = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+
+  assert.match(source, /\.notice-step-context\s*{[^}]*min-height:\s*64px/s);
+  assert.match(source, /\.notice-step-context > div:first-child\s*{[^}]*min-width:\s*0/s);
+  assert.match(source, /\.notice-step-context strong\s*{[^}]*overflow:\s*hidden/s);
+  assert.match(source, /\.notice-step-context strong\s*{[^}]*text-overflow:\s*ellipsis/s);
+  assert.match(source, /\.notice-step-context strong\s*{[^}]*white-space:\s*nowrap/s);
+  assert.match(source, /\.notice-step-context-meter\s*{[^}]*min-height:\s*26px/s);
+  assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-step-context\s*{[^}]*min-height:\s*96px/s);
+  assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-step-context strong\s*{[^}]*white-space:\s*nowrap/s);
+});
+
 test("globals.css fixes stepper header height and inline title copy", async () => {
   const source = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
 
