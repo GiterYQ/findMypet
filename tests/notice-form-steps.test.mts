@@ -35,21 +35,23 @@ test("essentials step stays within the first-screen field budget", () => {
   assert.deepEqual(step.fields, ["noticeCategory", "addressText", "nearbyLandmark", "contact", "petName", "petType"]);
 });
 
-test("essentials step only requires location and contact", () => {
+test("essentials step requires publishing type location contact and pet type", () => {
   const step = getNoticeFormStepById("essentials");
 
-  assert.deepEqual(step.requiredFields, ["addressText", "contact"]);
+  assert.deepEqual(step.requiredFields, ["noticeCategory", "addressText", "contact", "petType"]);
 });
 
 test("isNoticeFormFieldRequired identifies required fields per step", () => {
+  assert.equal(isNoticeFormFieldRequired("essentials", "noticeCategory"), true);
   assert.equal(isNoticeFormFieldRequired("essentials", "addressText"), true);
   assert.equal(isNoticeFormFieldRequired("essentials", "contact"), true);
+  assert.equal(isNoticeFormFieldRequired("essentials", "petType"), true);
   assert.equal(isNoticeFormFieldRequired("essentials", "petName"), false);
   assert.equal(isNoticeFormFieldRequired("photo", "photoUpload"), false);
 });
 
 test("getNoticeFormRequiredSummary makes required scope obvious", () => {
-  assert.equal(getNoticeFormRequiredSummary("essentials"), "必填：位置、联系方式");
+  assert.equal(getNoticeFormRequiredSummary("essentials"), "必填：发布类型、位置、联系方式、宠物类型");
   assert.equal(getNoticeFormRequiredSummary("photo"), "可选信息，可直接下一步");
 });
 

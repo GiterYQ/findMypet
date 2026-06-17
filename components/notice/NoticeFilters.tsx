@@ -17,7 +17,7 @@ const petTypeOptions = [
   { value: "cat", label: "猫" },
   { value: "dog", label: "狗" },
   { value: "bird", label: "鸟" },
-  { value: "other", label: "其他" }
+  { value: "other", label: "异宠" }
 ] as const;
 
 export function NoticeFilters({ selectedRegionCode, selectedPetType, regionOptions }: NoticeFiltersProps) {

@@ -19,7 +19,7 @@ import {
   noticeFormSteps
 } from "@/lib/notice/notice-form-steps";
 import { type NoticeCreateInput } from "@/lib/notice/notice.schema";
-import { getLocationFieldLabel, getNoticeCategoryLabel, getTimeFieldLabel } from "@/lib/notice/notice-display";
+import { getLocationFieldLabel, getNoticeCategoryLabel, getPetTypeLabel, getTimeFieldLabel } from "@/lib/notice/notice-display";
 import { saveManagedNotice } from "@/lib/manage/manage-history";
 import { getHalfHourTimeOptions, getNoticeTimeDisplayOptions } from "@/lib/notice/notice-time-options";
 
@@ -895,7 +895,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
                 <option value="cat">猫</option>
                 <option value="dog">狗</option>
                 <option value="bird">鸟</option>
-                <option value="other">其他</option>
+                <option value="other">异宠</option>
               </select>
             </div>
             ) : null}
@@ -1019,8 +1019,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
               <div>
                 <dt>宠物</dt>
                 <dd>
-                  {payload.petProfile.name.trim() || "未知"} /{" "}
-                  {payload.petProfile.type === "cat" ? "猫" : payload.petProfile.type === "dog" ? "狗" : payload.petProfile.type === "bird" ? "鸟" : "其他"}
+                  {payload.petProfile.name.trim() || "未知"} / {getPetTypeLabel(payload.petProfile.type)}
                 </dd>
               </div>
               <div>

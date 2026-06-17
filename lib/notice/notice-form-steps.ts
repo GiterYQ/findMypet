@@ -61,7 +61,7 @@ export const noticeFormSteps = [
     goal: "填位置和联系方式，先把启事发得出去。",
     estimate: "约 1 分钟",
     fields: ["noticeCategory", "addressText", "nearbyLandmark", "contact", "petName", "petType"],
-    requiredFields: ["addressText", "contact"],
+    requiredFields: ["noticeCategory", "addressText", "contact", "petType"],
     skippable: false,
     tone: "ember"
   },

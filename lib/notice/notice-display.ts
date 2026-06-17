@@ -29,7 +29,7 @@ const petTypeLabels: Record<PetProfile["type"], string> = {
   cat: "猫",
   dog: "狗",
   bird: "鸟",
-  other: "其他"
+  other: "异宠"
 };
 
 const noticeCategoryLabels: Record<NoticeCategory, string> = {

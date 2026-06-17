@@ -53,6 +53,13 @@ test("NoticeForm exposes browser geolocation action for location fields", async 
   assert.match(source, /privacyLevel:\s*"approximate"/);
 });
 
+test("NoticeForm labels exotic pets for the other pet type", async () => {
+  const source = await readFile(new URL("../components/notice/NoticeForm.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /<option value="other">异宠<\/option>/);
+  assert.doesNotMatch(source, /<option value="other">其他<\/option>/);
+});
+
 test("globals.css styles field requirement badges", async () => {
   const source = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
 
