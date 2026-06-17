@@ -196,12 +196,12 @@ test("globals.css keeps desktop form preview at one third and form at two thirds
 test("globals.css keeps live preview compact and skeletonized", async () => {
   const source = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
 
-  assert.match(source, /\.notice-live-preview-card\s*{[^}]*min-height:\s*300px/s);
-  assert.match(source, /\.notice-live-preview-card\s*{[^}]*max-height:\s*340px/s);
+  assert.match(source, /\.notice-live-preview-card\s*{[^}]*min-height:\s*400px/s);
+  assert.match(source, /\.notice-live-preview-card\s*{[^}]*max-height:\s*440px/s);
   assert.match(source, /\.notice-live-preview-media\s*{/);
   assert.match(source, /\.notice-preview-skeleton\s*{/);
   assert.match(source, /\.notice-preview-skeleton-line\s*{/);
-  assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-live-preview-card\s*{[^}]*min-height:\s*240px/s);
+  assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-live-preview-card\s*{[^}]*min-height:\s*320px/s);
 });
 
 test("globals.css fixes live preview size to prevent layout jumping while typing", async () => {
@@ -209,9 +209,9 @@ test("globals.css fixes live preview size to prevent layout jumping while typing
 
   assert.match(source, /\.notice-live-preview\s*{[^}]*width:\s*100%/s);
   assert.match(source, /\.notice-live-preview\s*{[^}]*justify-self:\s*start/s);
-  assert.match(source, /\.notice-live-preview-card\s*{[^}]*height:\s*320px/s);
+  assert.match(source, /\.notice-live-preview-card\s*{[^}]*height:\s*420px/s);
   assert.match(source, /\.notice-live-preview-card\s*{[^}]*width:\s*100%/s);
-  assert.match(source, /\.notice-live-preview-card\s*{[^}]*grid-template-rows:\s*94px 116px 6px 42px/s);
+  assert.match(source, /\.notice-live-preview-card\s*{[^}]*grid-template-rows:\s*188px 116px 6px 42px/s);
   assert.match(source, /\.notice-live-preview-content\s*{[^}]*overflow:\s*hidden/s);
   assert.match(source, /\.notice-live-preview-title-row\s*{/);
   assert.match(source, /\.notice-live-preview-location\s*{/);
@@ -219,9 +219,9 @@ test("globals.css fixes live preview size to prevent layout jumping while typing
   assert.match(source, /\.notice-live-preview-location\s*{[^}]*-webkit-line-clamp:\s*3/s);
   assert.match(source, /\.notice-live-preview-contact\s*{[^}]*height:\s*42px/s);
   assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-live-preview\s*{[^}]*width:\s*100%/s);
-  assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-live-preview-card\s*{[^}]*height:\s*270px/s);
+  assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-live-preview-card\s*{[^}]*height:\s*340px/s);
   assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-live-preview-card\s*{[^}]*width:\s*100%/s);
-  assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-live-preview-card\s*{[^}]*grid-template-rows:\s*70px 110px 5px 40px/s);
+  assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-live-preview-card\s*{[^}]*grid-template-rows:\s*140px 110px 5px 40px/s);
 });
 
 test("globals.css keeps live preview before form columns on desktop and mobile", async () => {
