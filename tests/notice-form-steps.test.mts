@@ -32,7 +32,7 @@ test("essentials step stays within the first-screen field budget", () => {
   const step = getNoticeFormStepById("essentials");
 
   assert.equal(step.fields.length, 6);
-  assert.deepEqual(step.fields, ["noticeCategory", "petName", "petType", "addressText", "nearbyLandmark", "contact"]);
+  assert.deepEqual(step.fields, ["noticeCategory", "addressText", "nearbyLandmark", "contact", "petName", "petType"]);
 });
 
 test("essentials step only requires location and contact", () => {

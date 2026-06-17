@@ -22,8 +22,25 @@ test("NoticeForm renders mobile step context summary", async () => {
   assert.match(source, /notice-step-context/);
   assert.match(source, /notice-step-context-meter/);
   assert.match(source, /notice-step-context-stat/);
+  assert.match(source, /notice-optional-divider/);
   assert.match(source, /activeStep\.goal/);
   assert.match(source, /activeStep\.estimate/);
+});
+
+test("NoticeForm renders required essentials before optional pet details", async () => {
+  const source = await readFile(new URL("../components/notice/NoticeForm.tsx", import.meta.url), "utf8");
+  const addressIndex = source.indexOf('isFieldVisible("addressText")');
+  const contactIndex = source.indexOf('isFieldVisible("contact")');
+  const petNameIndex = source.indexOf('isFieldVisible("petName")');
+  const petTypeIndex = source.indexOf('isFieldVisible("petType")');
+
+  assert.notEqual(addressIndex, -1);
+  assert.notEqual(contactIndex, -1);
+  assert.notEqual(petNameIndex, -1);
+  assert.notEqual(petTypeIndex, -1);
+  assert.ok(addressIndex < petNameIndex);
+  assert.ok(contactIndex < petNameIndex);
+  assert.ok(contactIndex < petTypeIndex);
 });
 
 test("globals.css styles field requirement badges", async () => {
@@ -41,6 +58,7 @@ test("globals.css styles mobile step context summary", async () => {
   assert.match(source, /\.notice-step-context\s*{/);
   assert.match(source, /\.notice-step-context-meter\s*{/);
   assert.match(source, /\.notice-step-context-stat\s*{/);
+  assert.match(source, /\.notice-optional-divider\s*{/);
   assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-step-context\s*{/);
 });
 

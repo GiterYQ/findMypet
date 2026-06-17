@@ -479,6 +479,23 @@ textarea {
   display: inline;
 }
 
+.notice-optional-divider {
+  align-items: center;
+  color: var(--muted);
+  display: flex;
+  font-size: 0.82rem;
+  font-weight: 900;
+  gap: 10px;
+  margin: 2px 0 10px;
+}
+
+.notice-optional-divider::after {
+  background: rgba(215, 206, 192, 0.82);
+  content: "";
+  flex: 1 1 auto;
+  height: 1px;
+}
+
 .notice-stepper-header > span {
   background: var(--step-accent, var(--text));
   border-radius: 999px;
@@ -1726,6 +1743,19 @@ textarea {
   .notice-step-context-stat {
     font-size: 0.74rem;
     padding: 5px 8px;
+  }
+
+  .notice-optional-divider {
+    background: rgba(255, 255, 255, 0.68);
+    border: 1px dashed rgba(215, 206, 192, 0.9);
+    border-radius: 999px;
+    justify-content: center;
+    margin: 4px 0 10px;
+    padding: 7px 10px;
+  }
+
+  .notice-optional-divider::after {
+    display: none;
   }
 
   .notice-step-theme .field > label,

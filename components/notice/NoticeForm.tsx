@@ -498,54 +498,6 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
             </div>
             ) : null}
 
-            {isFieldVisible("petName") ? (
-              <div className="field">
-              {renderFieldLabel("petName", "宠物名称", "petName")}
-              <input
-                id="petName"
-                maxLength={30}
-                placeholder={payload.noticeCategory === "found-owner" ? '不知道可填"未知"' : "例如：小橘、豆豆"}
-                value={String(payload.petProfile.name)}
-                onChange={(event) =>
-                  setPayload((current) => ({
-                    ...current,
-                    petProfile: {
-                      ...current.petProfile,
-                      name: event.target.value
-                    }
-                  }))
-                }
-              />
-              {!payload.petProfile.name.trim() ? (
-                <div className="hint">可不填，生成时会自动显示为&ldquo;未知&rdquo;。</div>
-              ) : null}
-            </div>
-            ) : null}
-
-            {isFieldVisible("petType") ? (
-              <div className="field">
-              {renderFieldLabel("petType", "宠物类型", "petType")}
-              <select
-                id="petType"
-                value={String(payload.petProfile.type)}
-                onChange={(event) =>
-                  setPayload((current) => ({
-                    ...current,
-                    petProfile: {
-                      ...current.petProfile,
-                      type: event.target.value as NoticeCreateInput["petProfile"]["type"]
-                    }
-                  }))
-                }
-              >
-                <option value="cat">猫</option>
-                <option value="dog">狗</option>
-                <option value="bird">鸟</option>
-                <option value="other">其他</option>
-              </select>
-            </div>
-            ) : null}
-
             {isFieldVisible("photoUpload") ? (
               <div className="field">
               {renderFieldLabel("photoUpload", "宠物照片", "photoUpload")}
@@ -837,6 +789,58 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
                   }))
                 }
               />
+            </div>
+            ) : null}
+
+            {isFieldVisible("petName") || isFieldVisible("petType") ? (
+              <div className="notice-optional-divider">下面可选，想快一点可以直接下一步</div>
+            ) : null}
+
+            {isFieldVisible("petName") ? (
+              <div className="field">
+              {renderFieldLabel("petName", "宠物名称", "petName")}
+              <input
+                id="petName"
+                maxLength={30}
+                placeholder={payload.noticeCategory === "found-owner" ? '不知道可填"未知"' : "例如：小橘、豆豆"}
+                value={String(payload.petProfile.name)}
+                onChange={(event) =>
+                  setPayload((current) => ({
+                    ...current,
+                    petProfile: {
+                      ...current.petProfile,
+                      name: event.target.value
+                    }
+                  }))
+                }
+              />
+              {!payload.petProfile.name.trim() ? (
+                <div className="hint">可不填，生成时会自动显示为&ldquo;未知&rdquo;。</div>
+              ) : null}
+            </div>
+            ) : null}
+
+            {isFieldVisible("petType") ? (
+              <div className="field">
+              {renderFieldLabel("petType", "宠物类型", "petType")}
+              <select
+                id="petType"
+                value={String(payload.petProfile.type)}
+                onChange={(event) =>
+                  setPayload((current) => ({
+                    ...current,
+                    petProfile: {
+                      ...current.petProfile,
+                      type: event.target.value as NoticeCreateInput["petProfile"]["type"]
+                    }
+                  }))
+                }
+              >
+                <option value="cat">猫</option>
+                <option value="dog">狗</option>
+                <option value="bird">鸟</option>
+                <option value="other">其他</option>
+              </select>
             </div>
             ) : null}
           </div>
