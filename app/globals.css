@@ -496,6 +496,23 @@ textarea {
   height: 1px;
 }
 
+.notice-location-tools {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  margin: 0 0 10px;
+}
+
+.notice-location-button {
+  flex: 0 0 auto;
+}
+
+.notice-location-status {
+  color: var(--muted);
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+
 .notice-stepper-header > span {
   background: var(--step-accent, var(--text));
   border-radius: 999px;
@@ -1756,6 +1773,24 @@ textarea {
 
   .notice-optional-divider::after {
     display: none;
+  }
+
+  .notice-location-tools {
+    align-items: stretch;
+    background: rgba(255, 255, 255, 0.68);
+    border: 1px dashed rgba(215, 206, 192, 0.9);
+    border-radius: 18px;
+    display: grid;
+    gap: 8px;
+    padding: 9px;
+  }
+
+  .notice-location-button {
+    width: 100%;
+  }
+
+  .notice-location-status {
+    font-size: 0.78rem;
   }
 
   .notice-step-theme .field > label,

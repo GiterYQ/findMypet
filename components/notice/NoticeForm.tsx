@@ -187,6 +187,8 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const [uploadingImages, setUploadingImages] = useState(false);
+  const [locating, setLocating] = useState(false);
+  const [locationStatus, setLocationStatus] = useState<string | null>(null);
   const [activeStepIndex, setActiveStepIndex] = useState(0);
   const isEditMode = mode === "edit";
   const isStepFlow = !isEditMode;
@@ -300,6 +302,46 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
       setUploadingImages(false);
       event.target.value = "";
     }
+  }
+
+  function handleUseCurrentLocation() {
+    if (!navigator.geolocation) {
+      setLocationStatus("当前浏览器不支持定位，请手动填写地点。");
+      return;
+    }
+
+    setLocating(true);
+    setLocationStatus("正在请求定位权限...");
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+
+        setPayload((current) => ({
+          ...current,
+          lostInfo: {
+            ...current.lostInfo,
+            location: {
+              ...current.lostInfo.location,
+              lat: latitude,
+              lng: longitude,
+              privacyLevel: "approximate"
+            }
+          }
+        }));
+        setLocationStatus("已获取当前位置坐标，请补充详细地点或附近标志物。");
+        setLocating(false);
+      },
+      () => {
+        setLocationStatus("无法获取当前位置，请手动填写地点。");
+        setLocating(false);
+      },
+      {
+        enableHighAccuracy: false,
+        maximumAge: 60_000,
+        timeout: 10_000
+      }
+    );
   }
 
   function validateForm(): string | null {
@@ -541,6 +583,20 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
             {isFieldVisible("addressText") || isFieldVisible("nearbyLandmark") ? (
               <fieldset className="field" style={{ border: "1px solid var(--color-border, #ddd)", borderRadius: 8, padding: 10 }}>
               <legend>{renderLegend("addressText", locationFieldLabel)}</legend>
+
+              <div className="notice-location-tools">
+                <button
+                  className="button button-secondary notice-location-button"
+                  disabled={locating}
+                  onClick={handleUseCurrentLocation}
+                  type="button"
+                >
+                  {locating ? "定位中..." : "使用当前位置"}
+                </button>
+                <span className="notice-location-status">
+                  {locationStatus ?? "浏览器会先请求授权；默认只保存近似坐标。"}
+                </span>
+              </div>
 
               {isEditMode ? (
                 <div className="grid" style={{ gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 8 }}>

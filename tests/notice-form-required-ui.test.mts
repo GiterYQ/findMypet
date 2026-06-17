@@ -43,6 +43,16 @@ test("NoticeForm renders required essentials before optional pet details", async
   assert.ok(contactIndex < petTypeIndex);
 });
 
+test("NoticeForm exposes browser geolocation action for location fields", async () => {
+  const source = await readFile(new URL("../components/notice/NoticeForm.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /handleUseCurrentLocation/);
+  assert.match(source, /navigator\.geolocation/);
+  assert.match(source, /notice-location-tools/);
+  assert.match(source, /notice-location-status/);
+  assert.match(source, /privacyLevel:\s*"approximate"/);
+});
+
 test("globals.css styles field requirement badges", async () => {
   const source = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
 
@@ -60,6 +70,15 @@ test("globals.css styles mobile step context summary", async () => {
   assert.match(source, /\.notice-step-context-stat\s*{/);
   assert.match(source, /\.notice-optional-divider\s*{/);
   assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-step-context\s*{/);
+});
+
+test("globals.css styles location geolocation action", async () => {
+  const source = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+
+  assert.match(source, /\.notice-location-tools\s*{/);
+  assert.match(source, /\.notice-location-button\s*{/);
+  assert.match(source, /\.notice-location-status\s*{/);
+  assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-location-tools\s*{/);
 });
 
 test("home page exposes mobile app chrome classes", async () => {
