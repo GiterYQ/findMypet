@@ -31,8 +31,14 @@ test("getNoticeFormStep clamps invalid indexes", () => {
 test("essentials step stays within the first-screen field budget", () => {
   const step = getNoticeFormStepById("essentials");
 
-  assert.equal(step.fields.length, 6);
-  assert.deepEqual(step.fields, ["noticeCategory", "addressText", "nearbyLandmark", "contact", "petName", "petType"]);
+  assert.equal(step.fields.length, 7);
+  assert.deepEqual(step.fields, ["noticeCategory", "photoUpload", "addressText", "nearbyLandmark", "contact", "petName", "petType"]);
+});
+
+test("photo step keeps description only because image upload is available in essentials", () => {
+  const step = getNoticeFormStepById("photo");
+
+  assert.deepEqual(step.fields, ["description"]);
 });
 
 test("essentials step requires publishing type location contact and pet type", () => {
@@ -57,7 +63,8 @@ test("getNoticeFormRequiredSummary makes required scope obvious", () => {
 
 test("isNoticeFormStepField matches field ids to their owning step", () => {
   assert.equal(isNoticeFormStepField("essentials", "contact"), true);
-  assert.equal(isNoticeFormStepField("essentials", "photoUpload"), false);
+  assert.equal(isNoticeFormStepField("essentials", "photoUpload"), true);
+  assert.equal(isNoticeFormStepField("photo", "photoUpload"), false);
   assert.equal(isNoticeFormStepField("photo", "description"), true);
   assert.equal(isNoticeFormStepField("review", "submit"), true);
 });

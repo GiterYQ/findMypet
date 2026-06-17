@@ -202,6 +202,16 @@ function hasUsableLocation(location: NoticeCreateInput["lostInfo"]["location"]) 
   return Boolean(location.addressText.trim() || buildAddressTextFallback(location));
 }
 
+function compactPreviewText(value: string, fallback: string, maxLength = 54) {
+  const normalized = value.replace(/\s+/g, " ").trim();
+
+  if (!normalized) {
+    return fallback;
+  }
+
+  return normalized.length > maxLength ? `${normalized.slice(0, maxLength)}...` : normalized;
+}
+
 function ensureSelectedDivisionOption(options: ChinaDivisionOption[], selectedName: string, selectedCode?: string) {
   if (!selectedName || options.some((option) => option.name === selectedName)) {
     return options;
@@ -244,7 +254,6 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
   const [cityOptions, setCityOptions] = useState<ChinaDivisionOption[]>([]);
   const [districtOptions, setDistrictOptions] = useState<ChinaDivisionOption[]>([]);
   const [streetOptions, setStreetOptions] = useState<ChinaDivisionOption[]>([]);
-  const [divisionStatus, setDivisionStatus] = useState<string | null>(null);
   const [showNearbyLandmark, setShowNearbyLandmark] = useState(() => Boolean(initialValue?.lostInfo?.location?.nearbyLandmark));
   const [activeStepIndex, setActiveStepIndex] = useState(0);
   const isEditMode = mode === "edit";
@@ -291,6 +300,10 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
   const visibleDistrictOptions = ensureSelectedDivisionOption(districtOptions, selectedDistrict);
   const visibleStreetOptions = ensureSelectedDivisionOption(streetOptions, selectedStreet);
   const previewLocationText = getFullLocationText(payload.lostInfo.location) || "填写地址后显示在这里";
+  const previewTitleText = compactPreviewText(payload.petProfile.name, "未知", 16);
+  const previewPetTypeText = compactPreviewText(getPetTypeDisplayName(payload.petProfile), "宠物", 12);
+  const previewAddressText = compactPreviewText(previewLocationText, "填写地址后显示在这里", 56);
+  const previewContactText = compactPreviewText(payload.contactMethods[0]?.value ?? "", "填写联系方式后显示", 32);
   const previewPhoto = payload.photos.find((photo) => photo.url);
   const hasPreviewPhoto = Boolean(previewPhoto);
   const canShowManualLocationFields = isEditMode || showManualLocationFields;
@@ -306,14 +319,9 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
       .then((options) => {
         if (!cancelled) {
           setProvinceOptions(options);
-          setDivisionStatus(null);
         }
       })
-      .catch(() => {
-        if (!cancelled) {
-          setDivisionStatus("地区下拉加载失败，可直接手动输入详细地址。");
-        }
-      });
+      .catch(() => undefined);
 
     return () => {
       cancelled = true;
@@ -334,11 +342,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
           setCityOptions(options);
         }
       })
-      .catch(() => {
-        if (!cancelled) {
-          setDivisionStatus("城市下拉加载失败，可继续手动填写。");
-        }
-      });
+      .catch(() => undefined);
 
     return () => {
       cancelled = true;
@@ -359,11 +363,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
           setDistrictOptions(options);
         }
       })
-      .catch(() => {
-        if (!cancelled) {
-          setDivisionStatus("区县下拉加载失败，可继续手动填写。");
-        }
-      });
+      .catch(() => undefined);
 
     return () => {
       cancelled = true;
@@ -384,11 +384,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
           setStreetOptions(options);
         }
       })
-      .catch(() => {
-        if (!cancelled) {
-          setDivisionStatus("街道下拉加载失败，可继续手动填写。");
-        }
-      });
+      .catch(() => undefined);
 
     return () => {
       cancelled = true;
@@ -534,7 +530,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
 
   function handleUseCurrentLocation() {
     if (!navigator.geolocation) {
-      setLocationStatus("当前浏览器不支持定位，请手动填写地点。");
+      setLocationStatus("位置识别失败，请手动输入位置。");
       setShowManualLocationFields(true);
       return;
     }
@@ -562,16 +558,16 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
 
         try {
           const resolved = await handleReverseGeocodeLocation(latitude, longitude);
-          setLocationStatus(resolved ? "已自动填入大致地址，请检查并补充门口/楼栋等细节。" : "已获取坐标，但未识别出地址，请手动填写。");
+          setLocationStatus(resolved ? "已自动填入大致地址，请检查并补充门口/楼栋等细节。" : "位置识别失败，请手动输入位置。");
         } catch {
-          setLocationStatus("已获取坐标，但地址识别失败，请手动填写详细地址。");
+          setLocationStatus("位置识别失败，请手动输入位置。");
           setShowManualLocationFields(true);
         } finally {
           setLocating(false);
         }
       },
       () => {
-        setLocationStatus("无法获取当前位置，请手动填写地点。");
+        setLocationStatus("位置识别失败，请手动输入位置。");
         setShowManualLocationFields(true);
         setLocating(false);
       },
@@ -741,13 +737,16 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
             </div>
             <div className="notice-stepper-track">
               {noticeFormSteps.map((step, index) => (
-                <span
+                <button
+                  aria-label={`跳转到第 ${index + 1} 步：${step.title}`}
                   aria-current={index === activeStepIndex ? "step" : undefined}
                   className={`notice-step-pill ${index === activeStepIndex ? "notice-step-pill-active" : ""}`}
                   key={step.id}
+                  onClick={() => setActiveStepIndex(index)}
+                  type="button"
                 >
                   {index + 1}
-                </span>
+                </button>
               ))}
             </div>
           </div>
@@ -827,36 +826,36 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
               <fieldset className="field" style={{ border: "1px solid var(--color-border, #ddd)", borderRadius: 8, padding: 10 }}>
               <legend>{renderLegend("addressText", locationFieldLabel)}</legend>
 
-              <div className="notice-location-tools">
+              <div className="notice-location-choice-row">
+                <div className="notice-location-tools">
+                  <button
+                    className="button button-secondary notice-location-button"
+                    disabled={locating}
+                    onClick={handleUseCurrentLocation}
+                    type="button"
+                  >
+                    {locating ? "定位中..." : "使用当前位置"}
+                  </button>
+                </div>
+
                 <button
-                  className="button button-secondary notice-location-button"
-                  disabled={locating}
-                  onClick={handleUseCurrentLocation}
+                  className="notice-manual-location-toggle"
+                  onClick={() => setShowManualLocationFields((current) => !current)}
                   type="button"
                 >
-                  {locating ? "定位中..." : "使用当前位置"}
+                  {canShowManualLocationFields ? "收起位置选择" : "手动选择位置"}
                 </button>
-                <span className="notice-location-status">
-                  {locationStatus ?? "浏览器会先请求授权；默认只保存近似坐标。"}
-                </span>
               </div>
+              <span className="notice-location-status">
+                {locationStatus ?? "定位和手动输入二选一；定位失败时可直接手动填写。"}
+              </span>
 
-              <button
-                className="notice-manual-location-toggle"
-                onClick={() => setShowManualLocationFields((current) => !current)}
-                type="button"
-              >
-                {canShowManualLocationFields ? "收起省市区街道" : "手动选择省市区街道"}
-              </button>
-
-              {canShowManualLocationFields ? (
+              <div className={`notice-manual-location-panel ${canShowManualLocationFields ? "notice-manual-location-panel-open" : ""}`}>
                 <div className="notice-manual-location-grid">
-                  <div className="notice-manual-location-note">
-                    {divisionStatus ?? "省市区街道使用本地公开行政区划数据；如果找不到，可直接填写详细地址。"}
-                  </div>
                   <div className="field" style={{ marginBottom: 0 }}>
-                    {renderFieldLabel("addressText", "省/直辖市", "province")}
+                    <label className="sr-only" htmlFor="province">选择省份</label>
                     <select
+                      aria-label="选择省份"
                       id="province"
                       value={selectedProvinceOption?.code ?? selectedProvince}
                       onChange={(event) => {
@@ -886,8 +885,9 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
                     </select>
                   </div>
                   <div className="field" style={{ marginBottom: 0 }}>
-                    {renderFieldLabel("addressText", "市", "city")}
+                    <label className="sr-only" htmlFor="city">选择城市</label>
                     <select
+                      aria-label="选择城市"
                       id="city"
                       value={selectedCityOption?.code ?? selectedCity}
                       onChange={(event) => {
@@ -916,8 +916,9 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
                     </select>
                   </div>
                   <div className="field" style={{ marginBottom: 0 }}>
-                    {renderFieldLabel("addressText", "区/县", "district")}
+                    <label className="sr-only" htmlFor="district">选择区县</label>
                     <select
+                      aria-label="选择区县"
                       id="district"
                       value={selectedDistrictOption?.code ?? selectedDistrict}
                       onChange={(event) => {
@@ -945,8 +946,9 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
                     </select>
                   </div>
                   <div className="field notice-manual-location-street" style={{ marginBottom: 8 }}>
-                    {renderFieldLabel("addressText", "街道/乡镇", "street")}
+                    <label className="sr-only" htmlFor="street">填写街道或乡镇</label>
                     <input
+                      aria-label="填写街道或乡镇"
                       id="street"
                       list="streetOptions"
                       maxLength={50}
@@ -969,7 +971,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
                     </datalist>
                   </div>
                 </div>
-              ) : null}
+              </div>
 
               <div className="field" style={{ marginBottom: 8 }}>
                 {renderFieldLabel("addressText", "详细地址", "addressText")}
@@ -992,8 +994,30 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
               </div>
 
               {showNearbyLandmark ? (
-                <div className="field" style={{ marginBottom: 0 }}>
-                  {renderFieldLabel("nearbyLandmark", "附近标志物", "nearbyLandmark")}
+                <div className="field notice-landmark-field" style={{ marginBottom: 0 }}>
+                  <div className="notice-landmark-label-row">
+                    {renderFieldLabel("nearbyLandmark", "附近标志物", "nearbyLandmark")}
+                    <button
+                      aria-label="取消附近标志物"
+                      className="notice-landmark-remove"
+                      onClick={() => {
+                        setShowNearbyLandmark(false);
+                        setPayload((current) => ({
+                          ...current,
+                          lostInfo: {
+                            ...current.lostInfo,
+                            location: {
+                              ...current.lostInfo.location,
+                              nearbyLandmark: ""
+                            }
+                          }
+                        }));
+                      }}
+                      type="button"
+                    >
+                      -
+                    </button>
+                  </div>
                   <input
                     id="nearbyLandmark"
                     maxLength={100}
@@ -1345,12 +1369,16 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
                 </div>
                 <div className="notice-live-preview-content">
                   <div className="notice-live-preview-kicker">{categoryLabel}</div>
-                  <strong>{payload.petProfile.name.trim() || "未知"}</strong>
-                  <p>{getPetTypeDisplayName(payload.petProfile)} · {previewLocationText}</p>
+                  <div className="notice-live-preview-title-row">
+                    <strong>{previewTitleText}</strong>
+                    <span>{previewPetTypeText}</span>
+                  </div>
+                  <p className="notice-live-preview-location">{previewAddressText}</p>
                 </div>
                 <div className="notice-preview-skeleton-line" aria-hidden="true" />
                 <div className="notice-live-preview-contact">
-                  {payload.contactMethods[0]?.value || "填写联系方式后显示"}
+                  <span className="notice-live-preview-contact-label">联系</span>
+                  <strong>{previewContactText}</strong>
                 </div>
               </div>
             </aside>

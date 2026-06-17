@@ -16,6 +16,15 @@ test("NoticeForm renders step required summary and field requirement badges", as
   assert.match(source, /isNoticeFormFieldRequired/);
 });
 
+test("NoticeForm lets users jump between form steps from the stepper", async () => {
+  const source = await readFile(new URL("../components/notice/NoticeForm.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /notice-step-pill/);
+  assert.match(source, /type="button"/);
+  assert.match(source, /onClick=\{\(\) => setActiveStepIndex\(index\)\}/);
+  assert.match(source, /aria-label=\{`跳转到第 \$\{index \+ 1\} 步/);
+});
+
 test("NoticeForm renders mobile step context summary", async () => {
   const source = await readFile(new URL("../components/notice/NoticeForm.tsx", import.meta.url), "utf8");
 
@@ -59,13 +68,27 @@ test("NoticeForm offers manual structured address fallback when geocoding cannot
   const source = await readFile(new URL("../components/notice/NoticeForm.tsx", import.meta.url), "utf8");
 
   assert.match(source, /showManualLocationFields/);
-  assert.match(source, /手动选择省市区街道/);
+  assert.match(source, /手动选择位置/);
   assert.match(source, /setShowManualLocationFields\(true\)/);
   assert.match(source, /<select[\s\S]*id="province"/);
   assert.match(source, /<select[\s\S]*id="city"/);
   assert.match(source, /<select[\s\S]*id="district"/);
   assert.match(source, /loadChinaDivisionOptions/);
   assert.match(source, /level: "streets"/);
+  assert.match(source, /位置识别失败，请手动输入位置。/);
+  assert.match(source, /aria-label="选择省份"/);
+  assert.match(source, /aria-label="选择城市"/);
+  assert.match(source, /aria-label="选择区县"/);
+  assert.match(source, /aria-label="填写街道或乡镇"/);
+  assert.doesNotMatch(source, /已获取坐标/);
+  assert.doesNotMatch(source, /无法获取当前位置/);
+  assert.doesNotMatch(source, /当前浏览器不支持定位/);
+  assert.doesNotMatch(source, /renderFieldLabel\("addressText", "省\/直辖市"/);
+  assert.doesNotMatch(source, /renderFieldLabel\("addressText", "市"/);
+  assert.doesNotMatch(source, /renderFieldLabel\("addressText", "区\/县"/);
+  assert.match(source, /notice-location-choice-row/);
+  assert.match(source, /notice-manual-location-panel/);
+  assert.doesNotMatch(source, /省市区街道使用本地公开行政区划数据/);
 });
 
 test("NoticeForm collapses nearby landmark behind an add button", async () => {
@@ -74,6 +97,9 @@ test("NoticeForm collapses nearby landmark behind an add button", async () => {
   assert.match(source, /showNearbyLandmark/);
   assert.match(source, /notice-landmark-toggle/);
   assert.match(source, /添加附近标志物/);
+  assert.match(source, /取消附近标志物/);
+  assert.match(source, /setShowNearbyLandmark\(false\)/);
+  assert.match(source, /nearbyLandmark: ""/);
 });
 
 test("NoticeForm renders a live poster preview while editing", async () => {
@@ -84,6 +110,9 @@ test("NoticeForm renders a live poster preview while editing", async () => {
   assert.match(source, /previewLocationText/);
   assert.match(source, /notice-live-preview-media/);
   assert.match(source, /notice-preview-skeleton/);
+  assert.match(source, /notice-live-preview-title-row/);
+  assert.match(source, /notice-live-preview-location/);
+  assert.match(source, /notice-live-preview-contact-label/);
 });
 
 test("NoticeForm labels exotic pets for the other pet type", async () => {
@@ -115,10 +144,14 @@ test("globals.css styles mobile step context summary", async () => {
 test("globals.css styles location geolocation action", async () => {
   const source = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
 
+  assert.match(source, /\.notice-location-choice-row\s*{/);
+  assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-location-choice-row\s*{[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\)/s);
   assert.match(source, /\.notice-location-tools\s*{/);
   assert.match(source, /\.notice-location-button\s*{/);
   assert.match(source, /\.notice-location-status\s*{/);
   assert.match(source, /\.notice-manual-location-toggle\s*{/);
+  assert.match(source, /\.notice-manual-location-panel\s*{/);
+  assert.match(source, /\.notice-manual-location-panel-open\s*{/);
   assert.match(source, /\.notice-manual-location-grid\s*{/);
   assert.match(source, /\.notice-landmark-toggle\s*{/);
   assert.match(source, /\.notice-live-preview\s*{/);
@@ -128,30 +161,32 @@ test("globals.css styles location geolocation action", async () => {
 test("globals.css keeps live preview compact and skeletonized", async () => {
   const source = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
 
-  assert.match(source, /\.notice-live-preview-card\s*{[^}]*min-height:\s*260px/s);
-  assert.match(source, /\.notice-live-preview-card\s*{[^}]*max-height:\s*320px/s);
+  assert.match(source, /\.notice-live-preview-card\s*{[^}]*min-height:\s*300px/s);
+  assert.match(source, /\.notice-live-preview-card\s*{[^}]*max-height:\s*340px/s);
   assert.match(source, /\.notice-live-preview-media\s*{/);
   assert.match(source, /\.notice-preview-skeleton\s*{/);
   assert.match(source, /\.notice-preview-skeleton-line\s*{/);
-  assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-live-preview-card\s*{[^}]*min-height:\s*220px/s);
+  assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-live-preview-card\s*{[^}]*min-height:\s*240px/s);
 });
 
 test("globals.css fixes live preview size to prevent layout jumping while typing", async () => {
   const source = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
 
-  assert.match(source, /\.notice-live-preview\s*{[^}]*width:\s*280px/s);
+  assert.match(source, /\.notice-live-preview\s*{[^}]*width:\s*320px/s);
   assert.match(source, /\.notice-live-preview\s*{[^}]*justify-self:\s*start/s);
-  assert.match(source, /\.notice-live-preview-card\s*{[^}]*height:\s*300px/s);
-  assert.match(source, /\.notice-live-preview-card\s*{[^}]*width:\s*280px/s);
-  assert.match(source, /\.notice-live-preview-card\s*{[^}]*grid-template-rows:\s*118px 86px 8px 42px/s);
+  assert.match(source, /\.notice-live-preview-card\s*{[^}]*height:\s*320px/s);
+  assert.match(source, /\.notice-live-preview-card\s*{[^}]*width:\s*320px/s);
+  assert.match(source, /\.notice-live-preview-card\s*{[^}]*grid-template-rows:\s*94px 116px 6px 42px/s);
   assert.match(source, /\.notice-live-preview-content\s*{[^}]*overflow:\s*hidden/s);
+  assert.match(source, /\.notice-live-preview-title-row\s*{/);
+  assert.match(source, /\.notice-live-preview-location\s*{/);
   assert.match(source, /\.notice-live-preview-card strong\s*{[^}]*-webkit-line-clamp:\s*1/s);
-  assert.match(source, /\.notice-live-preview-card p\s*{[^}]*-webkit-line-clamp:\s*2/s);
+  assert.match(source, /\.notice-live-preview-location\s*{[^}]*-webkit-line-clamp:\s*3/s);
   assert.match(source, /\.notice-live-preview-contact\s*{[^}]*height:\s*42px/s);
   assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-live-preview\s*{[^}]*width:\s*100%/s);
-  assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-live-preview-card\s*{[^}]*height:\s*248px/s);
+  assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-live-preview-card\s*{[^}]*height:\s*270px/s);
   assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-live-preview-card\s*{[^}]*width:\s*100%/s);
-  assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-live-preview-card\s*{[^}]*grid-template-rows:\s*84px 70px 7px 38px/s);
+  assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-live-preview-card\s*{[^}]*grid-template-rows:\s*70px 110px 5px 40px/s);
 });
 
 test("globals.css keeps live preview before form columns on desktop and mobile", async () => {

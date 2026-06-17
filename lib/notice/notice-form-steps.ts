@@ -60,7 +60,7 @@ export const noticeFormSteps = [
     summary: "先填能生成启事的最低信息。",
     goal: "填位置和联系方式，先把启事发得出去。",
     estimate: "约 1 分钟",
-    fields: ["noticeCategory", "addressText", "nearbyLandmark", "contact", "petName", "petType"],
+    fields: ["noticeCategory", "photoUpload", "addressText", "nearbyLandmark", "contact", "petName", "petType"],
     requiredFields: ["noticeCategory", "addressText", "contact", "petType"],
     skippable: false,
     tone: "ember"
@@ -68,10 +68,10 @@ export const noticeFormSteps = [
   {
     id: "photo",
     title: "照片与描述",
-    summary: "上传照片，补充可识别特征。",
-    goal: "让看到的人一眼认出宠物，不上传也能继续。",
+    summary: "补充可识别特征。",
+    goal: "写一点特征描述，让看到的人更容易判断。",
     estimate: "约 1 分钟",
-    fields: ["photoUpload", "description"],
+    fields: ["description"],
     requiredFields: [],
     skippable: true,
     tone: "leaf"
