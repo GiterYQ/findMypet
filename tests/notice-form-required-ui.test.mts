@@ -108,6 +108,15 @@ test("globals.css styles location geolocation action", async () => {
   assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-location-tools\s*{/);
 });
 
+test("globals.css keeps live preview before form columns on desktop and mobile", async () => {
+  const source = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+
+  assert.match(source, /\.notice-step-grid-with-preview\s*{[^}]*grid-template-columns:\s*minmax\(240px,\s*0\.68fr\) minmax\(0,\s*1fr\)/s);
+  assert.match(source, /\.notice-step-grid-form-column\s*{[^}]*grid-column:\s*2/s);
+  assert.match(source, /\.notice-live-preview\s*{[^}]*grid-column:\s*1/s);
+  assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-live-preview\s*{[^}]*order:\s*-1/s);
+});
+
 test("mine page uses compact mobile header instead of tall hero", async () => {
   const source = await readFile(new URL("../app/mine/page.tsx", import.meta.url), "utf8");
 

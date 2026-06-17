@@ -540,12 +540,18 @@ textarea {
 
 .notice-step-grid-with-preview {
   align-items: start;
-  grid-template-columns: minmax(0, 1fr) minmax(240px, 0.68fr);
+  grid-template-columns: minmax(240px, 0.68fr) minmax(0, 1fr);
+}
+
+.notice-step-grid-form-column {
+  grid-column: 2;
 }
 
 .notice-live-preview {
   display: grid;
   gap: 8px;
+  grid-column: 1;
+  grid-row: 1 / span 2;
   position: sticky;
   top: 14px;
 }
@@ -1912,7 +1918,13 @@ textarea {
     grid-template-columns: 1fr;
   }
 
+  .notice-step-grid-form-column {
+    grid-column: auto;
+  }
+
   .notice-live-preview {
+    grid-column: auto;
+    grid-row: auto;
     order: -1;
     position: static;
   }

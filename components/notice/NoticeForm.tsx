@@ -573,7 +573,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
         ) : null}
         <div className={`grid ${isEditMode ? "two-col" : "notice-step-grid notice-step-grid-with-preview"}`}>
           {hasLeftColumnFields ? (
-            <div>
+            <div className="notice-step-grid-form-column">
             {isFieldVisible("noticeCategory") ? (
               <div className="field">
               {renderFieldLabel("noticeCategory", "发布类型")}
@@ -972,7 +972,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
           ) : null}
 
           {hasRightColumnFields ? (
-            <div>
+            <div className="notice-step-grid-form-column">
             {!isEditMode && isFieldVisible("ownerEmail") ? (
               <div className="field">
                 {renderFieldLabel("ownerEmail", "管理链接邮箱", "ownerEmail")}
