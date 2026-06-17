@@ -1177,73 +1177,78 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
               <div className="notice-optional-divider">下面可选，想快一点可以直接下一步</div>
             ) : null}
 
-            {isFieldVisible("petName") ? (
-              <div className="field">
-              {renderFieldLabel("petName", "宠物名称", "petName")}
-              <input
-                id="petName"
-                maxLength={30}
-                placeholder={payload.noticeCategory === "found-owner" ? '不知道可填"未知"' : "例如：小橘、豆豆"}
-                value={String(payload.petProfile.name)}
-                onChange={(event) =>
-                  setPayload((current) => ({
-                    ...current,
-                    petProfile: {
-                      ...current.petProfile,
-                      name: event.target.value
-                    }
-                  }))
-                }
-              />
-              {!payload.petProfile.name.trim() ? (
-                <div className="hint">可不填，生成时会自动显示为&ldquo;未知&rdquo;。</div>
-              ) : null}
-            </div>
+            {isFieldVisible("petName") || isFieldVisible("petType") ? (
+              <div className="notice-pet-identity-grid">
+                {isFieldVisible("petName") ? (
+                  <div className="field">
+                    {renderFieldLabel("petName", "宠物名称", "petName")}
+                    <input
+                      id="petName"
+                      maxLength={30}
+                      placeholder={payload.noticeCategory === "found-owner" ? '不知道可填"未知"' : "例如：小橘、豆豆"}
+                      value={String(payload.petProfile.name)}
+                      onChange={(event) =>
+                        setPayload((current) => ({
+                          ...current,
+                          petProfile: {
+                            ...current.petProfile,
+                            name: event.target.value
+                          }
+                        }))
+                      }
+                    />
+                    {!payload.petProfile.name.trim() ? (
+                      <div className="hint">可不填，生成时会自动显示为&ldquo;未知&rdquo;。</div>
+                    ) : null}
+                  </div>
+                ) : null}
+
+                {isFieldVisible("petType") ? (
+                  <div className="field">
+                    {renderFieldLabel("petType", "宠物类型", "petType")}
+                    <select
+                      id="petType"
+                      value={String(payload.petProfile.type)}
+                      onChange={(event) =>
+                        setPayload((current) => ({
+                          ...current,
+                          petProfile: {
+                            ...current.petProfile,
+                            type: event.target.value as NoticeCreateInput["petProfile"]["type"],
+                            customType: event.target.value === "other" ? current.petProfile.customType : ""
+                          }
+                        }))
+                      }
+                    >
+                      <option value="cat">猫</option>
+                      <option value="dog">狗</option>
+                      <option value="bird">鸟</option>
+                      <option value="other">异宠</option>
+                    </select>
+                  </div>
+                ) : null}
+              </div>
             ) : null}
 
-            {isFieldVisible("petType") ? (
+            {isFieldVisible("petType") && payload.petProfile.type === "other" ? (
               <div className="field">
-              {renderFieldLabel("petType", "宠物类型", "petType")}
-              <select
-                id="petType"
-                value={String(payload.petProfile.type)}
-                onChange={(event) =>
-                  setPayload((current) => ({
-                    ...current,
-                    petProfile: {
-                      ...current.petProfile,
-                      type: event.target.value as NoticeCreateInput["petProfile"]["type"],
-                      customType: event.target.value === "other" ? current.petProfile.customType : ""
-                    }
-                  }))
-                }
-              >
-                <option value="cat">猫</option>
-                <option value="dog">狗</option>
-                <option value="bird">鸟</option>
-                <option value="other">异宠</option>
-              </select>
-              {payload.petProfile.type === "other" ? (
-                <div className="field" style={{ marginBottom: 0 }}>
-                  {renderFieldLabel("petType", "具体宠物类型", "petCustomType")}
-                  <input
-                    id="petCustomType"
-                    maxLength={30}
-                    placeholder="例如：兔子、仓鼠、乌龟、蜥蜴"
-                    value={String(payload.petProfile.customType ?? "")}
-                    onChange={(event) =>
-                      setPayload((current) => ({
-                        ...current,
-                        petProfile: {
-                          ...current.petProfile,
-                          customType: event.target.value
-                        }
-                      }))
-                    }
-                  />
-                </div>
-              ) : null}
-            </div>
+                {renderFieldLabel("petType", "具体宠物类型", "petCustomType")}
+                <input
+                  id="petCustomType"
+                  maxLength={30}
+                  placeholder="例如：兔子、仓鼠、乌龟、蜥蜴"
+                  value={String(payload.petProfile.customType ?? "")}
+                  onChange={(event) =>
+                    setPayload((current) => ({
+                      ...current,
+                      petProfile: {
+                        ...current.petProfile,
+                        customType: event.target.value
+                      }
+                    }))
+                  }
+                />
+              </div>
             ) : null}
           </div>
           ) : null}

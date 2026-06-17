@@ -52,6 +52,14 @@ test("NoticeForm renders required essentials before optional pet details", async
   assert.ok(contactIndex < petTypeIndex);
 });
 
+test("NoticeForm places pet name and type in one desktop row", async () => {
+  const source = await readFile(new URL("../components/notice/NoticeForm.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /notice-pet-identity-grid/);
+  assert.match(source, /isFieldVisible\("petName"\) \|\| isFieldVisible\("petType"\)/);
+  assert.match(source, /isFieldVisible\("petName"\)[\s\S]*isFieldVisible\("petType"\)/);
+});
+
 test("NoticeForm exposes browser geolocation action for location fields", async () => {
   const source = await readFile(new URL("../components/notice/NoticeForm.tsx", import.meta.url), "utf8");
 
@@ -153,9 +161,22 @@ test("globals.css styles location geolocation action", async () => {
   assert.match(source, /\.notice-manual-location-panel\s*{/);
   assert.match(source, /\.notice-manual-location-panel-open\s*{/);
   assert.match(source, /\.notice-manual-location-grid\s*{/);
+  assert.match(source, /\.notice-manual-location-grid\s*{[^}]*grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\)/s);
+  assert.match(source, /@media \(min-width: 761px\) and \(max-width: 980px\)[\s\S]*\.notice-manual-location-grid\s*{[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\)/s);
   assert.match(source, /\.notice-landmark-toggle\s*{/);
   assert.match(source, /\.notice-live-preview\s*{/);
   assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-location-tools\s*{/);
+});
+
+test("globals.css keeps desktop form preview at one third and form at two thirds", async () => {
+  const source = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+
+  assert.match(source, /scrollbar-gutter:\s*stable/);
+  assert.match(source, /\.notice-step-grid-with-preview\s*{[^}]*grid-template-columns:\s*minmax\(240px,\s*1fr\) minmax\(0,\s*2fr\)/s);
+  assert.match(source, /\.notice-live-preview\s*{[^}]*width:\s*100%/s);
+  assert.match(source, /\.notice-live-preview-card\s*{[^}]*width:\s*100%/s);
+  assert.doesNotMatch(source, /\.notice-live-preview\s*{[^}]*width:\s*320px/s);
+  assert.doesNotMatch(source, /\.notice-live-preview-card\s*{[^}]*width:\s*320px/s);
 });
 
 test("globals.css keeps live preview compact and skeletonized", async () => {
@@ -172,10 +193,10 @@ test("globals.css keeps live preview compact and skeletonized", async () => {
 test("globals.css fixes live preview size to prevent layout jumping while typing", async () => {
   const source = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
 
-  assert.match(source, /\.notice-live-preview\s*{[^}]*width:\s*320px/s);
+  assert.match(source, /\.notice-live-preview\s*{[^}]*width:\s*100%/s);
   assert.match(source, /\.notice-live-preview\s*{[^}]*justify-self:\s*start/s);
   assert.match(source, /\.notice-live-preview-card\s*{[^}]*height:\s*320px/s);
-  assert.match(source, /\.notice-live-preview-card\s*{[^}]*width:\s*320px/s);
+  assert.match(source, /\.notice-live-preview-card\s*{[^}]*width:\s*100%/s);
   assert.match(source, /\.notice-live-preview-card\s*{[^}]*grid-template-rows:\s*94px 116px 6px 42px/s);
   assert.match(source, /\.notice-live-preview-content\s*{[^}]*overflow:\s*hidden/s);
   assert.match(source, /\.notice-live-preview-title-row\s*{/);
@@ -192,10 +213,18 @@ test("globals.css fixes live preview size to prevent layout jumping while typing
 test("globals.css keeps live preview before form columns on desktop and mobile", async () => {
   const source = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
 
-  assert.match(source, /\.notice-step-grid-with-preview\s*{[^}]*grid-template-columns:\s*minmax\(240px,\s*0\.68fr\) minmax\(0,\s*1fr\)/s);
+  assert.match(source, /\.notice-step-grid-with-preview\s*{[^}]*grid-template-columns:\s*minmax\(240px,\s*1fr\) minmax\(0,\s*2fr\)/s);
   assert.match(source, /\.notice-step-grid-form-column\s*{[^}]*grid-column:\s*2/s);
   assert.match(source, /\.notice-live-preview\s*{[^}]*grid-column:\s*1/s);
   assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-live-preview\s*{[^}]*order:\s*-1/s);
+});
+
+test("globals.css places pet identity fields in one row on desktop", async () => {
+  const source = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+
+  assert.match(source, /\.notice-pet-identity-grid\s*{/);
+  assert.match(source, /\.notice-pet-identity-grid\s*{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\) minmax\(180px,\s*0\.72fr\)/s);
+  assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-pet-identity-grid\s*{[^}]*grid-template-columns:\s*1fr/s);
 });
 
 test("mine page uses compact mobile header instead of tall hero", async () => {

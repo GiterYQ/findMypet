@@ -28,6 +28,7 @@ html {
     radial-gradient(circle at top left, rgba(211, 94, 56, 0.12), transparent 28%),
     radial-gradient(circle at top right, rgba(157, 120, 67, 0.12), transparent 24%),
     var(--bg);
+  scrollbar-gutter: stable;
 }
 
 body {
@@ -569,13 +570,19 @@ textarea {
   border-radius: 16px;
   display: grid;
   gap: 8px;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   min-height: 0;
   padding: 10px;
 }
 
 .notice-manual-location-street {
-  grid-column: 1 / -1;
+  grid-column: auto;
+}
+
+.notice-pet-identity-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: minmax(0, 1fr) minmax(180px, 0.72fr);
 }
 
 .notice-landmark-label-row {
@@ -627,7 +634,7 @@ textarea {
 
 .notice-step-grid-with-preview {
   align-items: start;
-  grid-template-columns: minmax(240px, 0.68fr) minmax(0, 1fr);
+  grid-template-columns: minmax(240px, 1fr) minmax(0, 2fr);
 }
 
 .notice-step-grid-form-column {
@@ -642,7 +649,7 @@ textarea {
   justify-self: start;
   position: sticky;
   top: 14px;
-  width: 320px;
+  width: 100%;
 }
 
 .notice-live-preview > span {
@@ -668,7 +675,7 @@ textarea {
   min-height: 300px;
   overflow: hidden;
   padding: 16px;
-  width: 320px;
+  width: 100%;
 }
 
 .notice-live-preview-media {
@@ -924,6 +931,12 @@ textarea {
   line-height: 1.2;
   padding: 7px 10px;
   width: fit-content;
+}
+
+@media (min-width: 761px) and (max-width: 980px) {
+  .notice-manual-location-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 .notice-step-theme fieldset.field {
@@ -2112,6 +2125,10 @@ textarea {
   .notice-manual-location-grid {
     grid-template-columns: 1fr;
     padding: 9px;
+  }
+
+  .notice-pet-identity-grid {
+    grid-template-columns: 1fr;
   }
 
   .notice-landmark-toggle {
