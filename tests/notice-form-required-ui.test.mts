@@ -136,6 +136,19 @@ test("globals.css keeps live preview compact and skeletonized", async () => {
   assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-live-preview-card\s*{[^}]*min-height:\s*220px/s);
 });
 
+test("globals.css fixes live preview size to prevent layout jumping while typing", async () => {
+  const source = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+
+  assert.match(source, /\.notice-live-preview-card\s*{[^}]*height:\s*300px/s);
+  assert.match(source, /\.notice-live-preview-card\s*{[^}]*grid-template-rows:\s*118px 86px 8px 42px/s);
+  assert.match(source, /\.notice-live-preview-content\s*{[^}]*overflow:\s*hidden/s);
+  assert.match(source, /\.notice-live-preview-card strong\s*{[^}]*-webkit-line-clamp:\s*1/s);
+  assert.match(source, /\.notice-live-preview-card p\s*{[^}]*-webkit-line-clamp:\s*2/s);
+  assert.match(source, /\.notice-live-preview-contact\s*{[^}]*height:\s*42px/s);
+  assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-live-preview-card\s*{[^}]*height:\s*248px/s);
+  assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-live-preview-card\s*{[^}]*grid-template-rows:\s*84px 70px 7px 38px/s);
+});
+
 test("globals.css keeps live preview before form columns on desktop and mobile", async () => {
   const source = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
 
