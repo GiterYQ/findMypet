@@ -8,6 +8,7 @@
 
 import { type ChangeEvent, useState } from "react";
 import { CopyButton } from "@/components/notice/CopyButton";
+import { chinaRegionOptions, getChinaCityOptions, getChinaDistrictOptions, getChinaStreetOptions } from "@/lib/location/cn-region-options";
 import { compressImageFile, uploadCompressedImage } from "@/lib/media/client-image";
 import { formatAmountMinorForDisplay, majorAmountInputToMinor, minorAmountToMajorInput } from "@/lib/notice/money";
 import {
@@ -19,7 +20,7 @@ import {
   noticeFormSteps
 } from "@/lib/notice/notice-form-steps";
 import { type NoticeCreateInput } from "@/lib/notice/notice.schema";
-import { getLocationFieldLabel, getNoticeCategoryLabel, getPetTypeLabel, getTimeFieldLabel } from "@/lib/notice/notice-display";
+import { getFullLocationText, getLocationFieldLabel, getNoticeCategoryLabel, getPetTypeLabel, getTimeFieldLabel } from "@/lib/notice/notice-display";
 import { saveManagedNotice } from "@/lib/manage/manage-history";
 import { getHalfHourTimeOptions, getNoticeTimeDisplayOptions } from "@/lib/notice/notice-time-options";
 
@@ -181,6 +182,25 @@ function isHalfHourTimeValue(value?: string): boolean {
   return Boolean(value && /^\d{2}:(00|30)$/.test(value));
 }
 
+function buildAddressTextFallback(location: NoticeCreateInput["lostInfo"]["location"]) {
+  return [
+    location.province,
+    location.city,
+    location.district,
+    location.street
+  ]
+    .filter((part): part is string => Boolean(part?.trim()))
+    .join("");
+}
+
+function hasUsableLocation(location: NoticeCreateInput["lostInfo"]["location"]) {
+  return Boolean(location.addressText.trim() || buildAddressTextFallback(location));
+}
+
+function ensureSelectedOption(options: string[], selectedValue: string) {
+  return selectedValue && !options.includes(selectedValue) ? [selectedValue, ...options] : options;
+}
+
 export function NoticeForm({ initialValue, manageToken, mode = "create", shortId }: NoticeFormProps) {
   const [payload, setPayload] = useState<NoticeCreateInput>(() => ({ ...defaultNotice, ...initialValue }));
   const [result, setResult] = useState<{ publicShareUrl: string; manageUrl: string } | null>(null);
@@ -189,6 +209,9 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
   const [uploadingImages, setUploadingImages] = useState(false);
   const [locating, setLocating] = useState(false);
   const [locationStatus, setLocationStatus] = useState<string | null>(null);
+  const [showManualLocationFields, setShowManualLocationFields] = useState(() =>
+    Boolean(initialValue?.lostInfo?.location?.province || initialValue?.lostInfo?.location?.city || initialValue?.lostInfo?.location?.district)
+  );
   const [showNearbyLandmark, setShowNearbyLandmark] = useState(() => Boolean(initialValue?.lostInfo?.location?.nearbyLandmark));
   const [activeStepIndex, setActiveStepIndex] = useState(0);
   const isEditMode = mode === "edit";
@@ -223,6 +246,21 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
   const requiredSummary = getNoticeFormRequiredSummary(activeStep.id);
   const completedStepCount = activeStepIndex;
   const remainingStepCount = Math.max(noticeFormSteps.length - activeStepIndex - 1, 0);
+  const selectedProvince = String(payload.lostInfo.location.province ?? "");
+  const selectedCity = String(payload.lostInfo.location.city ?? "");
+  const selectedDistrict = String(payload.lostInfo.location.district ?? "");
+  const selectedStreet = String(payload.lostInfo.location.street ?? "");
+  const cityOptions = getChinaCityOptions(selectedProvince);
+  const districtOptions = getChinaDistrictOptions(selectedProvince, selectedCity);
+  const baseStreetOptions = getChinaStreetOptions(selectedProvince, selectedCity, selectedDistrict);
+  const provinceNameOptions = ensureSelectedOption(chinaRegionOptions.map((province) => province.name), selectedProvince);
+  const cityNameOptions = ensureSelectedOption(cityOptions.map((city) => city.name), selectedCity);
+  const districtNameOptions = ensureSelectedOption(districtOptions.map((district) => district.name), selectedDistrict);
+  const streetOptions = ensureSelectedOption(baseStreetOptions, selectedStreet);
+  const previewLocationText = getFullLocationText(payload.lostInfo.location) || "填写地址后显示在这里";
+  const previewPhoto = payload.photos.find((photo) => photo.url);
+  const hasPreviewPhoto = Boolean(previewPhoto);
+  const canShowManualLocationFields = isEditMode || showManualLocationFields;
 
   function isFieldVisible(field: NoticeFormStepField) {
     return isEditMode || activeStepFields.includes(field);
@@ -335,6 +373,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
     };
 
     if (!data.location) {
+      setShowManualLocationFields(true);
       return false;
     }
 
@@ -355,12 +394,15 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
       }
     }));
 
-    return Boolean(data.location.addressText || data.location.city || data.location.district);
+    const resolved = Boolean(data.location.addressText || data.location.city || data.location.district);
+    setShowManualLocationFields(!resolved);
+    return resolved;
   }
 
   function handleUseCurrentLocation() {
     if (!navigator.geolocation) {
       setLocationStatus("当前浏览器不支持定位，请手动填写地点。");
+      setShowManualLocationFields(true);
       return;
     }
 
@@ -390,12 +432,14 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
           setLocationStatus(resolved ? "已自动填入大致地址，请检查并补充门口/楼栋等细节。" : "已获取坐标，但未识别出地址，请手动填写。");
         } catch {
           setLocationStatus("已获取坐标，但地址识别失败，请手动填写详细地址。");
+          setShowManualLocationFields(true);
         } finally {
           setLocating(false);
         }
       },
       () => {
         setLocationStatus("无法获取当前位置，请手动填写地点。");
+        setShowManualLocationFields(true);
         setLocating(false);
       },
       {
@@ -408,7 +452,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
 
   function validateForm(): string | null {
     if (payload.petProfile.name.length > 30) return "宠物名称不能超过 30 个字符";
-    if (!payload.lostInfo.location.addressText.trim()) return `请填写${locationFieldLabel}详细地址`;
+    if (!hasUsableLocation(payload.lostInfo.location)) return `请填写${locationFieldLabel}`;
     if (payload.lostInfo.location.addressText.length > 200) return "详细地址不能超过 200 个字符";
     if (!payload.contactMethods[0]?.value.trim()) return "请填写联系方式";
     if (payload.contactMethods[0].value.length > 100) return "联系方式不能超过 100 个字符";
@@ -422,7 +466,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
     }
 
     if (payload.petProfile.name.length > 30) return "宠物名称不能超过 30 个字符";
-    if (!payload.lostInfo.location.addressText.trim()) return `请填写${locationFieldLabel}详细地址`;
+    if (!hasUsableLocation(payload.lostInfo.location)) return `请填写${locationFieldLabel}`;
     if (payload.lostInfo.location.addressText.length > 200) return "详细地址不能超过 200 个字符";
     if (!payload.contactMethods[0]?.value.trim()) return "请填写联系方式";
     if (payload.contactMethods[0].value.length > 100) return "联系方式不能超过 100 个字符";
@@ -448,6 +492,9 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
   }
 
   function cleanPayload() {
+    const fallbackAddressText = buildAddressTextFallback(payload.lostInfo.location);
+    const addressText = payload.lostInfo.location.addressText.trim() || fallbackAddressText;
+
     return {
       ...payload,
       photos: payload.photos.filter((p) => p.url),
@@ -466,7 +513,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
           district: payload.lostInfo.location.district?.trim() || undefined,
           street: payload.lostInfo.location.street?.trim() || undefined,
           nearbyLandmark: payload.lostInfo.location.nearbyLandmark?.trim() || undefined,
-          addressText: payload.lostInfo.location.addressText.trim()
+          addressText
         }
       }
     };
@@ -660,84 +707,132 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
                 </span>
               </div>
 
-              {isEditMode ? (
-                <div className="grid" style={{ gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 8 }}>
-                <div className="field" style={{ marginBottom: 0 }}>
-                  {renderFieldLabel("addressText", "省/直辖市", "province")}
-                  <input
-                    id="province"
-                    maxLength={20}
-                    placeholder="例如：北京市"
-                    value={String(payload.lostInfo.location.province ?? "")}
-                    onChange={(event) =>
-                      setPayload((current) => ({
-                        ...current,
-                        lostInfo: {
-                          ...current.lostInfo,
-                          location: { ...current.lostInfo.location, province: event.target.value }
-                        }
-                      }))
-                    }
-                  />
-                </div>
-                <div className="field" style={{ marginBottom: 0 }}>
-                  {renderFieldLabel("addressText", "市", "city")}
-                  <input
-                    id="city"
-                    maxLength={20}
-                    placeholder="例如：北京市"
-                    value={String(payload.lostInfo.location.city ?? "")}
-                    onChange={(event) =>
-                      setPayload((current) => ({
-                        ...current,
-                        lostInfo: {
-                          ...current.lostInfo,
-                          location: { ...current.lostInfo.location, city: event.target.value }
-                        }
-                      }))
-                    }
-                  />
-                </div>
-                <div className="field" style={{ marginBottom: 0 }}>
-                  {renderFieldLabel("addressText", "区/县", "district")}
-                  <input
-                    id="district"
-                    maxLength={20}
-                    placeholder="例如：朝阳区"
-                    value={String(payload.lostInfo.location.district ?? "")}
-                    onChange={(event) =>
-                      setPayload((current) => ({
-                        ...current,
-                        lostInfo: {
-                          ...current.lostInfo,
-                          location: { ...current.lostInfo.location, district: event.target.value }
-                        }
-                      }))
-                    }
-                  />
-                </div>
-              </div>
-              ) : null}
+              <button
+                className="notice-manual-location-toggle"
+                onClick={() => setShowManualLocationFields((current) => !current)}
+                type="button"
+              >
+                {canShowManualLocationFields ? "收起省市区街道" : "手动选择省市区街道"}
+              </button>
 
-              {isEditMode ? (
-                <div className="field" style={{ marginBottom: 8 }}>
-                {renderFieldLabel("addressText", "街道/乡镇", "street")}
-                <input
-                  id="street"
-                  maxLength={50}
-                  placeholder="例如：望京街道"
-                  value={String(payload.lostInfo.location.street ?? "")}
-                  onChange={(event) =>
-                    setPayload((current) => ({
-                      ...current,
-                      lostInfo: {
-                        ...current.lostInfo,
-                        location: { ...current.lostInfo.location, street: event.target.value }
+              {canShowManualLocationFields ? (
+                <div className="notice-manual-location-grid">
+                  <div className="field" style={{ marginBottom: 0 }}>
+                    {renderFieldLabel("addressText", "省/直辖市", "province")}
+                    <select
+                      id="province"
+                      value={selectedProvince}
+                      onChange={(event) => {
+                        const nextProvince = event.target.value;
+                        const firstCity = getChinaCityOptions(nextProvince)[0];
+                        const firstDistrict = firstCity?.districts[0];
+                        setPayload((current) => ({
+                          ...current,
+                          lostInfo: {
+                            ...current.lostInfo,
+                            location: {
+                              ...current.lostInfo.location,
+                              province: nextProvince,
+                              city: firstCity?.name ?? "",
+                              district: firstDistrict?.name ?? "",
+                              street: firstDistrict?.streets[0] ?? ""
+                            }
+                          }
+                        }));
+                      }}
+                    >
+                      <option value="">选择省份</option>
+                      {provinceNameOptions.map((province) => (
+                        <option key={province} value={province}>
+                          {province}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="field" style={{ marginBottom: 0 }}>
+                    {renderFieldLabel("addressText", "市", "city")}
+                    <select
+                      id="city"
+                      value={selectedCity}
+                      onChange={(event) => {
+                        const nextCity = event.target.value;
+                        const nextDistrict = getChinaDistrictOptions(selectedProvince, nextCity)[0];
+                        setPayload((current) => ({
+                          ...current,
+                          lostInfo: {
+                            ...current.lostInfo,
+                            location: {
+                              ...current.lostInfo.location,
+                              city: nextCity,
+                              district: nextDistrict?.name ?? "",
+                              street: nextDistrict?.streets[0] ?? ""
+                            }
+                          }
+                        }));
+                      }}
+                    >
+                      <option value="">选择城市</option>
+                      {cityNameOptions.map((city) => (
+                        <option key={city} value={city}>
+                          {city}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="field" style={{ marginBottom: 0 }}>
+                    {renderFieldLabel("addressText", "区/县", "district")}
+                    <select
+                      id="district"
+                      value={selectedDistrict}
+                      onChange={(event) => {
+                        const nextDistrict = event.target.value;
+                        const nextStreet = getChinaStreetOptions(selectedProvince, selectedCity, nextDistrict)[0] ?? "";
+                        setPayload((current) => ({
+                          ...current,
+                          lostInfo: {
+                            ...current.lostInfo,
+                            location: {
+                              ...current.lostInfo.location,
+                              district: nextDistrict,
+                              street: nextStreet
+                            }
+                          }
+                        }));
+                      }}
+                    >
+                      <option value="">选择区县</option>
+                      {districtNameOptions.map((district) => (
+                        <option key={district} value={district}>
+                          {district}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="field notice-manual-location-street" style={{ marginBottom: 8 }}>
+                    {renderFieldLabel("addressText", "街道/乡镇", "street")}
+                    <input
+                      id="street"
+                      list="streetOptions"
+                      maxLength={50}
+                      placeholder="例如：望京街道"
+                      value={selectedStreet}
+                      onChange={(event) =>
+                        setPayload((current) => ({
+                          ...current,
+                          lostInfo: {
+                            ...current.lostInfo,
+                            location: { ...current.lostInfo.location, street: event.target.value }
+                          }
+                        }))
                       }
-                    }))
-                  }
-                />
-              </div>
+                    />
+                    <datalist id="streetOptions">
+                      {streetOptions.map((street) => (
+                        <option key={street} value={street} />
+                      ))}
+                    </datalist>
+                  </div>
+                </div>
               ) : null}
 
               <div className="field" style={{ marginBottom: 8 }}>
@@ -757,6 +852,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
                     }))
                   }
                 />
+                <div className="hint">如果已经选择省市区街道，这里可只补门口、楼栋或路口。</div>
               </div>
 
               {showNearbyLandmark ? (
@@ -1080,10 +1176,22 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
             <aside className="notice-live-preview" aria-label="实时海报预览">
               <span>实时预览</span>
               <div className="notice-live-preview-card">
-                <div className="notice-live-preview-kicker">{categoryLabel}</div>
-                <strong>{payload.petProfile.name.trim() || "未知"}</strong>
-                <p>{getPetTypeLabel(payload.petProfile.type)} · {payload.lostInfo.location.addressText || "填写位置后显示在这里"}</p>
-                {payload.lostInfo.location.nearbyLandmark ? <p>附近：{payload.lostInfo.location.nearbyLandmark}</p> : null}
+                <div className="notice-live-preview-media" aria-label={hasPreviewPhoto ? "已上传照片预览" : "照片骨架预览"}>
+                  {previewPhoto ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img alt="实时预览主图" src={previewPhoto.url} />
+                  ) : (
+                    <div className="notice-preview-skeleton" aria-hidden="true">
+                      <span />
+                    </div>
+                  )}
+                </div>
+                <div className="notice-live-preview-content">
+                  <div className="notice-live-preview-kicker">{categoryLabel}</div>
+                  <strong>{payload.petProfile.name.trim() || "未知"}</strong>
+                  <p>{getPetTypeLabel(payload.petProfile.type)} · {previewLocationText}</p>
+                </div>
+                <div className="notice-preview-skeleton-line" aria-hidden="true" />
                 <div className="notice-live-preview-contact">
                   {payload.contactMethods[0]?.value || "填写联系方式后显示"}
                 </div>

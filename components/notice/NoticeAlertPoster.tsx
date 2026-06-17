@@ -8,9 +8,9 @@ import {
   getBusinessStatusLabel,
   getContactDisplayValue,
   getContactTypeLabel,
-  getLocationFieldLabel,
   getNoticeCategoryLabel,
   getPetTypeLabel,
+  getPosterAddressLine,
   getRiskFlagLabels,
   getTimeFieldLabel
 } from "@/lib/notice/notice-display";
@@ -55,6 +55,7 @@ export function NoticeAlertPoster({ notice, id, className }: NoticeAlertPosterPr
   const statusLabel = getBusinessStatusLabel(notice.businessStatus, notice.noticeCategory);
   const commandLine = notice.noticeCategory === "found-owner" ? "见过主人请立即联系" : "见到或有线索请立即联系";
   const detailLine = notice.petProfile.description || `${getPetTypeLabel(notice.petProfile.type)}，${statusLabel}，请扩散。`;
+  const posterAddressLine = getPosterAddressLine(notice.lostInfo.location);
 
   return (
     <article className={className ? `poster-alert ${className}` : "poster-alert"} id={id}>
@@ -79,7 +80,7 @@ export function NoticeAlertPoster({ notice, id, className }: NoticeAlertPosterPr
 
       <section className="poster-alert-statement">
         <span>{getTimeFieldLabel(notice.noticeCategory)}：{notice.lostInfo.lostTime.displayText ?? "待确认"}</span>
-        <strong>{getLocationFieldLabel(notice.noticeCategory)}：{notice.lostInfo.location.addressText}</strong>
+        <strong>{posterAddressLine}</strong>
         <b>{getRewardLine(notice)}</b>
       </section>
 

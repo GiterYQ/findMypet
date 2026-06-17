@@ -55,6 +55,18 @@ test("NoticeForm exposes browser geolocation action for location fields", async 
   assert.match(source, /privacyLevel:\s*"approximate"/);
 });
 
+test("NoticeForm offers manual structured address fallback when geocoding cannot resolve text", async () => {
+  const source = await readFile(new URL("../components/notice/NoticeForm.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /showManualLocationFields/);
+  assert.match(source, /手动选择省市区街道/);
+  assert.match(source, /setShowManualLocationFields\(true\)/);
+  assert.match(source, /<select[\s\S]*id="province"/);
+  assert.match(source, /<select[\s\S]*id="city"/);
+  assert.match(source, /<select[\s\S]*id="district"/);
+  assert.match(source, /streetOptions/);
+});
+
 test("NoticeForm collapses nearby landmark behind an add button", async () => {
   const source = await readFile(new URL("../components/notice/NoticeForm.tsx", import.meta.url), "utf8");
 
@@ -68,7 +80,9 @@ test("NoticeForm renders a live poster preview while editing", async () => {
 
   assert.match(source, /notice-live-preview/);
   assert.match(source, /实时预览/);
-  assert.match(source, /payload\.lostInfo\.location\.addressText/);
+  assert.match(source, /previewLocationText/);
+  assert.match(source, /notice-live-preview-media/);
+  assert.match(source, /notice-preview-skeleton/);
 });
 
 test("NoticeForm labels exotic pets for the other pet type", async () => {
@@ -103,9 +117,22 @@ test("globals.css styles location geolocation action", async () => {
   assert.match(source, /\.notice-location-tools\s*{/);
   assert.match(source, /\.notice-location-button\s*{/);
   assert.match(source, /\.notice-location-status\s*{/);
+  assert.match(source, /\.notice-manual-location-toggle\s*{/);
+  assert.match(source, /\.notice-manual-location-grid\s*{/);
   assert.match(source, /\.notice-landmark-toggle\s*{/);
   assert.match(source, /\.notice-live-preview\s*{/);
   assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-location-tools\s*{/);
+});
+
+test("globals.css keeps live preview compact and skeletonized", async () => {
+  const source = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+
+  assert.match(source, /\.notice-live-preview-card\s*{[^}]*min-height:\s*260px/s);
+  assert.match(source, /\.notice-live-preview-card\s*{[^}]*max-height:\s*320px/s);
+  assert.match(source, /\.notice-live-preview-media\s*{/);
+  assert.match(source, /\.notice-preview-skeleton\s*{/);
+  assert.match(source, /\.notice-preview-skeleton-line\s*{/);
+  assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-live-preview-card\s*{[^}]*min-height:\s*220px/s);
 });
 
 test("globals.css keeps live preview before form columns on desktop and mobile", async () => {

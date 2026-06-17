@@ -9,9 +9,9 @@ import {
   getBusinessStatusLabel,
   getContactDisplayValue,
   getContactTypeLabel,
-  getLocationFieldLabel,
   getNoticeCategoryLabel,
   getPetTypeLabel,
+  getPosterAddressLine,
   getPrimaryContactPrompt,
   getRiskFlagLabels,
   getTimeFieldLabel
@@ -27,6 +27,7 @@ type NoticePosterProps = {
 export function NoticePoster({ notice, id, className }: NoticePosterProps) {
   const riskTags = getRiskFlagLabels(notice.riskFlags);
   const primaryContact = notice.contactMethods.find((item) => item.isPrimary) ?? notice.contactMethods[0];
+  const posterAddressLine = getPosterAddressLine(notice.lostInfo.location);
 
   return (
     <article className={className ? `poster-shell ${className}` : "poster-shell"} id={id}>
@@ -35,7 +36,7 @@ export function NoticePoster({ notice, id, className }: NoticePosterProps) {
           <div className="poster-kicker">{getBusinessStatusLabel(notice.businessStatus)}</div>
           <h1>{notice.petProfile.name}</h1>
           <p>
-            {getNoticeCategoryLabel(notice.noticeCategory)} · {getPetTypeLabel(notice.petProfile.type)} · {notice.lostInfo.location.addressText}
+            {getNoticeCategoryLabel(notice.noticeCategory)} · {getPetTypeLabel(notice.petProfile.type)} · {posterAddressLine}
           </p>
         </div>
       </header>
@@ -59,8 +60,8 @@ export function NoticePoster({ notice, id, className }: NoticePosterProps) {
                 <dd>{notice.lostInfo.lostTime.displayText ?? "待补充"}</dd>
               </div>
               <div>
-                <dt>{getLocationFieldLabel(notice.noticeCategory)}</dt>
-                <dd>{notice.lostInfo.location.addressText}</dd>
+                <dt>地址</dt>
+                <dd>{posterAddressLine}</dd>
               </div>
               <div>
                 <dt>最近活跃</dt>

@@ -7,9 +7,9 @@
 import {
   getContactDisplayValue,
   getContactTypeLabel,
-  getLocationFieldLabel,
   getNoticeCategoryLabel,
   getPetTypeLabel,
+  getPosterAddressLine,
   getRiskFlagLabels,
   getTimeFieldLabel
 } from "@/lib/notice/notice-display";
@@ -41,6 +41,7 @@ export function NoticeUrgentPoster({ notice, id, className }: NoticeUrgentPoster
     formatReward(notice.rewards?.clue?.amountMinor, notice.rewards?.clue?.currency) ||
     "有线索请立即联系";
   const riskLine = riskTags.length > 0 ? riskTags.slice(0, 5).join(" / ") : "情况紧急，请帮忙扩散";
+  const posterAddressLine = getPosterAddressLine(notice.lostInfo.location);
 
   return (
     <article className={className ? `poster-urgent ${className}` : "poster-urgent"} id={id}>
@@ -69,8 +70,8 @@ export function NoticeUrgentPoster({ notice, id, className }: NoticeUrgentPoster
 
       <section className="poster-urgent-facts">
         <div>
-          <span>{getLocationFieldLabel(notice.noticeCategory)}</span>
-          <strong>{notice.lostInfo.location.addressText}</strong>
+          <span>地址</span>
+          <strong>{posterAddressLine}</strong>
         </div>
         <div>
           <span>{getTimeFieldLabel(notice.noticeCategory)}</span>

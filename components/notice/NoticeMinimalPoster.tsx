@@ -8,9 +8,9 @@ import {
   getBusinessStatusLabel,
   getContactDisplayValue,
   getContactTypeLabel,
-  getLocationFieldLabel,
   getNoticeCategoryLabel,
   getPetTypeLabel,
+  getPosterAddressLine,
   getPrimaryContactPrompt,
   getTimeFieldLabel
 } from "@/lib/notice/notice-display";
@@ -25,6 +25,7 @@ type NoticeMinimalPosterProps = {
 export function NoticeMinimalPoster({ notice, id, className }: NoticeMinimalPosterProps) {
   const primaryContact = notice.contactMethods.find((item) => item.isPrimary) ?? notice.contactMethods[0];
   const statusLabel = getBusinessStatusLabel(notice.businessStatus, notice.noticeCategory);
+  const posterAddressLine = getPosterAddressLine(notice.lostInfo.location);
 
   return (
     <article className={className ? `poster-minimal ${className}` : "poster-minimal"} id={id}>
@@ -51,8 +52,8 @@ export function NoticeMinimalPoster({ notice, id, className }: NoticeMinimalPost
 
         <dl className="poster-minimal-facts">
           <div>
-            <dt>{getLocationFieldLabel(notice.noticeCategory)}</dt>
-            <dd>{notice.lostInfo.location.addressText}</dd>
+            <dt>地址</dt>
+            <dd>{posterAddressLine}</dd>
           </div>
           <div>
             <dt>{getTimeFieldLabel(notice.noticeCategory)}</dt>

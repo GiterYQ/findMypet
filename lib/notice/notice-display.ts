@@ -4,7 +4,7 @@
  * 联动：列表卡片、分享页、管理页、后续海报模板。
  * 层级：constants
  */
-import { type ContactMethod, type NoticeCategory, type PetProfile, type RiskFlags, type PublicNoticePayload } from "@/lib/notice/notice.types";
+import type { ContactMethod, NoticeCategory, PetProfile, RiskFlags, PublicNoticePayload } from "@/lib/notice/notice.types";
 
 const businessStatusLabels: Record<NoticeCategory, Record<PublicNoticePayload["businessStatus"], string>> = {
   "lost-pet": {
@@ -114,6 +114,17 @@ export function getFullLocationText(location: {
   ].filter(Boolean);
   const base = parts.join("");
   return location.nearbyLandmark ? `${base}（${location.nearbyLandmark}附近）` : base;
+}
+
+export function getPosterAddressLine(location: {
+  province?: string;
+  city?: string;
+  district?: string;
+  street?: string;
+  addressText: string;
+  nearbyLandmark?: string;
+}) {
+  return `地址：${getFullLocationText(location) || "待补充"}`;
 }
 
 export function getContactDisplayValue(contact: ContactMethod) {

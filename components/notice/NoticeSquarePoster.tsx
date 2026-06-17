@@ -8,9 +8,9 @@ import {
   getBusinessStatusLabel,
   getContactDisplayValue,
   getContactTypeLabel,
-  getLocationFieldLabel,
   getNoticeCategoryLabel,
   getPetTypeLabel,
+  getPosterAddressLine,
   getPrimaryContactPrompt,
   getRiskFlagLabels,
   getTimeFieldLabel
@@ -42,6 +42,7 @@ export function NoticeSquarePoster({ notice, id, className }: NoticeSquarePoster
     formatReward(notice.rewards?.recovery?.amountMinor, notice.rewards?.recovery?.currency) ||
     formatReward(notice.rewards?.clue?.amountMinor, notice.rewards?.clue?.currency);
   const statusLabel = getBusinessStatusLabel(notice.businessStatus, notice.noticeCategory);
+  const posterAddressLine = getPosterAddressLine(notice.lostInfo.location);
 
   return (
     <article className={className ? `poster-square ${className}` : "poster-square"} id={id}>
@@ -75,8 +76,8 @@ export function NoticeSquarePoster({ notice, id, className }: NoticeSquarePoster
 
       <section className="poster-square-info">
         <div>
-          <span>{getLocationFieldLabel(notice.noticeCategory)}</span>
-          <strong>{notice.lostInfo.location.addressText}</strong>
+          <span>地址</span>
+          <strong>{posterAddressLine}</strong>
         </div>
         <div>
           <span>{getTimeFieldLabel(notice.noticeCategory)}</span>
