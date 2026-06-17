@@ -48,9 +48,27 @@ test("NoticeForm exposes browser geolocation action for location fields", async 
 
   assert.match(source, /handleUseCurrentLocation/);
   assert.match(source, /navigator\.geolocation/);
+  assert.match(source, /handleReverseGeocodeLocation/);
+  assert.match(source, /\/api\/location\/reverse-geocode/);
   assert.match(source, /notice-location-tools/);
   assert.match(source, /notice-location-status/);
   assert.match(source, /privacyLevel:\s*"approximate"/);
+});
+
+test("NoticeForm collapses nearby landmark behind an add button", async () => {
+  const source = await readFile(new URL("../components/notice/NoticeForm.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /showNearbyLandmark/);
+  assert.match(source, /notice-landmark-toggle/);
+  assert.match(source, /添加附近标志物/);
+});
+
+test("NoticeForm renders a live poster preview while editing", async () => {
+  const source = await readFile(new URL("../components/notice/NoticeForm.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /notice-live-preview/);
+  assert.match(source, /实时预览/);
+  assert.match(source, /payload\.lostInfo\.location\.addressText/);
 });
 
 test("NoticeForm labels exotic pets for the other pet type", async () => {
@@ -85,7 +103,16 @@ test("globals.css styles location geolocation action", async () => {
   assert.match(source, /\.notice-location-tools\s*{/);
   assert.match(source, /\.notice-location-button\s*{/);
   assert.match(source, /\.notice-location-status\s*{/);
+  assert.match(source, /\.notice-landmark-toggle\s*{/);
+  assert.match(source, /\.notice-live-preview\s*{/);
   assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-location-tools\s*{/);
+});
+
+test("mine page uses compact mobile header instead of tall hero", async () => {
+  const source = await readFile(new URL("../app/mine/page.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /compact-page-header/);
+  assert.doesNotMatch(source, /className="hero"/);
 });
 
 test("home page exposes mobile app chrome classes", async () => {

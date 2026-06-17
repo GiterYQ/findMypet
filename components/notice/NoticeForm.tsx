@@ -189,6 +189,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
   const [uploadingImages, setUploadingImages] = useState(false);
   const [locating, setLocating] = useState(false);
   const [locationStatus, setLocationStatus] = useState<string | null>(null);
+  const [showNearbyLandmark, setShowNearbyLandmark] = useState(() => Boolean(initialValue?.lostInfo?.location?.nearbyLandmark));
   const [activeStepIndex, setActiveStepIndex] = useState(0);
   const isEditMode = mode === "edit";
   const isStepFlow = !isEditMode;
@@ -304,6 +305,59 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
     }
   }
 
+  async function handleReverseGeocodeLocation(latitude: number, longitude: number) {
+    const response = await fetch("/api/location/reverse-geocode", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        lat: latitude,
+        lng: longitude,
+        language: payload.locale
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error("reverse geocode failed");
+    }
+
+    const data = (await response.json()) as {
+      location?: {
+        province?: string;
+        city?: string;
+        district?: string;
+        street?: string;
+        addressText?: string;
+        placeName?: string;
+        regionCode?: string;
+      } | null;
+    };
+
+    if (!data.location) {
+      return false;
+    }
+
+    setPayload((current) => ({
+      ...current,
+      lostInfo: {
+        ...current.lostInfo,
+        location: {
+          ...current.lostInfo.location,
+          province: data.location?.province ?? current.lostInfo.location.province,
+          city: data.location?.city ?? current.lostInfo.location.city,
+          district: data.location?.district ?? current.lostInfo.location.district,
+          street: data.location?.street ?? current.lostInfo.location.street,
+          addressText: data.location?.addressText ?? current.lostInfo.location.addressText,
+          placeName: data.location?.placeName ?? current.lostInfo.location.placeName,
+          regionCode: data.location?.regionCode ?? current.lostInfo.location.regionCode
+        }
+      }
+    }));
+
+    return Boolean(data.location.addressText || data.location.city || data.location.district);
+  }
+
   function handleUseCurrentLocation() {
     if (!navigator.geolocation) {
       setLocationStatus("当前浏览器不支持定位，请手动填写地点。");
@@ -314,7 +368,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
     setLocationStatus("正在请求定位权限...");
 
     navigator.geolocation.getCurrentPosition(
-      (position) => {
+      async (position) => {
         const { latitude, longitude } = position.coords;
 
         setPayload((current) => ({
@@ -329,8 +383,16 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
             }
           }
         }));
-        setLocationStatus("已获取当前位置坐标，请补充详细地点或附近标志物。");
-        setLocating(false);
+        setLocationStatus("已获取当前位置，正在识别省市区...");
+
+        try {
+          const resolved = await handleReverseGeocodeLocation(latitude, longitude);
+          setLocationStatus(resolved ? "已自动填入大致地址，请检查并补充门口/楼栋等细节。" : "已获取坐标，但未识别出地址，请手动填写。");
+        } catch {
+          setLocationStatus("已获取坐标，但地址识别失败，请手动填写详细地址。");
+        } finally {
+          setLocating(false);
+        }
       },
       () => {
         setLocationStatus("无法获取当前位置，请手动填写地点。");
@@ -509,7 +571,7 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
             </div>
           </div>
         ) : null}
-        <div className={`grid ${isEditMode ? "two-col" : "notice-step-grid"}`}>
+        <div className={`grid ${isEditMode ? "two-col" : "notice-step-grid notice-step-grid-with-preview"}`}>
           {hasLeftColumnFields ? (
             <div>
             {isFieldVisible("noticeCategory") ? (
@@ -697,24 +759,31 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
                 />
               </div>
 
-              <div className="field" style={{ marginBottom: 0 }}>
-                {renderFieldLabel("nearbyLandmark", "附近标志物", "nearbyLandmark")}
-                <input
-                  id="nearbyLandmark"
-                  maxLength={100}
-                  placeholder="例如：地铁14号线望京站C口旁"
-                  value={String(payload.lostInfo.location.nearbyLandmark ?? "")}
-                  onChange={(event) =>
-                    setPayload((current) => ({
-                      ...current,
-                      lostInfo: {
-                        ...current.lostInfo,
-                        location: { ...current.lostInfo.location, nearbyLandmark: event.target.value }
-                      }
-                    }))
-                  }
-                />
-              </div>
+              {showNearbyLandmark ? (
+                <div className="field" style={{ marginBottom: 0 }}>
+                  {renderFieldLabel("nearbyLandmark", "附近标志物", "nearbyLandmark")}
+                  <input
+                    id="nearbyLandmark"
+                    maxLength={100}
+                    placeholder="例如：地铁14号线望京站C口旁"
+                    value={String(payload.lostInfo.location.nearbyLandmark ?? "")}
+                    onChange={(event) =>
+                      setPayload((current) => ({
+                        ...current,
+                        lostInfo: {
+                          ...current.lostInfo,
+                          location: { ...current.lostInfo.location, nearbyLandmark: event.target.value }
+                        }
+                      }))
+                    }
+                  />
+                </div>
+              ) : (
+                <button className="notice-landmark-toggle" onClick={() => setShowNearbyLandmark(true)} type="button">
+                  <span>+</span>
+                  添加附近标志物
+                </button>
+              )}
             </fieldset>
             ) : null}
 
@@ -1005,6 +1074,21 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
             </div>
             ) : null}
           </div>
+          ) : null}
+
+          {isStepFlow ? (
+            <aside className="notice-live-preview" aria-label="实时海报预览">
+              <span>实时预览</span>
+              <div className="notice-live-preview-card">
+                <div className="notice-live-preview-kicker">{categoryLabel}</div>
+                <strong>{payload.petProfile.name.trim() || "未知"}</strong>
+                <p>{getPetTypeLabel(payload.petProfile.type)} · {payload.lostInfo.location.addressText || "填写位置后显示在这里"}</p>
+                {payload.lostInfo.location.nearbyLandmark ? <p>附近：{payload.lostInfo.location.nearbyLandmark}</p> : null}
+                <div className="notice-live-preview-contact">
+                  {payload.contactMethods[0]?.value || "填写联系方式后显示"}
+                </div>
+              </div>
+            </aside>
           ) : null}
         </div>
 

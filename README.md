@@ -135,9 +135,13 @@ APP_BASE_URL          公开站点 origin，用于生成分享链接和管理链
 RESEND_API_KEY        可选，Resend 邮件 API key
 RESEND_FROM_EMAIL     可选，管理链接邮件发件地址
 CRON_SECRET           生产环境调用 cron 接口的密钥
+REVERSE_GEOCODE_ENDPOINT  可选，坐标反查地址服务，默认 Nominatim
+REVERSE_GEOCODE_EMAIL     可选，公共 Nominatim 使用时用于识别应用联系人
 ```
 
 如果邮件未配置或发送失败，创建仍会成功。用户需要复制管理链接，或在同一浏览器的 `/mine` 找回。
+
+定位地址回填通过后端 `/api/location/reverse-geocode` 调用反查服务。默认使用 Nominatim 公共服务，只适合低频 MVP 演示；生产环境建议替换为高德、Google、Mapbox 或自有可商用服务。
 
 ## 验证命令
 
@@ -160,6 +164,7 @@ npm run build
 - 环境：配置 `APP_BASE_URL`、`CRON_SECRET`、数据库 URL、邮件 key。
 - 定时任务：定期调用 `/api/cron/notices/activity`。
 - HTTPS：真实定位、微信内访问、PWA 安装都需要 HTTPS。
+- 地图服务：配置可商用的 reverse geocode 服务，避免依赖公共低频接口。
 - 限流：创建、上传、举报接口需要基础限流。
 - 内容审核：公开图片上传需要接入鉴黄、暴恐、违规图检测。
 - 备份：数据库和对象存储要有备份策略。

@@ -9,12 +9,11 @@ import { ManageHistory } from "@/components/notice/ManageHistory";
 export default function MinePage() {
   return (
     <main className="shell">
-      <section className="hero">
+      <section className="compact-page-header">
         <h1>我的启事</h1>
-        <p>这里显示当前浏览器保存过的管理入口。</p>
+        <p>当前浏览器保存过的管理入口。</p>
       </section>
       <ManageHistory />
     </main>
   );
 }
-

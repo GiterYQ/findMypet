@@ -18,4 +18,6 @@ test("README documents project structure production checklist and WeChat directi
   assert.match(source, /对象存储/);
   assert.match(source, /HTTPS/);
   assert.match(source, /匿名管理链接/);
+  assert.match(source, /REVERSE_GEOCODE_ENDPOINT/);
+  assert.match(source, /reverse geocode/);
 });
