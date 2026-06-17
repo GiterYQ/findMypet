@@ -21,7 +21,7 @@ import { type NoticeCreateInput } from "@/lib/notice/notice.schema";
 import { getFullLocationText, getLocationFieldLabel, getNoticeCategoryLabel, getPetTypeDisplayName, getTimeFieldLabel } from "@/lib/notice/notice-display";
 import { saveManagedNotice } from "@/lib/manage/manage-history";
 import { getHalfHourTimeOptions, getNoticeTimeDisplayOptions } from "@/lib/notice/notice-time-options";
-import { normalizePosterTemplate, posterTemplateOptions, type PosterTemplateId } from "@/lib/notice/poster-template";
+import { getPosterTemplateHref, normalizePosterTemplate, posterTemplateOptions, type PosterTemplateId } from "@/lib/notice/poster-template";
 
 type NoticeFormProps = {
   initialValue?: Partial<NoticeCreateInput>;
@@ -309,9 +309,25 @@ function clearNoticeFormDraft() {
   window.localStorage.removeItem(NOTICE_FORM_DRAFT_STORAGE_KEY);
 }
 
+function buildShareCopy(payload: NoticeCreateInput, publicShareUrl: string) {
+  const name = payload.petProfile.name.trim() || "未知";
+  const petType = getPetTypeDisplayName(payload.petProfile);
+  const locationText = getFullLocationText(payload.lostInfo.location) || "地址待补充";
+  const contactText = payload.contactMethods[0]?.value.trim() || "请查看分享页";
+  const category = getNoticeCategoryLabel(payload.noticeCategory);
+
+  return [
+    `【${category}启事】${name} / ${petType}`,
+    `地址：${locationText}`,
+    `联系：${contactText}`,
+    `最新状态与海报：${publicShareUrl}`,
+    "防骗提示：未核实前，请勿提前支付任何费用。"
+  ].join("\n");
+}
+
 export function NoticeForm({ initialValue, manageToken, mode = "create", shortId }: NoticeFormProps) {
   const [payload, setPayload] = useState<NoticeCreateInput>(() => ({ ...defaultNotice, ...initialValue }));
-  const [result, setResult] = useState<{ publicShareUrl: string; manageUrl: string } | null>(null);
+  const [result, setResult] = useState<{ publicShareUrl: string; manageUrl: string; shortId: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const [uploadingImages, setUploadingImages] = useState(false);
@@ -378,6 +394,8 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
   const previewPhoto = payload.photos.find((photo) => photo.url);
   const hasPreviewPhoto = Boolean(previewPhoto);
   const canShowManualLocationFields = isEditMode || showManualLocationFields;
+  const shareCopy = result ? buildShareCopy(payload, result.publicShareUrl) : "";
+  const selectedPosterUrl = result ? getPosterTemplateHref(result.shortId, selectedPosterTemplate) : "";
 
   useEffect(() => {
     if (!canShowManualLocationFields) {
@@ -785,7 +803,8 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
       } else {
         setResult({
           publicShareUrl: data.publicShareUrl,
-          manageUrl: data.manageUrl
+          manageUrl: data.manageUrl,
+          shortId: data.shortId
         });
         clearNoticeFormDraft();
         localStorage.setItem("findMypet.latestManageUrl", data.manageUrl);
@@ -1573,8 +1592,26 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
 
         {error ? <p className="danger-box">{error}</p> : null}
         {result && !isEditMode ? (
-          <div className="panel section" style={{ marginTop: 12 }}>
+          <div className="panel section notice-share-guide" style={{ marginTop: 12 }}>
             <h3>启事已生成</h3>
+            <p className="hint">先复制公开链接或转发文案，再保存管理链接。匿名模式下，管理链接就是后续刷新、编辑和标记找回的凭证。</p>
+            <div className="notice-share-copy">
+              <strong>可直接发群：</strong>
+              <pre>{shareCopy}</pre>
+            </div>
+            <div className="actions">
+              <CopyButton label="复制转发文案" text={shareCopy} />
+              <button
+                className="button button-secondary"
+                onClick={() => {
+                  setResult(null);
+                  setActiveStepIndex(0);
+                }}
+                type="button"
+              >
+                继续编辑信息
+              </button>
+            </div>
             <div className="field">
               <label>公开分享页</label>
               <div className="actions">
@@ -1596,9 +1633,14 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
             </div>
             <div className="field">
               <label>海报页</label>
-              <a className="button button-secondary" href={result.publicShareUrl.replace("/notice/", "/poster/")} target="_blank" rel="noopener noreferrer">
-                查看海报
-              </a>
+              <div className="actions">
+                <a className="button button-secondary" href={selectedPosterUrl} target="_blank" rel="noopener noreferrer">
+                  查看所选模板海报
+                </a>
+                <a className="button button-secondary" href={result.publicShareUrl.replace("/notice/", "/poster/")} target="_blank" rel="noopener noreferrer">
+                  查看经典海报
+                </a>
+              </div>
             </div>
           </div>
         ) : null}

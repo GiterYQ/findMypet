@@ -313,6 +313,19 @@ test("globals.css keeps live preview before form columns on desktop and mobile",
   assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-live-preview\s*{[^}]*order:\s*-1/s);
 });
 
+test("NoticeForm result panel gives share-ready actions after generation", async () => {
+  const source = await readFile(new URL("../components/notice/NoticeForm.tsx", import.meta.url), "utf8");
+  const styleSource = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+
+  assert.match(source, /notice-share-guide/);
+  assert.match(source, /buildShareCopy/);
+  assert.match(source, /复制转发文案/);
+  assert.match(source, /继续编辑信息/);
+  assert.match(source, /getPosterTemplateHref\(result\.shortId,\s*selectedPosterTemplate\)/);
+  assert.match(styleSource, /\.notice-share-guide\s*{/);
+  assert.match(styleSource, /\.notice-share-copy\s*{/);
+});
+
 test("globals.css places pet identity fields in one row on desktop", async () => {
   const source = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
 
