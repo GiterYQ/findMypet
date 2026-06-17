@@ -602,8 +602,10 @@ textarea {
   gap: 8px;
   grid-column: 1;
   grid-row: 1 / span 2;
+  justify-self: start;
   position: sticky;
   top: 14px;
+  width: 280px;
 }
 
 .notice-live-preview > span {
@@ -629,6 +631,7 @@ textarea {
   min-height: 260px;
   overflow: hidden;
   padding: 16px;
+  width: 280px;
 }
 
 .notice-live-preview-media {
@@ -2053,6 +2056,7 @@ textarea {
     grid-row: auto;
     order: -1;
     position: static;
+    width: 100%;
   }
 
   .notice-live-preview-card {
@@ -2063,6 +2067,7 @@ textarea {
     max-height: 280px;
     min-height: 220px;
     padding: 12px;
+    width: 100%;
   }
 
   .notice-live-preview-media {
