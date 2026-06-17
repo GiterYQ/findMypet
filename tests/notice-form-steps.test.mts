@@ -23,6 +23,19 @@ test("noticeFormSteps keeps the create flow short and ordered", () => {
   );
 });
 
+test("noticeFormSteps uses the approved short guidance copy", () => {
+  assert.deepEqual(
+    noticeFormSteps.map((step) => `${step.title}：${step.summary}`),
+    [
+      "必要信息：发布类型、位置、联系方式、宠物类型",
+      "照片与描述：补充可识别特征",
+      "时间与紧急程度：补充时间和风险标签，将影响排序",
+      "悬赏与找回：设置悬赏和管理链接邮箱",
+      "预览生成：确认信息后生成分享页和海报"
+    ]
+  );
+});
+
 test("getNoticeFormStep clamps invalid indexes", () => {
   assert.equal(getNoticeFormStep(-1).id, "essentials");
   assert.equal(getNoticeFormStep(99).id, "review");

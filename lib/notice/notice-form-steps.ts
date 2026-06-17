@@ -57,7 +57,7 @@ export const noticeFormSteps = [
   {
     id: "essentials",
     title: "必要信息",
-    summary: "先填能生成启事的最低信息。",
+    summary: "发布类型、位置、联系方式、宠物类型",
     goal: "填位置和联系方式，先把启事发得出去。",
     estimate: "约 1 分钟",
     fields: ["noticeCategory", "photoUpload", "addressText", "nearbyLandmark", "contact", "petName", "petType"],
@@ -68,7 +68,7 @@ export const noticeFormSteps = [
   {
     id: "photo",
     title: "照片与描述",
-    summary: "补充可识别特征。",
+    summary: "补充可识别特征",
     goal: "写一点特征描述，让看到的人更容易判断。",
     estimate: "约 1 分钟",
     fields: ["description"],
@@ -79,7 +79,7 @@ export const noticeFormSteps = [
   {
     id: "time-risk",
     title: "时间与紧急程度",
-    summary: "补充时间和风险标签，影响排序。",
+    summary: "补充时间和风险标签，将影响排序",
     goal: "说明什么时候丢失、是否有病危或交通危险。",
     estimate: "约 30 秒",
     fields: ["lostDate", "timePrecision", "lostDisplay", "riskFlags"],
@@ -90,7 +90,7 @@ export const noticeFormSteps = [
   {
     id: "reward-extra",
     title: "悬赏与找回",
-    summary: "设置悬赏和管理链接邮箱。",
+    summary: "设置悬赏和管理链接邮箱",
     goal: "补充悬赏和邮箱，方便之后找回管理链接。",
     estimate: "约 30 秒",
     fields: ["rewardRecovery", "ownerEmail", "antiScam"],
@@ -101,7 +101,7 @@ export const noticeFormSteps = [
   {
     id: "review",
     title: "预览生成",
-    summary: "确认信息后生成分享页和海报。",
+    summary: "确认信息后生成分享页和海报",
     goal: "最后确认一次，生成可转发的链接和海报。",
     estimate: "立即生成",
     fields: ["submit"],

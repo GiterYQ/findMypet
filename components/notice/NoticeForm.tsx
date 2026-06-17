@@ -11,7 +11,6 @@ import { CopyButton } from "@/components/notice/CopyButton";
 import { compressImageFile, uploadCompressedImage } from "@/lib/media/client-image";
 import { formatAmountMinorForDisplay, majorAmountInputToMinor, minorAmountToMajorInput } from "@/lib/notice/money";
 import {
-  getNoticeFormRequiredSummary,
   getNoticeFormNextButtonLabel,
   getNoticeFormStep,
   type NoticeFormStepField,
@@ -285,7 +284,6 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
     currentTimeDisplay && !timeDisplayOptions.some((option) => option.value === currentTimeDisplay)
       ? [{ label: currentTimeDisplay, value: currentTimeDisplay }, ...timeDisplayOptions]
       : timeDisplayOptions;
-  const requiredSummary = getNoticeFormRequiredSummary(activeStep.id);
   const completedStepCount = activeStepIndex;
   const remainingStepCount = Math.max(noticeFormSteps.length - activeStepIndex - 1, 0);
   const selectedProvince = String(payload.lostInfo.location.province ?? "");
@@ -731,9 +729,9 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
               <div className="notice-stepper-copy">
                 <div className="notice-stepper-title-row">
                   <strong>{activeStep.title}</strong>
+                  <span className="notice-stepper-colon">：</span>
                   <span className="notice-stepper-summary">{activeStep.summary}</span>
                 </div>
-                <p className="notice-step-required-summary">{requiredSummary}</p>
               </div>
             </div>
             <div className="notice-stepper-track">

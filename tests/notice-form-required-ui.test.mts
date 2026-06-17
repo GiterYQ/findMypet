@@ -8,12 +8,13 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-test("NoticeForm renders step required summary and field requirement badges", async () => {
+test("NoticeForm renders field requirement badges without a separate step required summary", async () => {
   const source = await readFile(new URL("../components/notice/NoticeForm.tsx", import.meta.url), "utf8");
 
-  assert.match(source, /getNoticeFormRequiredSummary/);
   assert.match(source, /notice-field-badge/);
   assert.match(source, /isNoticeFormFieldRequired/);
+  assert.doesNotMatch(source, /getNoticeFormRequiredSummary/);
+  assert.doesNotMatch(source, /notice-step-required-summary/);
 });
 
 test("NoticeForm lets users jump between form steps from the stepper", async () => {
@@ -41,9 +42,10 @@ test("NoticeForm keeps stepper header copy in a stable row structure", async () 
   const source = await readFile(new URL("../components/notice/NoticeForm.tsx", import.meta.url), "utf8");
 
   assert.match(source, /notice-stepper-title-row/);
+  assert.match(source, /notice-stepper-colon/);
   assert.match(source, /notice-stepper-summary/);
-  assert.match(source, /notice-step-required-summary/);
-  assert.match(source, /<strong>\{activeStep\.title\}<\/strong>[\s\S]*<span className="notice-stepper-summary">\{activeStep\.summary\}<\/span>/);
+  assert.doesNotMatch(source, /notice-step-required-summary/);
+  assert.match(source, /<strong>\{activeStep\.title\}<\/strong>[\s\S]*<span className="notice-stepper-colon">：<\/span>[\s\S]*<span className="notice-stepper-summary">\{activeStep\.summary\}<\/span>/);
   assert.doesNotMatch(source, /activeStep\.skippable \? <p>/);
   assert.doesNotMatch(source, /这一步可不填，直接点下一步。/);
 });
@@ -195,12 +197,13 @@ test("globals.css fixes stepper header height and inline title copy", async () =
   const source = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
 
   assert.match(source, /\.notice-stepper-header\s*{[^}]*align-items:\s*center/s);
-  assert.match(source, /\.notice-stepper-header\s*{[^}]*height:\s*58px/s);
+  assert.match(source, /\.notice-stepper-header\s*{[^}]*height:\s*44px/s);
   assert.match(source, /\.notice-stepper-title-row\s*{[^}]*align-items:\s*baseline/s);
-  assert.match(source, /\.notice-stepper-title-row\s*{[^}]*grid-template-columns:\s*auto minmax\(0,\s*1fr\)/s);
+  assert.match(source, /\.notice-stepper-title-row\s*{[^}]*grid-template-columns:\s*auto auto minmax\(0,\s*1fr\)/s);
+  assert.match(source, /\.notice-stepper-colon\s*{[^}]*color:\s*var\(--step-accent-dark,\s*var\(--accent-dark\)\)/s);
   assert.match(source, /\.notice-stepper-summary\s*{[^}]*color:\s*var\(--muted\)/s);
   assert.match(source, /\.notice-stepper-summary\s*{[^}]*white-space:\s*nowrap/s);
-  assert.match(source, /\.notice-step-required-summary\s*{[^}]*min-height:\s*20px/s);
+  assert.doesNotMatch(source, /\.notice-step-required-summary\s*{/);
 });
 
 test("globals.css styles location geolocation action", async () => {
