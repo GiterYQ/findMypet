@@ -379,6 +379,24 @@ textarea {
   background: linear-gradient(135deg, rgba(211, 94, 56, 0.18), rgba(110, 90, 60, 0.16));
 }
 
+.notice-upload-preview-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, 96px);
+  margin-top: 10px;
+}
+
+.notice-upload-preview-photo {
+  aspect-ratio: 1 / 1;
+  background: linear-gradient(135deg, rgba(211, 94, 56, 0.18), rgba(110, 90, 60, 0.16));
+  border: 1px solid rgba(215, 206, 192, 0.78);
+  border-radius: 16px;
+  display: block;
+  height: 96px;
+  object-fit: cover;
+  width: 96px;
+}
+
 .meta {
   color: var(--muted);
   font-size: 0.92rem;

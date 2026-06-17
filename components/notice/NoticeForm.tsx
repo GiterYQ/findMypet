@@ -807,15 +807,14 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
                   </button>
                 ))}
               </div>
-              <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", marginTop: 12 }}>
+              <div className="notice-upload-preview-grid">
                 {payload.photos.filter((photo) => photo.url).map((photo, index) => (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     alt={`宠物照片 ${index + 1}`}
-                    className="notice-photo"
+                    className="notice-upload-preview-photo"
                     key={`${photo.url}-preview-${index}`}
                     src={photo.url}
-                    style={{ aspectRatio: "1 / 1", minHeight: 120 }}
                   />
                 ))}
               </div>

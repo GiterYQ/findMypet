@@ -123,6 +123,20 @@ test("NoticeForm renders a live poster preview while editing", async () => {
   assert.match(source, /notice-live-preview-contact-label/);
 });
 
+test("NoticeForm keeps uploaded photo previews as small thumbnails", async () => {
+  const formSource = await readFile(new URL("../components/notice/NoticeForm.tsx", import.meta.url), "utf8");
+  const styleSource = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+
+  assert.match(formSource, /notice-upload-preview-grid/);
+  assert.match(formSource, /className="notice-upload-preview-photo"/);
+  assert.doesNotMatch(formSource, /className="notice-photo"/);
+  assert.match(styleSource, /\.notice-upload-preview-grid\s*{/);
+  assert.match(styleSource, /\.notice-upload-preview-grid\s*{[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*96px\)/s);
+  assert.match(styleSource, /\.notice-upload-preview-photo\s*{[^}]*height:\s*96px/s);
+  assert.match(styleSource, /\.notice-upload-preview-photo\s*{[^}]*width:\s*96px/s);
+  assert.match(styleSource, /\.notice-upload-preview-photo\s*{[^}]*object-fit:\s*cover/s);
+});
+
 test("NoticeForm labels exotic pets for the other pet type", async () => {
   const source = await readFile(new URL("../components/notice/NoticeForm.tsx", import.meta.url), "utf8");
 
