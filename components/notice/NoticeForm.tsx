@@ -1356,8 +1356,45 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
             </div>
           ) : null}
 
-          {isStepFlow && !hasLeftColumnFields && !hasRightColumnFields ? (
-            <div className="notice-step-grid-placeholder" aria-hidden="true" />
+          {isFinalCreateStep ? (
+            <div className="notice-step-grid-form-column">
+              <div className="notice-step-review">
+                <h3>确认后生成</h3>
+                <dl className="notice-review-list">
+                  <div>
+                    <dt>类型</dt>
+                    <dd>{categoryLabel}</dd>
+                  </div>
+                  <div>
+                    <dt>宠物</dt>
+                    <dd>
+                      {payload.petProfile.name.trim() || "未知"} / {getPetTypeDisplayName(payload.petProfile)}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>{locationFieldLabel}</dt>
+                    <dd>{payload.lostInfo.location.addressText || "未填写"}</dd>
+                  </div>
+                  <div>
+                    <dt>联系方式</dt>
+                    <dd>{payload.contactMethods[0]?.value || "未填写"}</dd>
+                  </div>
+                  <div>
+                    <dt>照片</dt>
+                    <dd>{uploadedPhotoCount > 0 ? `${uploadedPhotoCount} 张` : "未上传，可稍后补"}</dd>
+                  </div>
+                  <div>
+                    <dt>紧急标签</dt>
+                    <dd>{selectedRiskLabels.length > 0 ? selectedRiskLabels.join("、") : "未选择"}</dd>
+                  </div>
+                  <div>
+                    <dt>找回奖励</dt>
+                    <dd>{formatAmountMinorForDisplay(recoveryRewardMinor, payload.rewards?.recovery?.currency ?? "CNY")}</dd>
+                  </div>
+                </dl>
+                <p className="hint">生成后会得到公开分享页、海报页和匿名管理链接。管理链接会保存在本机“我的启事”，如填写邮箱也会尝试发送到邮箱。</p>
+              </div>
+            </div>
           ) : null}
 
           {isStepFlow ? (
@@ -1391,45 +1428,6 @@ export function NoticeForm({ initialValue, manageToken, mode = "create", shortId
             </aside>
           ) : null}
         </div>
-
-        {isFinalCreateStep ? (
-          <div className="notice-step-review">
-            <h3>确认后生成</h3>
-            <dl className="notice-review-list">
-              <div>
-                <dt>类型</dt>
-                <dd>{categoryLabel}</dd>
-              </div>
-              <div>
-                <dt>宠物</dt>
-                <dd>
-                  {payload.petProfile.name.trim() || "未知"} / {getPetTypeDisplayName(payload.petProfile)}
-                </dd>
-              </div>
-              <div>
-                <dt>{locationFieldLabel}</dt>
-                <dd>{payload.lostInfo.location.addressText || "未填写"}</dd>
-              </div>
-              <div>
-                <dt>联系方式</dt>
-                <dd>{payload.contactMethods[0]?.value || "未填写"}</dd>
-              </div>
-              <div>
-                <dt>照片</dt>
-                <dd>{uploadedPhotoCount > 0 ? `${uploadedPhotoCount} 张` : "未上传，可稍后补"}</dd>
-              </div>
-              <div>
-                <dt>紧急标签</dt>
-                <dd>{selectedRiskLabels.length > 0 ? selectedRiskLabels.join("、") : "未选择"}</dd>
-              </div>
-              <div>
-                <dt>找回奖励</dt>
-                <dd>{formatAmountMinorForDisplay(recoveryRewardMinor, payload.rewards?.recovery?.currency ?? "CNY")}</dd>
-              </div>
-            </dl>
-            <p className="hint">生成后会得到公开分享页、海报页和匿名管理链接。管理链接会保存在本机“我的启事”，如填写邮箱也会尝试发送到邮箱。</p>
-          </div>
-        ) : null}
 
         <div className={`actions ${isStepFlow ? "notice-step-actions" : ""}`} style={{ marginTop: 12 }}>
           {isStepFlow ? (

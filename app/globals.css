@@ -683,12 +683,6 @@ textarea {
   grid-column: 2;
 }
 
-.notice-step-grid-placeholder {
-  grid-column: 2;
-  min-height: 1px;
-  pointer-events: none;
-}
-
 .notice-live-preview {
   display: grid;
   gap: 8px;
@@ -2206,10 +2200,6 @@ textarea {
 
   .notice-step-grid-form-column {
     grid-column: auto;
-  }
-
-  .notice-step-grid-placeholder {
-    display: none;
   }
 
   .notice-live-preview {

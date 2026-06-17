@@ -278,8 +278,8 @@ test("globals.css keeps live preview before form columns on desktop and mobile",
   assert.match(source, /\.notice-step-grid-with-preview\s*{[^}]*grid-template-columns:\s*minmax\(560px,\s*0\.92fr\) minmax\(0,\s*1fr\)/s);
   assert.match(source, /\.notice-step-grid:not\(\.notice-step-grid-with-preview\)\s*{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)/s);
   assert.match(source, /\.notice-step-grid-form-column\s*{[^}]*grid-column:\s*2/s);
-  assert.match(source, /\.notice-step-grid-placeholder\s*{[^}]*grid-column:\s*2/s);
-  assert.match(formSource, /notice-step-grid-placeholder/);
+  assert.match(formSource, /isFinalCreateStep \? \([\s\S]*<div className="notice-step-grid-form-column">[\s\S]*<div className="notice-step-review">/);
+  assert.doesNotMatch(formSource, /notice-step-grid-placeholder/);
   assert.match(source, /\.notice-live-preview\s*{[^}]*grid-column:\s*1/s);
   assert.match(source, /@media \(max-width: 760px\)[\s\S]*\.notice-live-preview\s*{[^}]*order:\s*-1/s);
 });
