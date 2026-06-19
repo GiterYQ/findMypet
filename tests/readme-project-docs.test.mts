@@ -1,7 +1,7 @@
 /**
  * README project docs tests
- * 作用：锁定项目交接文档必须包含结构、部署和微信公众号接入方向。
- * 联动：README.md、progress.md。
+ * 作用：锁定项目交接文档必须包含结构、部署、开源协作和微信公众号接入方向。
+ * 联动：README.md、ROADMAP.md、progress.md。
  * 层级：test
  */
 import assert from "node:assert/strict";
@@ -12,6 +12,11 @@ test("README documents project structure production checklist and WeChat directi
   const source = await readFile(new URL("../README.md", import.meta.url), "utf8");
 
   assert.match(source, /## 目录结构/);
+  assert.match(source, /## 开源协作/);
+  assert.match(source, /ROADMAP\.md/);
+  assert.match(source, /CONTRIBUTING\.md/);
+  assert.match(source, /SECURITY\.md/);
+  assert.match(source, /LICENSE/);
   assert.match(source, /## 生产部署清单/);
   assert.match(source, /## 微信公众号接入方向/);
   assert.match(source, /PostgreSQL/);

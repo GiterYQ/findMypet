@@ -1,18 +1,110 @@
-# findMypet 下一阶段任务计划：模板扩展与分步发布流程
+# findMypet 下一阶段任务计划：开源协作与生产化地基
 
 ## 目标
 
-把当前“功能可用”的 H5 工具推进到“用户愿意填、愿意转发、能快速生成好海报”的阶段。
+把当前“本地可演示”的 H5 工具推进到“开源可协作、小范围可试运营”的阶段。
 
-重点解决两个问题：
-- 模板少：用户需要不同传播场景的海报模板，而不是只有一个默认样式。
-- 表单压迫感强：现在字段一次性铺开太多，用户看到会觉得麻烦。
+重点解决三个问题：
+- 仓库开放：外部贡献者需要许可证、贡献说明、Issue/PR 模板、安全披露入口和清晰路线图。
+- 上线地基：当前 SQLite、本地上传、无审核、无限流，不适合直接公开。
+- 继续开发边界：下一步必须先补基础设施和风险控制，避免继续堆平台功能。
 
 ## 当前状态
 
-- 已有匿名创建、分享页、管理页、图片上传、三套海报模板：`classic`、`alert`、`square`。
-- 已支持手机局域网预览：`npm run dev:mobile`。
-- 当前发布表单仍是单页大表单，字段密度高。
+- 已有匿名创建、分享页、管理页、图片上传、5 套海报模板：`classic`、`alert`、`square`、`minimal`、`urgent`。
+- 已支持手机局域网预览、分步发布、实时预览、模板切换、本地草稿、生成后分享引导。
+- 当前 `npm run lint`、`npm test`、`npm run build` 通过。
+- 仍未达到生产公开上线标准：数据库、图片存储、限流、内容审核、HTTPS、商用地图服务和完整本地化都待补。
+
+## 阶段 6：开源仓库基础治理
+
+状态：complete
+
+任务：
+- 新增 `LICENSE`，默认使用 MIT。
+- 新增 `CONTRIBUTING.md`，说明本地运行、开发规范、分支/提交要求和 PR 前验证。
+- 新增 `CODE_OF_CONDUCT.md`，明确社区行为边界。
+- 新增 `SECURITY.md`，说明安全问题披露方式和当前不接受公开利用细节。
+- 新增 `.github/ISSUE_TEMPLATE/*` 和 `.github/pull_request_template.md`。
+- 新增 `ROADMAP.md`，把 P0-P4 后续方向写清楚。
+- 更新 README，增加开源协作入口。
+
+验收：
+- 新贡献者能从 README 找到路线图、贡献指南、安全说明和许可证。
+- Issue/PR 模板能引导贡献者提供复现、截图、测试结果和影响范围。
+- `npm run lint`、`npm test`、`npm run build` 通过。
+
+完成记录：
+- 已新增 MIT `LICENSE`、`CONTRIBUTING.md`、`CODE_OF_CONDUCT.md`、`SECURITY.md`。
+- 已新增 GitHub Issue 模板和 PR 模板。
+- 已新增 `ROADMAP.md`，按 P0-P4 拆分下一步。
+- README 已增加开源协作入口。
+
+## 阶段 7：生产化 P0 地基
+
+状态：pending
+
+任务：
+- SQLite 迁移到 PostgreSQL。
+- 本地 `public/uploads` 替换为对象存储，例如 S3、R2、OSS 或 COS。
+- 增加 create/upload/report/refresh/status/reopen 接口限流。
+- 图片上传接入基础内容审核，至少覆盖鉴黄、暴恐、违规图。
+- 为公开列表和筛选补 Prisma 索引：`moderationState + businessStatus + activityState + priorityScore/lastRefreshedAt`、`regionCode`、`ownerNotificationEmail`。
+- 收紧状态机：`recovered/closed -> active` 必须走 `/reopen`，不能由通用 status patch 绕开。
+- 配置 HTTPS、`APP_BASE_URL`、`CRON_SECRET`、邮件服务和定时任务。
+
+验收：
+- 公开试运营时不会依赖本机文件系统。
+- 上传和举报接口有基础滥用防护。
+- public list 查询路径有明确索引支撑。
+- cron 能稳定推进 stale/archive。
+
+## 阶段 8：发布成功率优化
+
+状态：pending
+
+任务：
+- 生产级反查地址服务或地图选点。
+- 非中国地区手动地址 fallback。
+- AI 照片特征建议作为待确认草稿值。
+- 管理链接邮箱重发。
+- `NoticeForm.tsx` 拆成小组件，降低后续贡献门槛。
+- UI 文案逐步迁移到 `t(key, fallback)`。
+
+验收：
+- 手机 1-2 分钟内可完成有效启事。
+- 定位失败不阻断发布。
+- AI 建议必须由用户确认后才能提交。
+
+## 阶段 9：传播效果优化
+
+状态：pending
+
+任务：
+- 海报二维码或短链。
+- 创建页模板缩略图。
+- 已找回/停止扩散海报状态。
+- 微信、WhatsApp、Telegram、邮件分享文案优化。
+- 基于救助志愿者反馈继续扩展真实模板。
+
+验收：
+- 每张海报都能回流到最新分享页。
+- 旧图传播不会误导用户继续扩散已找回信息。
+
+## 阶段 10：轻协作能力
+
+状态：pending
+
+任务：
+- 协助者 invite link，仅允许 refresh。
+- 举报审核工作流。
+- 基础后台审核页面。
+- 区域聚合页。
+- 埋点事件：创建开始/成功、海报打开/下载、复制分享文案、刷新、找回、举报。
+
+验收：
+- 志愿者能帮助刷新，不接触 owner 核心信息。
+- 举报和审核不需要直接操作数据库。
 
 ## 阶段 1：模板体系产品化
 
@@ -134,7 +226,9 @@
 
 ## 当前优先级
 
-1. 阶段 5：完整预览回归。
+1. 阶段 6：开源仓库基础治理。
+2. 阶段 7：生产化 P0 地基。
+3. 阶段 8：发布成功率优化。
 
 ## 暂不做
 

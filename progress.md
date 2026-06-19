@@ -1,5 +1,27 @@
 # findMypet 进度记录
 
+## 2026-06-19 开源协作与下一步计划
+
+- 完成仓库评价：
+  - 当前是可演示、可本地试用的 MVP。
+  - 生产上线准备度仍不足，主要缺口是数据库、对象存储、限流、图片审核、HTTPS、cron 和商用地图服务。
+- 新增下一阶段路线图：
+  - `ROADMAP.md` 按 P0-P4 拆分开源与生产化地基、发布成功率、传播效果、轻协作和平台扩展。
+- 更新 `task_plan.md`：
+  - 新阶段 6：开源仓库基础治理。
+  - 新阶段 7：生产化 P0 地基。
+  - 新阶段 8：发布成功率优化。
+  - 新阶段 9：传播效果优化。
+  - 新阶段 10：轻协作能力。
+- 新增开源基础文件：
+  - `LICENSE`
+  - `CONTRIBUTING.md`
+  - `CODE_OF_CONDUCT.md`
+  - `SECURITY.md`
+  - `.github/ISSUE_TEMPLATE/*`
+  - `.github/pull_request_template.md`
+- 更新 `README.md`，增加开源协作入口、路线图、贡献指南、安全披露和许可证链接。
+
 ## 2026-06-16
 
 - 创建下一阶段规划文件：`task_plan.md`、`findings.md`、`progress.md`。

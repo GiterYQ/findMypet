@@ -41,6 +41,25 @@ findMypet 当前更接近一个“轻量 notice 系统”，不是单纯海报�
 - Zod
 - Node test runner
 
+## 开源协作
+
+这个仓库计划作为开源项目持续迭代。欢迎围绕真实寻宠/寻主场景提交问题、模板建议、生产化基础设施和用户体验改进。
+
+协作入口：
+
+- 路线图：[`ROADMAP.md`](./ROADMAP.md)
+- 贡献指南：[`CONTRIBUTING.md`](./CONTRIBUTING.md)
+- 行为准则：[`CODE_OF_CONDUCT.md`](./CODE_OF_CONDUCT.md)
+- 安全披露：[`SECURITY.md`](./SECURITY.md)
+- 许可证：[`LICENSE`](./LICENSE)
+
+适合优先贡献的方向：
+
+- 生产化 P0：PostgreSQL、对象存储、限流、上传审核、cron、HTTPS 部署。
+- 发布成功率：定位 fallback、AI 特征建议、管理链接找回、表单组件拆分。
+- 传播效果：海报二维码、模板缩略图、已找回/停止扩散海报、微信分享文案。
+- 开源治理：Issue/PR 模板、CI、文档、示例部署说明。
+
 ## 目录结构
 
 ```text
